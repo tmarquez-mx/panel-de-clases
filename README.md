@@ -62,9 +62,21 @@ Conviene usarlo desde esa dirección y no con doble clic, porque al estar servid
 `https` sí funcionan **Vincular archivo** (guardar en un .json de tu OneDrive
 sincronizado) y **Pegar**, que el navegador bloquea en las páginas locales.
 
-Para volver a publicar después de un cambio: `npm run build` y arrastra la carpeta
-`dist` a https://app.netlify.com/projects/panel-de-clases/deploys, o pídemelo y lo
-subo desde aquí.
+El código vive en **https://github.com/tmarquez-mx/panel-de-clases**, y el sitio está
+conectado a ese repositorio: **cada `git push` a `main` reconstruye y publica solo.**
+No hay que arrastrar carpetas ni tocar el tablero de Netlify.
+
+```bash
+git add -A && git commit -m "lo que cambiaste" && git push
+```
+
+En un minuto el cambio está en línea. El avance se ve en
+https://app.netlify.com/projects/panel-de-clases/deploys, y si una construcción falla,
+el sitio anterior se queda publicado: no se cae.
+
+Los ajustes de construcción no están en el tablero sino en `netlify.toml`, dentro del
+repositorio: comando (`npm run build`), carpeta publicada (`dist`) y versión de Node.
+Así el despliegue es reproducible y cualquier cambio queda en la historia de git.
 
 ## Publicar en GitHub Pages
 
