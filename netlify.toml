@@ -11,7 +11,15 @@
   # construcción de hoy y la de dentro de dos años den lo mismo.
   NODE_VERSION = "20"
 
-# El panel es una sola página: cualquier ruta devuelve el mismo archivo.
+# Guía de uso, independiente del panel: /ayuda.html vive en public/ y Netlify
+# ya la sirve tal cual porque el archivo existe; este alias solo da una URL
+# limpia. Debe ir antes del comodín de abajo.
+[[redirects]]
+  from = "/ayuda"
+  to = "/ayuda.html"
+  status = 200
+
+# El panel es una sola página: cualquier otra ruta devuelve el mismo archivo.
 [[redirects]]
   from = "/*"
   to = "/index.html"

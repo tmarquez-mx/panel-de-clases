@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%20%3Crect%20width='32'%20height='32'%20fill='%23E00034'/%3E%20%3Crect%20x='7.3'%20y='4'%20width='1.4'%20height='24'%20fill='%23FFFFFF'%20opacity='0.45'/%3E%20%3Ccircle%20cx='8'%20cy='7'%20r='3.4'%20fill='%23FFFFFF'/%3E%20%3Ccircle%20cx='8'%20cy='16'%20r='3.4'%20fill='%23FFFFFF'/%3E%20%3Ccircle%20cx='8'%20cy='25'%20r='3.4'%20fill='%23FFFFFF'/%3E%20%3Crect%20x='15'%20y='5.3'%20width='13'%20height='3.4'%20fill='%23FFFFFF'/%3E%20%3Crect%20x='15'%20y='14.3'%20width='13'%20height='3.4'%20fill='%23FFFFFF'/%3E%20%3Crect%20x='15'%20y='23.3'%20width='9'%20height='3.4'%20fill='%23FFFFFF'/%3E%20%3C/svg%3E">
+<title>Guía del Panel de Clases</title>
+<style>
+/* =========================================================
+   Mismos tokens que la aplicación (src/estilos/base.css):
+   paleta institucional IBERO y tipografía de sistema.
+   La app declara color-scheme:light — este documento hereda
+   ese mismo compromiso, sin variante oscura.
+   ========================================================= */
+:root{
+  --rojo:#E00034;
+  --gris:#82786F;
+  --negro:#000000;
+  --blanco:#FFFFFF;
+  --papel:#F4F2F0;
+  --linea:#D6D0CA;
+  --gris-tenue:#6E655D;
+  --texto:"Myriad Pro","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --nav-w:250px;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;padding:0;
+  font-family:var(--texto);
+  background:var(--papel);color:var(--negro);
+  font-size:15.5px;line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--rojo)}
+:focus-visible{outline:2px solid var(--negro);outline-offset:2px}
+ul,ol{margin:0;padding:0;list-style:none}
+p{margin:0 0 .8em}
+p:last-child{margin-bottom:0}
+h1,h2,h3,h4{margin:0;font-weight:700}
+img,svg{max-width:100%}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+}
+
+/* ---------- Masthead (réplica de .barra) ---------- */
+.masthead{background:var(--rojo);color:var(--blanco);padding:16px 26px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.marca{
+  flex:none;font-family:"Times New Roman","Liberation Serif",Times,Georgia,serif;
+  font-size:38px;line-height:1;font-weight:700;letter-spacing:.03em;color:var(--blanco);
+}
+.masthead .titulo{min-width:0}
+.masthead .eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.22em;opacity:.88}
+.masthead h1{font-size:21px;font-weight:700;margin:1px 0 0;letter-spacing:.01em}
+.masthead .der{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn-masthead{
+  border:1px solid rgba(255,255,255,.6);background:transparent;color:var(--blanco);
+  padding:8px 15px;font-size:13px;text-decoration:none;font-family:var(--texto);
+  display:inline-flex;align-items:center;gap:7px;white-space:nowrap;
+}
+.btn-masthead:hover{background:var(--blanco);color:var(--rojo)}
+
+/* ---------- Barra de dirección (marco de las maquetas) ---------- */
+.dirbar{
+  background:#E8E5E1;border:1px solid var(--linea);border-bottom:0;
+  padding:6px 12px;font-family:var(--mono);font-size:11px;color:var(--gris-tenue);
+  display:flex;align-items:center;gap:6px;
+}
+.dirbar .candado{opacity:.7}
+
+/* ---------- Estructura general de la guía ---------- */
+.envoltura{display:flex;align-items:flex-start}
+.nav-lateral{
+  width:var(--nav-w);flex:none;border-right:1px solid var(--linea);
+  padding:24px 16px;background:var(--blanco);
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+}
+.rotulo{font-size:10px;text-transform:uppercase;letter-spacing:.2em;color:var(--gris-tenue);margin:0 0 8px;font-weight:700}
+.nav-lateral .grupo + .grupo{margin-top:24px}
+.nav-lateral a{
+  display:block;border-left:3px solid transparent;padding:6px 9px;margin-bottom:1px;
+  font-size:13px;color:var(--negro);text-decoration:none;
+}
+.nav-lateral a:hover{background:var(--papel)}
+.nav-lateral a.activo{background:var(--papel);border-left-color:var(--rojo);font-weight:700}
+
+.principal{flex:1;min-width:0;padding:0 0 60px}
+
+.seccion{max-width:760px;padding:52px 40px;border-bottom:1px solid var(--linea)}
+.seccion:last-of-type{border-bottom:0}
+
+.cabecera{border-bottom:2px solid var(--negro);padding-bottom:14px;margin-bottom:24px}
+.cabecera .meta{font-size:11px;text-transform:uppercase;letter-spacing:.18em;color:var(--gris-tenue);margin-bottom:6px}
+.cabecera h2{font-size:26px;line-height:1.2}
+.cabecera p{color:var(--gris-tenue);max-width:62ch;font-size:14.5px;margin-top:8px}
+
+h3{font-size:15.5px;margin:0 0 4px}
+.seccion > p{color:var(--negro)}
+
+/* ---------- Riel de pasos (idéntico al riel de recursos de la app) ---------- */
+.riel{position:relative;padding-left:44px;margin:22px 0}
+.riel::before{content:"";position:absolute;left:13px;top:6px;bottom:6px;width:1px;background:var(--linea)}
+.tarjeta{position:relative;margin-bottom:14px;background:var(--blanco);border:1px solid var(--linea);padding:16px 18px}
+.tarjeta::before{content:"";position:absolute;left:-37px;top:20px;width:13px;height:13px;border-radius:50%;background:var(--blanco);border:2px solid var(--rojo)}
+.tarjeta .etiquetas{display:flex;gap:6px;align-items:center;margin-bottom:6px}
+.tarjeta .tipo{font-size:10px;text-transform:uppercase;letter-spacing:.14em;border:1px solid var(--rojo);color:var(--rojo);padding:2px 7px}
+.tarjeta h3{font-size:16px;margin-bottom:4px}
+.tarjeta p{color:var(--gris-tenue);font-size:14px;margin:0}
+
+/* ---------- Cajas de aviso (idénticas a .aviso / .alm-modo) ---------- */
+.nota-caja{border-left:3px solid var(--gris);background:var(--papel);padding:10px 14px;margin:16px 0;font-size:13.5px;color:var(--gris-tenue)}
+.aviso-caja{border-left:3px solid var(--rojo);background:var(--papel);padding:12px 16px;margin:18px 0;font-size:14px;color:var(--negro)}
+.aviso-caja strong{color:var(--negro)}
+.oscuro-caja{background:var(--negro);color:var(--blanco);border-left:4px solid var(--rojo);padding:16px 18px;margin:20px 0;font-size:14.5px;line-height:1.55}
+.oscuro-caja strong{color:var(--blanco)}
+.oscuro-caja a{color:var(--blanco);text-decoration:underline}
+
+code{font-family:var(--mono);font-size:.9em;background:var(--papel);color:var(--negro);padding:1px 5px;border:1px solid var(--linea)}
+kbd{font-family:var(--mono);font-size:.85em;background:var(--blanco);border:1px solid var(--linea);border-bottom-width:2px;padding:1px 6px}
+
+/* ---------- Maquetas (réplicas de la interfaz real) ---------- */
+.maqueta{border:1px solid var(--linea);background:var(--blanco);margin:22px 0;overflow:hidden}
+.maqueta-lienzo{position:relative}
+.maqueta .m-barra{background:var(--rojo);color:var(--blanco);padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.maqueta .m-marca{font-family:"Times New Roman",serif;font-size:22px;font-weight:700}
+.maqueta .m-eyebrow{font-size:9px;text-transform:uppercase;letter-spacing:.18em;opacity:.85}
+.maqueta .m-h1{font-size:13px;font-weight:700}
+.maqueta .m-der{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.maqueta .m-guardado{font-size:9.5px;opacity:.95;display:flex;align-items:center;gap:5px}
+.maqueta .m-guardado .punto{width:6px;height:6px;border:1px solid var(--blanco);background:var(--blanco)}
+.maqueta .m-btn{border:1px solid rgba(255,255,255,.6);background:transparent;color:var(--blanco);padding:5px 9px;font-size:10.5px;white-space:nowrap}
+.maqueta .m-btn.marcado{background:var(--blanco);color:var(--rojo);border-color:var(--blanco)}
+
+.maqueta .m-envoltura{display:flex}
+.maqueta .m-lateral{width:190px;flex:none;border-right:1px solid var(--linea);padding:14px 12px;background:var(--blanco)}
+.maqueta .m-rotulo{font-size:9px;text-transform:uppercase;letter-spacing:.16em;color:var(--gris-tenue);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.maqueta .m-rotulo .m-mas{margin-left:auto;border:1px solid var(--linea);padding:1px 5px;font-size:10px;color:var(--gris-tenue)}
+.maqueta .m-fila{border-left:3px solid transparent;padding:5px 7px;font-size:11.5px;margin-bottom:2px}
+.maqueta .m-fila.activa{background:var(--papel);border-left-color:var(--rojo);font-weight:700}
+.maqueta .m-fila small{display:block;color:var(--gris-tenue);font-size:9.5px;font-weight:400}
+.maqueta .m-principal{flex:1;min-width:0;padding:16px 18px}
+
+.maqueta .m-cabecera{border-bottom:2px solid var(--negro);padding-bottom:9px;margin-bottom:12px}
+.maqueta .m-meta{font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:var(--gris-tenue)}
+.maqueta .m-h2{font-size:15px;margin:3px 0}
+
+.maqueta .m-tarjeta{border:1px solid var(--linea);padding:9px 11px;margin-bottom:6px;font-size:11.5px;background:var(--blanco)}
+.maqueta .m-tarjeta .m-etq{display:flex;align-items:center;gap:6px;margin-bottom:3px}
+.maqueta .m-tipo{font-size:8.5px;text-transform:uppercase;letter-spacing:.1em;border:1px solid var(--gris);color:var(--gris-tenue);padding:1px 5px}
+.maqueta .m-momento{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--gris-tenue)}
+.maqueta .m-tarjeta h4{font-size:12.5px;margin:0 0 2px;font-weight:700}
+.maqueta .m-tarjeta .m-nota{color:var(--gris-tenue);font-size:10.5px}
+
+/* insignias de anotación pedagógica: en línea, nunca se sobreponen al texto */
+.badge{
+  flex:none;width:17px;height:17px;border-radius:50%;background:var(--rojo);color:var(--blanco);
+  font-size:9.5px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;
+  margin-right:6px;
+}
+.leyenda{border-top:1px solid var(--linea);padding:12px 16px;background:var(--papel)}
+.leyenda ol{counter-reset:leyenda}
+.leyenda li{
+  display:flex;gap:10px;font-size:13px;color:var(--negro);margin-bottom:6px;align-items:baseline;
+}
+.leyenda li:last-child{margin-bottom:0}
+.leyenda .num{
+  flex:none;width:18px;height:18px;border-radius:50%;background:var(--rojo);color:var(--blanco);
+  font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:1px;
+}
+.leyenda strong{font-weight:700}
+.leyenda span{color:var(--gris-tenue)}
+
+/* ---------- Diálogo (réplica de dialog/.dlg-*) ---------- */
+.m-dialogo-fondo{background:rgba(0,0,0,.45);padding:26px;display:flex;justify-content:center}
+.m-dialogo{border:1px solid var(--negro);background:var(--blanco);width:100%;max-width:340px;font-size:12px}
+.m-dialogo .m-dlg-cuerpo{padding:16px 18px}
+.m-dialogo h4{font-size:14px;margin:0 0 3px}
+.m-dialogo .m-sub{color:var(--gris-tenue);font-size:11px;margin:0 0 12px}
+.m-dialogo .m-campo{margin-bottom:10px}
+.m-dialogo .m-campo label{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--gris-tenue);margin-bottom:3px;font-weight:700}
+.m-dialogo .m-campo .m-valor{border:1px solid var(--linea);background:var(--papel);padding:6px 9px;font-size:12px}
+.m-dialogo .m-dlg-pie{display:flex;gap:6px;justify-content:flex-end;padding:11px 18px;border-top:1px solid var(--linea);background:var(--papel)}
+.m-mini{border:1px solid var(--linea);background:var(--blanco);padding:5px 10px;font-size:11px;white-space:nowrap}
+.m-mini.solido{background:var(--rojo);border-color:var(--rojo);color:var(--blanco)}
+
+.m-dlg-opcion{border:1px solid var(--linea);padding:8px 10px;margin-bottom:6px;font-size:11.5px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.m-dlg-opcion.marcada{border-color:var(--rojo)}
+
+/* ---------- alm-copias ---------- */
+.m-copia{display:flex;align-items:center;gap:10px;border-top:1px solid var(--linea);padding:9px 0;font-size:11.5px}
+.m-copia:first-child{border-top:0}
+.m-copia .m-cuando{font-family:var(--mono);font-size:10px;color:var(--gris-tenue);flex:none;width:96px}
+.m-copia .m-que{flex:1;color:var(--gris-tenue)}
+.m-copia.nueva{background:var(--papel)}
+
+/* ---------- Modo clase (réplica) ---------- */
+.m-modoclase{background:var(--negro);color:var(--blanco);padding:22px 26px;min-height:220px;display:flex;flex-direction:column}
+.m-mc-progreso{display:flex;gap:4px;margin-bottom:18px}
+.m-mc-progreso span{height:3px;flex:1;background:rgba(255,255,255,.22)}
+.m-mc-progreso span.hecho{background:var(--rojo)}
+.m-mc-cabeza{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.m-mc-eyebrow{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--rojo);font-family:var(--mono)}
+.m-mc-reloj{
+  margin-left:auto;font-family:var(--mono);font-size:11px;letter-spacing:.03em;color:#CFC9C3;
+  border:1px solid rgba(255,255,255,.28);padding:3px 9px;white-space:nowrap;
+}
+.m-mc-reloj[data-situacion="tarde"]{color:var(--blanco);border-color:var(--rojo);background:var(--rojo)}
+.m-mc-reloj[data-situacion="adelante"]{color:#9A928B}
+.m-modoclase h4{font-size:22px;margin:10px 0 8px;line-height:1.15}
+.m-modoclase .m-nota{font-size:13px;color:#CFC9C3;max-width:46ch}
+.m-modoclase .m-ruta{color:#9A928B;font-family:var(--mono);font-size:10.5px;margin-top:10px;display:block}
+.m-mc-pie{margin-top:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding-top:16px}
+.m-mc-pie .m-btn2{border:1px solid rgba(255,255,255,.5);background:none;color:var(--blanco);padding:5px 10px;font-size:11px}
+.m-mc-tecla{font-family:var(--mono);font-size:10px;color:#8C847D;margin-left:auto}
+
+/* ---------- Aviso flotante ---------- */
+.m-aviso-flot{
+  display:inline-flex;align-items:center;gap:12px;background:var(--negro);color:var(--blanco);
+  border-left:4px solid var(--rojo);padding:10px 10px 10px 13px;font-size:12.5px;max-width:100%;
+}
+.m-aviso-flot .m-btn2{border:1px solid rgba(255,255,255,.55);background:none;color:var(--blanco);padding:4px 10px;font-size:11.5px;white-space:nowrap}
+
+/* ---------- Cuadrícula de tarjetas simples ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin:20px 0}
+.grid .item{border:1px solid var(--linea);padding:13px 15px;background:var(--blanco)}
+.grid .item h4{font-size:13.5px;margin-bottom:4px}
+.grid .item p{color:var(--gris-tenue);font-size:12.5px;margin:0}
+
+/* ---------- FAQ ---------- */
+details{border:1px solid var(--linea);margin-bottom:8px;background:var(--blanco)}
+summary{padding:12px 16px;cursor:pointer;font-weight:700;font-size:14px;list-style:none;display:flex;justify-content:space-between;gap:12px;align-items:center}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";color:var(--rojo);font-size:16px;font-weight:400}
+details[open] summary::after{content:"–"}
+details[open] summary{border-bottom:1px solid var(--linea)}
+.resp{padding:11px 16px 15px;font-size:13.5px;color:var(--gris-tenue)}
+.resp p{margin:0 0 8px}
+
+/* ---------- Pleca de crédito ---------- */
+.pleca{background:var(--rojo);color:var(--blanco);padding:13px 20px;text-align:center;font-size:12.5px;letter-spacing:.04em}
+.pleca a{color:var(--blanco)}
+
+/* ---------- Responsivo ---------- */
+@media (max-width:880px){
+  .envoltura{flex-direction:column}
+  .nav-lateral{position:static;width:100%;height:auto;border-right:0;border-bottom:1px solid var(--linea)}
+  .seccion{padding:36px 20px;max-width:none}
+  .maqueta .m-envoltura{flex-direction:column}
+  .maqueta .m-lateral{width:100%;border-right:0;border-bottom:1px solid var(--linea)}
+  .riel{padding-left:30px}
+  .riel::before{left:7px}
+  .tarjeta::before{left:-30px}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================ -->
+<header class="masthead">
+  <span class="marca">IBERO</span>
+  <div class="titulo">
+    <div class="eyebrow">Guía del artefacto epistémico</div>
+    <h1>Panel de clases</h1>
+  </div>
+  <div class="der">
+    <a class="btn-masthead" href="/" target="_blank" rel="noopener">Abrir el panel ↗</a>
+  </div>
+</header>
+
+<div class="envoltura">
+<nav class="nav-lateral" aria-label="Contenido de la guía">
+  <div class="grupo">
+    <p class="rotulo">Empezar</p>
+    <a href="#que-es">Qué es el Panel</a>
+    <a href="#abrirlo">Cómo abrirlo</a>
+    <a href="#organizacion">Cómo está organizado</a>
+  </div>
+  <div class="grupo">
+    <p class="rotulo">Planear</p>
+    <a href="#materias-sesiones">Materias y sesiones</a>
+    <a href="#recursos">Recursos de cada sesión</a>
+  </div>
+  <div class="grupo">
+    <p class="rotulo">Guardar</p>
+    <a href="#como-guarda">Cómo se guarda tu trabajo</a>
+    <a href="#onedrive">Vincular con OneDrive</a>
+    <a href="#respaldos">Copias de seguridad</a>
+  </div>
+  <div class="grupo">
+    <p class="rotulo">En clase</p>
+    <a href="#modo-clase">Modo clase</a>
+  </div>
+  <div class="grupo">
+    <p class="rotulo">Más</p>
+    <a href="#otras-herramientas">Otras herramientas</a>
+    <a href="#preguntas">Preguntas frecuentes</a>
+  </div>
+</nav>
+
+<main class="principal">
+
+<!-- ============================================================ -->
+<section class="seccion" id="que-es">
+  <div class="cabecera">
+    <div class="meta">Antes de empezar</div>
+    <h2>Qué es el Panel de clases</h2>
+    <p>Un solo lugar para planear cada sesión, guardar las ligas que vas a usar y presentarlas en pantalla completa el día de la clase — sin depender de una carpeta con veinte pestañas abiertas.</p>
+  </div>
+
+  <p>El Panel organiza tu trabajo en tres niveles: <strong>materias</strong>, que contienen <strong>sesiones</strong>, que contienen <strong>recursos</strong> (ligas, lecturas, actividades, notas). Cada cambio se guarda solo — no hay botón de «Guardar».</p>
+
+  <div class="oscuro-caja">
+    <strong>Dirección del Panel:</strong> <a href="/" target="_blank" rel="noopener">panel-de-clases.netlify.app</a><br>
+    Guárdala en tus favoritos. No se instala nada: es una página que abres en el navegador, igual en la oficina que en el salón.
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section class="seccion" id="abrirlo">
+  <div class="cabecera">
+    <div class="meta">Requisito</div>
+    <h2>Ábrelo en Chrome o Edge</h2>
+    <p>El Panel usa una función del navegador para leer y escribir directamente en un archivo tuyo — hoy solo la tienen Chrome y Edge. En Safari o Firefox el Panel abre, pero sin esa función: solo guarda en el navegador (más abajo se explica qué significa eso).</p>
+  </div>
+
+  <ol class="riel">
+    <li class="tarjeta">
+      <div class="etiquetas"><span class="tipo">Paso 1</span></div>
+      <h3>Abre Chrome o Edge</h3>
+      <p>Ambos son gratuitos y ya suelen venir instalados en los equipos de la universidad.</p>
+    </li>
+    <li class="tarjeta">
+      <div class="etiquetas"><span class="tipo">Paso 2</span></div>
+      <h3>Ve a panel-de-clases.netlify.app</h3>
+      <p>Escríbelo en la barra de direcciones, tal cual, sin «www».</p>
+    </li>
+    <li class="tarjeta">
+      <div class="etiquetas"><span class="tipo">Paso 3</span></div>
+      <h3>Verás una sesión de ejemplo</h3>
+      <p>Está ahí para que recorras la interfaz. Edítala o bórrala cuando quieras empezar con tu propia materia.</p>
+    </li>
+  </ol>
+</section>
+
+<!-- ============================================================ -->
+<section class="seccion" id="organizacion">
+  <div class="cabecera">
+    <div class="meta">Cómo está organizado</div>
+    <h2>Materias, sesiones y recursos</h2>
+    <p>Así se ve la pantalla principal la primera vez que la abres.</p>
+  </div>
+
+  <div class="maqueta">
+    <div class="dirbar"><span class="candado">🔒</span> panel-de-clases.netlify.app</div>
+    <div class="maqueta-lienzo">
+      <div class="m-barra">
+        <span class="m-marca">IBERO</span>
+        <div><div class="m-eyebrow">Artefacto epistémico</div><div class="m-h1">Panel de clases</div></div>
+        <div class="m-der">
+          <span class="m-guardado"><span class="punto"></span>Guardado 10:32 en este navegador</span>
+          <span class="m-btn">Vincular archivo</span>
+        </div>
+      </div>
+      <div class="m-envoltura">
+        <div class="m-lateral">
+          <p class="m-rotulo"><span class="badge">1</span>Materias <span class="m-mas">+ Materia</span></p>
+          <div class="m-fila activa">Comunicación oral<small>Posgrado · Otoño 2026</small></div>
+          <div class="m-fila">Redacción avanzada<small>Posgrado · Otoño 2026</small></div>
+          <p class="m-rotulo" style="margin-top:14px"><span class="badge">2</span>Sesión vigente <span class="m-mas">+ Sesión</span></p>
+          <div class="m-fila activa">Sesión 01<small>Mar. 1 sep. 2026</small></div>
+          <div class="m-fila">Sesión 02<small>Mar. 8 sep. 2026</small></div>
+        </div>
+        <div class="m-principal">
+          <div class="m-cabecera">
+            <div class="m-meta">Sesión 01 · martes, 1 de septiembre</div>
+            <div class="m-h2"><span class="badge">3</span>Cómo está armado este panel</div>
+          </div>
+          <div class="m-tarjeta">
+            <div class="m-etq"><span class="m-tipo">liga</span><span class="m-momento">0:00–0:10</span></div>
+            <h4>Recurso con liga web</h4>
+            <p class="m-nota">Las ligas https abren en otra pestaña.</p>
+          </div>
+          <div class="m-tarjeta">
+            <div class="m-etq"><span class="m-tipo">actividad</span><span class="m-momento">0:30–0:50</span></div>
+            <h4>Actividad sin liga</h4>
+            <p class="m-nota">No todo recurso necesita archivo.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="leyenda">
+      <ol>
+        <li><span class="num">1</span><div><strong>Materias</strong> <span>— tus cursos del semestre, en la columna izquierda.</span></div></li>
+        <li><span class="num">2</span><div><strong>Sesiones</strong> <span>— cada clase de esa materia, debajo de sus materias.</span></div></li>
+        <li><span class="num">3</span><div><strong>Recursos</strong> <span>— lo que usarás en esa clase, a la derecha, ordenados por minuto.</span></div></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section class="seccion" id="materias-sesiones">
+  <div class="cabecera">
+    <div class="meta">Planear</div>
+    <h2>Crea tus materias y sesiones</h2>
+    <p>Una materia por curso. Dentro, una sesión por clase.</p>
+  </div>
+
+  <h3 style="margin-top:4px">Nueva materia</h3>
+  <ol class="riel">
+    <li class="tarjeta">
+      <div class="etiquetas"><span class="tipo">Paso 1</span></div>
+      <h3>Haz clic en «+ Materia»</h3>
+      <p>Está junto al encabezado «Materias», arriba de la columna izquierda.</p>
+    </li>
+    <li class="tarjeta">
+      <div class="etiquetas"><span class="tipo">Paso 2</span></div>
+      <h3>Completa nombre, nivel y periodo</h3>
+      <p>Por ejemplo: nombre «Comunicación oral», y en «Nivel y periodo» algo como <code>Posgrado · Otoño 2026</code>. Puedes agregar también la carpeta de OneDrive del curso y el cuaderno de OneNote, si ya los tienes — quedan como enlaces fijos junto a la materia.</p>
+    </li>
+    <li class="tarjeta">
+      <div class="etiquetas"><span class="tipo">Paso 3</span></div>
+      <h3>Guarda</h3>
+      <p>La materia aparece de inmediato en la lista, lista para recibir sesiones.</p>
+    </li>
+  </ol>
+
+  <h3>Nueva sesión</h3>
+  <ol class="riel">
+    <li class="tarjeta">
+      <div class="etiquetas"><span class="tipo">Paso 1</span></div>
+      <h3>Selecciona la materia</h3>
+      <p>Haz clic en su nombre en la columna izquierda.</p>
+    </li>
+    <li class="tarjeta">
+      <div class="etiquetas"><span class="tipo">Paso 2</span></div>
+      <h3>Haz clic en «+ Sesión»</h3>
+      <p>Escribe número, fecha, título y el propósito de esa clase.</p>
+    </li>
+    <li class="tarjeta">
+      <div class="etiquetas"><span class="tipo">Paso 3</span></div>
+      <h3>Guarda — las sesiones se ordenan solas por fecha</h3>
+      <p>No importa en qué orden las captures, siempre aparecerán cronológicamente.</p>
+    </li>
+  </ol>
+
+  <div class="nota-caja">
+    <strong>¿Varias clases con la misma estructura?</strong> Usa <em>Duplicar sesión</em> (en los botones de la cabecera de cada sesión): copia todos sus recursos, en el mismo orden, con el estado reiniciado a pendiente. Solo la bitácora no se copia.
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section class="seccion" id="recursos">
+  <div class="cabecera">
+    <div class="meta">Planear</div>
+    <h2>Recursos de cada sesión</h2>
+    <p>Un recurso es cualquier cosa que uses en esa clase: una liga, una lectura, una actividad, una nota para ti misma.</p>
+  </div>
+
+  <ol class="riel">
+    <li class="tarjeta">
+      <div class="etiquetas"><span class="tipo">Paso 1</span></div>
+      <h3>Haz clic en «Agregar recurso»</h3>
+      <p>Está en la barra de controles, encima del listado de recursos de la sesión.</p>
+    </li>
+    <li class="tarjeta">
+      <div class="etiquetas"><span class="tipo">Paso 2</span></div>
+      <h3>Escribe el título y elige el tipo</h3>
+      <p>El tipo es libre: puedes usar los que ya existan (liga, lectura, actividad, video, presentación…) o escribir uno nuevo propio de tu materia — «rúbrica», «examen», lo que necesites.</p>
+    </li>
+    <li class="tarjeta">
+      <div class="etiquetas"><span class="tipo">Paso 3</span></div>
+      <h3>Indica el momento de la sesión</h3>
+      <p>Escribe el minuto, por ejemplo <code>0:15–0:40</code>. El recurso se acomoda solo en ese punto de la clase; lo que no lleva minuto se queda junto al recurso al que sigue. También puedes reordenar a mano con <em>Subir</em> y <em>Bajar</em>, o cambiarlo de sesión con <em>Mover a…</em></p>
+    </li>
+    <li class="tarjeta">
+      <div class="etiquetas"><span class="tipo">Paso 4</span></div>
+      <h3>Pega la liga de OneDrive</h3>
+      <p>En OneDrive: clic derecho sobre el archivo → <em>Compartir</em> → <em>Copiar vínculo</em>. Si el archivo todavía no existe, los botones <em>Word</em>, <em>PowerPoint</em>, <em>Excel</em> y <em>Cuaderno OneNote</em> lo crean en blanco y dejan el formulario abierto para pegar su liga después.</p>
+    </li>
+  </ol>
+
+  <p>Así se ve un recurso ya guardado, con sus acciones:</p>
+
+  <div class="maqueta" style="max-width:460px">
+    <div class="maqueta-lienzo" style="padding:16px">
+      <div class="m-tarjeta" style="font-size:13px">
+        <div class="m-etq" style="margin-bottom:6px"><span class="badge">1</span><span class="m-tipo" style="font-size:10px">liga</span><span class="badge" style="margin-left:8px">2</span><span class="m-momento" style="font-size:11px;margin-left:0">0:00–0:10</span></div>
+        <h4 style="font-size:14.5px">Recurso con liga web</h4>
+        <p class="m-nota" style="font-size:12px;margin-bottom:8px">Las ligas https abren en otra pestaña y entran en «Abrir todo».</p>
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <span class="badge">3</span>
+          <span class="m-mini" style="font-size:10.5px">Abrir</span>
+          <span class="m-mini" style="font-size:10.5px">Copiar liga</span>
+          <span class="m-mini" style="font-size:10.5px">Marcar como usado</span>
+          <span class="m-mini" style="font-size:10.5px">Subir</span>
+          <span class="m-mini" style="font-size:10.5px">Bajar</span>
+          <span class="m-mini" style="font-size:10.5px">Mover a…</span>
+          <span class="m-mini" style="font-size:10.5px">Editar</span>
+          <span class="m-mini" style="font-size:10.5px">Quitar</span>
+        </div>
+      </div>
+    </div>
+    <div class="leyenda">
+      <ol>
+        <li><span class="num">1</span><div><strong>Tipo</strong> <span>— libre, lo defines tú.</span></div></li>
+        <li><span class="num">2</span><div><strong>Momento</strong> <span>— minuto de la clase; ordena el recurso automáticamente.</span></div></li>
+        <li><span class="num">3</span><div><strong>Acciones</strong> <span>— abrir, marcar como usado, mover, editar o quitar.</span></div></li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="nota-caja">
+    Un punto en la línea del tiempo se pinta de rojo cuando el recurso está <strong>listo</strong>, y en negro (con la tarjeta atenuada) cuando ya lo marcaste como <strong>usado</strong> — te ayuda a ver de un vistazo qué falta en la sesión.
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section class="seccion" id="como-guarda">
+  <div class="cabecera">
+    <div class="meta">Guardar</div>
+    <h2>Cómo se guarda tu trabajo</h2>
+    <p>No hay botón de guardar: cada cambio se guarda solo. Lo que cambia es <em>dónde</em> queda guardado.</p>
+  </div>
+
+  <div class="grid">
+    <div class="item">
+      <h4>En este navegador <span style="color:var(--gris-tenue);font-weight:400">(automático)</span></h4>
+      <p>Al abrir el Panel sin hacer nada más, cada cambio se guarda en este navegador y esta computadora. No viaja a ningún servidor — y tampoco a tu otra computadora.</p>
+    </div>
+    <div class="item" style="border-color:var(--rojo)">
+      <h4 style="color:var(--rojo)">Archivo vinculado <span style="color:var(--gris-tenue);font-weight:400">(recomendado)</span></h4>
+      <p>Vinculas un archivo <code>.json</code> propio y el Panel escribe ahí cada cambio, además de dejar una copia en el navegador. Es la base de la sección de OneDrive, más abajo.</p>
+    </div>
+    <div class="item">
+      <h4>Sin guardado <span style="color:var(--gris-tenue);font-weight:400">(poco común)</span></h4>
+      <p>Solo ocurre si el navegador bloquea el almacenamiento local. El Panel te avisa; en ese caso, usa <em>Guardar respaldo</em> antes de cerrar la pestaña.</p>
+    </div>
+  </div>
+
+  <p>El estado actual siempre se ve en la pastilla junto a los botones, arriba a la derecha:</p>
+  <div class="maqueta" style="max-width:420px">
+    <div style="background:var(--rojo);padding:10px 14px">
+      <span style="color:#fff;font-size:11.5px;display:flex;align-items:center;gap:6px"><span style="width:7px;height:7px;background:#fff;border:1px solid #fff;display:inline-block"></span>Guardado 10:32 en panel-de-clases.json</span>
+    </div>
+  </div>
+
+  <div class="nota-caja">
+    Con «Guardar respaldo» descargas todo el Panel como <code>.json</code>, y con «Importar respaldo» lo cargas en otra computadora. Es la forma de pasar tus datos si no puedes vincular un archivo — pero hacerlo a mano cada vez es justo lo que <a href="#onedrive">vincular con OneDrive</a> evita.
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section class="seccion" id="onedrive">
+  <div class="cabecera">
+    <div class="meta">Guardar · recomendado</div>
+    <h2>Vincular tu archivo con OneDrive</h2>
+    <p>Esto es lo único que necesitas configurar una vez. Después, el Panel guarda solo, y tu planeación te sigue a cualquier computadora con acceso a tu OneDrive.</p>
+  </div>
+
+  <ol class="riel">
+    <li class="tarjeta">
+      <div class="etiquetas"><span class="tipo">Paso 1</span></div>
+      <h3>Abre el Panel en Chrome o Edge</h3>
+      <p><a href="/" target="_blank" rel="noopener">panel-de-clases.netlify.app</a></p>
+    </li>
+    <li class="tarjeta">
+      <div class="etiquetas"><span class="tipo">Paso 2</span></div>
+      <h3>Haz clic en «Vincular archivo»</h3>
+      <p>No es un ícono: es el primer botón de texto, arriba a la derecha, junto a «Importar respaldo» y «Guardar respaldo».</p>
+    </li>
+    <li class="tarjeta">
+      <div class="etiquetas"><span class="tipo">Paso 3</span></div>
+      <h3>Elige «Vincular archivo nuevo»</h3>
+      <p>Se abre una ventana titulada «Dónde se guardan tus datos», con varias opciones — esta es la que empieza a escribir en un archivo tuyo.</p>
+    </li>
+    <li class="tarjeta">
+      <div class="etiquetas"><span class="tipo">Paso 4</span></div>
+      <h3>Navega hasta tu carpeta de OneDrive</h3>
+      <p>Se abre el selector de archivos normal de tu sistema. Busca <strong>la misma carpeta de OneDrive donde ya guardas los materiales de este curso</strong> — lecturas, presentaciones, lo que sea.</p>
+    </li>
+    <li class="tarjeta">
+      <div class="etiquetas"><span class="tipo">Paso 5</span></div>
+      <h3>Nombra el archivo y guarda</h3>
+      <p>Por ejemplo <code>panel-de-clases.json</code>. La pastilla de estado cambiará a «Guardado… en panel-de-clases.json»: listo.</p>
+    </li>
+  </ol>
+
+  <p>Así se ve la ventana del paso 3:</p>
+  <div class="maqueta" style="max-width:420px">
+    <div class="maqueta-lienzo">
+      <div class="m-dialogo-fondo">
+        <div class="m-dialogo">
+          <div class="m-dlg-cuerpo">
+            <h4>Dónde se guardan tus datos</h4>
+            <p class="m-sub" style="margin-bottom:10px">Ahora mismo el Panel guarda en este navegador.</p>
+            <div class="m-dlg-opcion marcada" style="display:flex;align-items:center;justify-content:flex-start"><span class="badge">1</span>Vincular archivo nuevo</div>
+            <div class="m-dlg-opcion">Abrir archivo existente</div>
+            <div class="m-dlg-opcion">Desvincular</div>
+          </div>
+          <div class="m-dlg-pie">
+            <span class="m-mini">Cerrar</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="leyenda">
+      <ol>
+        <li><span class="num">1</span><div><strong>Vincular archivo nuevo</strong> <span>— crea el .json y empieza a escribir en él desde ahora.</span></div></li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="oscuro-caja">
+    <strong>Por qué guardarlo en la MISMA carpeta de tus materiales.</strong> Si <code>panel-de-clases.json</code> vive dentro de la carpeta de OneDrive que ya usas para este curso, tu planeación deja de estar atada a una sola computadora. En la del salón de clases, en la de tu oficina o en cualquiera de las salas de profesores: abres <a href="/" target="_blank" rel="noopener">panel-de-clases.netlify.app</a>, entras a «Vincular archivo» → «Abrir archivo existente», y eliges ese mismo archivo dentro de tu OneDrive. Verás tu planeación completa, tal como la dejaste — sin copiar nada a mano.
+  </div>
+
+  <h3>En una computadora nueva: «Abrir archivo existente»</h3>
+  <p>Es la opción de al lado. Elige el <code>.json</code> que ya vinculaste desde tu OneDrive y el Panel carga todo lo que tenías. Si dos computadoras editaron el archivo por separado, el Panel se queda con la versión más reciente.</p>
+
+  <div class="nota-caja">
+    De vez en cuando el navegador vuelve a pedir permiso sobre el archivo vinculado — es normal, una medida de seguridad del propio navegador, no un error del Panel. Cuando pase, entra a «Vincular archivo» y usa el botón <strong>Reconectar</strong>.
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section class="seccion" id="respaldos">
+  <div class="cabecera">
+    <div class="meta">Guardar</div>
+    <h2>Copias de seguridad</h2>
+    <p>Además de tu archivo, el Panel archiva por su cuenta las últimas tres versiones: una al abrir, y una antes de cada operación que sustituye todo (abrir otro archivo, importar un respaldo, restaurar una copia).</p>
+  </div>
+
+  <p>Estas copias aparecen al final de la misma ventana «Dónde se guardan tus datos»:</p>
+
+  <div class="maqueta" style="max-width:480px">
+    <div style="padding:14px 16px">
+      <h4 style="font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:var(--gris-tenue);margin-bottom:6px">Copias de seguridad</h4>
+      <div class="m-copia nueva">
+        <span class="m-cuando">Hoy, 10:32</span>
+        <span class="m-que">al abrir el panel · 2 materias, 5 sesiones</span>
+        <span class="m-mini">Restaurar</span>
+      </div>
+      <div class="m-copia">
+        <span class="m-cuando">Ayer, 18:10</span>
+        <span class="m-que">antes de importar un respaldo · 2 materias, 5 sesiones</span>
+        <span class="m-mini">Restaurar</span>
+      </div>
+      <div class="m-copia">
+        <span class="m-cuando">Ayer, 09:05</span>
+        <span class="m-que">al abrir el panel · 2 materias, 4 sesiones</span>
+        <span class="m-mini">Restaurar</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="nota-caja">
+    «Restaurar» sustituye lo que hay ahora — pero antes archiva el estado actual como una copia más, así que nunca pierdes la versión de la que partiste.
+  </div>
+
+  <p>Estas copias viven en el navegador, no en OneDrive: si abres el Panel en otra computadora no las vas a encontrar ahí. Por eso son un respaldo <em>local</em>, complementario a tener el archivo vinculado — no un sustituto.</p>
+</section>
+
+<!-- ============================================================ -->
+<section class="seccion" id="modo-clase">
+  <div class="cabecera">
+    <div class="meta">En clase</div>
+    <h2>Modo clase</h2>
+    <p>Pantalla completa, un recurso a la vez, con un reloj que compara el tiempo real contra el minuto planeado.</p>
+  </div>
+
+  <ol class="riel">
+    <li class="tarjeta">
+      <div class="etiquetas"><span class="tipo">Paso 1</span></div>
+      <h3>Selecciona la sesión del día y haz clic en «Modo clase»</h3>
+      <p>Es el botón rojo, en la barra de controles de la sesión.</p>
+    </li>
+    <li class="tarjeta">
+      <div class="etiquetas"><span class="tipo">Paso 2</span></div>
+      <h3>Navega con las flechas del teclado</h3>
+      <p>← → para moverte entre recursos, «Abrir recurso» para abrir su liga en otra pestaña sin salir de esta pantalla.</p>
+    </li>
+    <li class="tarjeta">
+      <div class="etiquetas"><span class="tipo">Paso 3</span></div>
+      <h3>Sal con <kbd>Esc</kbd></h3>
+      <p>O con el botón «Salir», al fondo.</p>
+    </li>
+  </ol>
+
+  <p>El reloj de abajo funciona de verdad — dale «Iniciar» y observa cómo cambia cuando el tiempo real se aleja del minuto planeado del recurso (0:00–0:10):</p>
+
+  <div class="maqueta">
+    <div class="m-modoclase" id="demo-mc">
+      <div class="m-mc-progreso">
+        <span class="hecho"></span><span></span><span></span>
+      </div>
+      <div class="m-mc-cabeza">
+        <span class="m-mc-eyebrow" id="mc-eyebrow">liga · 0:00–0:10 · 1 de 3</span>
+        <span class="m-mc-reloj" id="mc-reloj" data-situacion="normal">0:00 de sesión</span>
+      </div>
+      <h4 id="mc-titulo">Recurso con liga web</h4>
+      <p class="m-nota" id="mc-nota">Las ligas https abren en otra pestaña y entran en «Abrir todo».</p>
+      <span class="m-ruta">https://example.org/lectura</span>
+      <div class="m-mc-pie">
+        <span class="m-btn2">Anterior</span>
+        <span class="m-btn2">Abrir recurso</span>
+        <span class="m-btn2">Siguiente</span>
+        <span class="m-btn2">Salir</span>
+        <span class="m-mc-tecla">← → para navegar · Esc para salir</span>
+      </div>
+    </div>
+    <div class="leyenda">
+      <button type="button" class="m-mini solido" id="btn-mc-play" style="cursor:pointer">▶ Iniciar el reloj</button>
+      <span style="font-size:12px;color:var(--gris-tenue);margin-left:10px">Simulación acelerada — 1 minuto real ≈ 2 segundos aquí</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section class="seccion" id="otras-herramientas">
+  <div class="cabecera">
+    <div class="meta">Más</div>
+    <h2>Otras herramientas</h2>
+    <p>El resto de los botones de la barra de controles y del encabezado de cada sesión.</p>
+  </div>
+
+  <div class="grid">
+    <div class="item">
+      <h4>Ordenar por minutos</h4>
+      <p>Acomoda de golpe todos los recursos de la sesión según el minuto que declara cada uno.</p>
+    </div>
+    <div class="item">
+      <h4>Abrir todo</h4>
+      <p>Abre en pestañas todas las ligas web de la sesión, en orden.</p>
+    </div>
+    <div class="item">
+      <h4>Revisar enlaces</h4>
+      <p>Busca ligas vacías, rutas locales (<code>file://</code>, que no abren en otra computadora) y ligas mal formadas en toda la materia.</p>
+    </div>
+    <div class="item">
+      <h4>Vista de semestre</h4>
+      <p>Todas las sesiones del curso en una tabla, con fecha y número de recursos — para revisar el temario completo de un vistazo.</p>
+    </div>
+    <div class="item">
+      <h4>Imprimir guion</h4>
+      <p>Imprime la sesión activa como guion de papel, sin botones ni interfaz.</p>
+    </div>
+    <div class="item">
+      <h4>Exportar a Markdown</h4>
+      <p>Descarga la materia activa en texto plano: sesiones, recursos, ligas, notas y bitácoras.</p>
+    </div>
+    <div class="item">
+      <h4>Plantilla del curso</h4>
+      <p>Como la anterior, pero sin ligas ni bitácoras — para compartir tu planeación sin exponer tus URLs privadas.</p>
+    </div>
+    <div class="item">
+      <h4>Nueva nota en Word</h4>
+      <p>Abre un Word en blanco y deja listo el formulario de recurso para pegar su liga en cuanto lo guardes.</p>
+    </div>
+  </div>
+
+  <p>Si borraste algo por error, aparece un aviso abajo a la izquierda con la opción de deshacer:</p>
+  <div class="maqueta" style="padding:16px;background:var(--papel)">
+    <div class="m-aviso-flot">
+      <span>Se eliminó la sesión «Sesión 02».</span>
+      <span class="m-btn2">Deshacer</span>
+    </div>
+  </div>
+  <div class="nota-caja">Tienes unos segundos antes de que el aviso desaparezca solo.</div>
+</section>
+
+<!-- ============================================================ -->
+<section class="seccion" id="preguntas">
+  <div class="cabecera">
+    <div class="meta">Más</div>
+    <h2>Preguntas frecuentes</h2>
+  </div>
+
+  <details>
+    <summary>¿El Panel funciona sin internet?</summary>
+    <div class="resp"><p>Una vez cargada la página, sí. Pero si tu archivo vinculado está en OneDrive, necesitas conexión para que OneDrive sincronice esos cambios hacia tus otras computadoras.</p></div>
+  </details>
+
+  <details>
+    <summary>¿Por qué me vuelve a pedir permiso sobre el archivo?</summary>
+    <div class="resp"><p>Es el propio navegador, no el Panel: por seguridad, Chrome y Edge piden confirmar el acceso cada cierto tiempo. Se resuelve con el botón <strong>Reconectar</strong> dentro de «Vincular archivo».</p></div>
+  </details>
+
+  <details>
+    <summary>Cerré la pestaña sin vincular archivo. ¿Perdí mi planeación?</summary>
+    <div class="resp"><p>No: si estabas en modo «navegador», tus datos siguen guardados en este navegador y esta computadora. Ábrelo de nuevo en el mismo Chrome o Edge y ahí van a estar. Si no aparecen, revisa las <a href="#respaldos">copias de seguridad</a>.</p></div>
+  </details>
+
+  <details>
+    <summary>¿Puedo usar el mismo archivo desde varias computadoras?</summary>
+    <div class="resp"><p>Sí — es justo el punto de <a href="#onedrive">vincularlo dentro de tu carpeta de OneDrive</a>. En cada computadora usas «Vincular archivo» → «Abrir archivo existente» y eliges ese mismo .json.</p></div>
+  </details>
+
+  <details>
+    <summary>¿Mis ligas de OneDrive son privadas?</summary>
+    <div class="resp"><p>Sí, el Panel no las envía a ningún servidor. Pero los respaldos <code>.json</code> sí las incluyen, con sus claves de uso compartido — no subas ese archivo a un repositorio abierto ni lo compartas fuera de tu OneDrive institucional.</p></div>
+  </details>
+
+  <details>
+    <summary>¿Por qué una liga aparece marcada como «ruta local»?</summary>
+    <div class="resp"><p>Porque empieza con <code>file://</code>: apunta al disco de una sola computadora y no abre desde el navegador en ninguna otra. Súbela a OneDrive y sustituye la liga por la que te da «Copiar vínculo».</p></div>
+  </details>
+
+  <div class="aviso-caja" style="margin-top:28px">
+    <strong>¿Alguna duda que no esté aquí?</strong> Escribe a <a href="mailto:teresa.marquez@ibero.mx">teresa.marquez@ibero.mx</a>.
+  </div>
+</section>
+
+</main>
+</div>
+
+<footer class="pleca">
+  Diseñado por Teresa Márquez y desarrollado mediante vibecoding con Claude Opus 5. Agosto, 2026.
+</footer>
+
+<script>
+/* ---- scroll-spy ---- */
+(function(){
+  const enlaces = Array.from(document.querySelectorAll('.nav-lateral a'));
+  const secciones = enlaces.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const id = e.target.id;
+        enlaces.forEach(a => a.classList.toggle('activo', a.getAttribute('href') === '#' + id));
+      }
+    });
+  }, { rootMargin: '-15% 0px -65% 0px' });
+  secciones.forEach(s => obs.observe(s));
+})();
+
+/* ---- reloj real del Modo clase, con la misma lógica que la app ---- */
+(function(){
+  const btn = document.getElementById('btn-mc-play');
+  const reloj = document.getElementById('mc-reloj');
+  const eyebrow = document.getElementById('mc-eyebrow');
+  const titulo = document.getElementById('mc-titulo');
+  const nota = document.getElementById('mc-nota');
+  const pasos = document.querySelectorAll('#demo-mc .m-mc-progreso span');
+  if (!btn) return;
+
+  const recursos = [
+    { tipo: 'liga', momento: '0:00–0:10', min: 0, titulo: 'Recurso con liga web', nota: 'Las ligas https abren en otra pestaña y entran en «Abrir todo».' },
+    { tipo: 'lectura', momento: '0:10–0:30', min: 10, titulo: 'Recurso con ruta local', nota: 'Sirve para ver el aviso de ruta local y lo que marca «Revisar enlaces».' },
+    { tipo: 'actividad', momento: '0:30–0:50', min: 30, titulo: 'Actividad sin liga', nota: 'No todo recurso necesita archivo.' },
+  ];
+
+  let segundos = 0, indice = 0, tic = null, corriendo = false;
+
+  function pintarPaso() {
+    pasos.forEach((p, i) => p.classList.toggle('hecho', i <= indice));
+    const r = recursos[indice];
+    eyebrow.textContent = `${r.tipo} · ${r.momento} · ${indice + 1} de ${recursos.length}`;
+    titulo.textContent = r.titulo;
+    nota.textContent = r.nota;
+  }
+
+  function tick() {
+    segundos++;
+    const minutos = Math.floor(segundos / 60);
+
+    // avanza de recurso cuando el tiempo simulado alcanza el siguiente momento
+    if (indice < recursos.length - 1 && minutos >= recursos[indice + 1].min) {
+      indice++;
+      pintarPaso();
+    }
+
+    let texto = `${minutos}:${String(segundos % 60).padStart(2, '0')} de sesión`;
+    let situacion = 'normal';
+    const planeado = recursos[indice].min;
+    const diferencia = minutos - planeado;
+    if (diferencia <= -2) { texto += ` · ${-diferencia} min antes de lo planeado`; situacion = 'adelante'; }
+    else if (diferencia >= 2) { texto += ` · ${diferencia} min de retraso`; situacion = 'tarde'; }
+    else { texto += ' · a tiempo'; }
+
+    reloj.textContent = texto;
+    reloj.dataset.situacion = situacion;
+
+    if (minutos >= 55) parar();
+  }
+
+  function iniciar() {
+    corriendo = true;
+    btn.textContent = '⏹ Detener';
+    tic = setInterval(tick, 160); // ~1 minuto simulado cada 1.6s
+  }
+  function parar() {
+    corriendo = false;
+    clearInterval(tic);
+    btn.textContent = '↺ Reiniciar';
+  }
+  function reiniciar() {
+    segundos = 0; indice = 0;
+    pintarPaso();
+    reloj.textContent = '0:00 de sesión';
+    reloj.dataset.situacion = 'normal';
+    iniciar();
+  }
+
+  btn.addEventListener('click', () => {
+    if (corriendo) { parar(); }
+    else if (segundos > 0) { reiniciar(); }
+    else { iniciar(); }
+  });
+})();
+</script>
+</body>
+</html>
