@@ -1,0 +1,18 @@
+# Ajustes de construcción del sitio, versionados junto al código.
+# Netlify los lee de aquí en cada despliegue: no hay que configurarlos a mano
+# en el tablero, y si algún día cambian, el cambio queda en la historia de git.
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  # Vite 5 pide Node 18 o más nuevo. Se fija la versión para que la
+  # construcción de hoy y la de dentro de dos años den lo mismo.
+  NODE_VERSION = "20"
+
+# El panel es una sola página: cualquier ruta devuelve el mismo archivo.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
