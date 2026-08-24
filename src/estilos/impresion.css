@@ -1,0 +1,57 @@
+/* =========================================================
+   Impresión: guion de sesión en papel, sin interfaz.
+   Se imprime la vista que esté abierta (sesión o semestre).
+   ========================================================= */
+@media print{
+  :root{--papel:#FFFFFF}
+  body{background:#fff;font-size:11pt}
+
+  /* Fuera todo lo que sea interfaz */
+  .barra, .lateral, .controles, .acciones, .acciones-sesion,
+  .ver-todas, .rotulo, .modo-clase, .pie-pagina, .enlaces-materia,
+  dialog, .bitacora .pie-bit, .bitacora .aclara, .aviso-flotante{ display:none!important }
+
+  .envoltura{display:block;min-height:0}
+  .principal{padding:0;width:auto}
+
+  .cabecera{border-bottom:1.5pt solid #000;padding-bottom:8pt;display:block}
+  .cabecera h2{font-size:18pt;margin:4pt 0}
+  .cabecera .meta{font-size:8pt;letter-spacing:.14em;color:#000}
+  .cabecera p{color:#000;font-size:10.5pt;max-width:none}
+
+  /* El riel se convierte en lista numerada, más legible en papel */
+  .riel{padding-left:0}
+  .riel::before{display:none}
+  .tarjeta{
+    border:0;border-top:.5pt solid #999;padding:8pt 0;margin:0;
+    opacity:1!important;break-inside:avoid;page-break-inside:avoid;
+  }
+  .tarjeta::before{display:none}
+  .tarjeta .momento{font-size:9pt;color:#000}
+  .tarjeta h3{font-size:12pt}
+  .tarjeta .nota{color:#000;font-size:10pt;max-width:none}
+  .tipo{border-color:#000;color:#000}
+  .ruta{color:#333;font-size:8.5pt}
+  .aviso{border-left:1.5pt solid #000;background:none;color:#000}
+  .vacio{border:.5pt dashed #999}
+
+  .bitacora{border:.5pt solid #999;border-left:2pt solid #000;padding:8pt;margin-bottom:12pt}
+  .bitacora label{color:#000}
+  /* El textarea recorta el texto largo al imprimir: se imprime una copia
+     en párrafo, que sí fluye y se parte entre páginas. */
+  .bitacora textarea{display:none!important}
+  .solo-impresion{display:block;white-space:pre-wrap;font-size:10.5pt;margin:0}
+  .solo-impresion:empty{display:none}
+
+  .semestre{font-size:10pt}
+  .semestre th{border-bottom:1pt solid #000;color:#000}
+  .semestre td{border-bottom:.5pt solid #999}
+  .semestre tr{break-inside:avoid;page-break-inside:avoid}
+  .semestre tr[data-activo="true"] td{background:none}
+
+  a{color:#000;text-decoration:none}
+
+  /* El crédito se imprime como texto, sin gastar tinta en la pleca roja. */
+  .pleca{background:none!important;color:#000!important;border-top:.5pt solid #999;
+    padding:6pt 0 0;text-align:left;font-size:8pt;margin-top:12pt}
+}

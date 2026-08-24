@@ -1,0 +1,55 @@
+/* =========================================================
+   Base: paleta institucional, tipografía y controles comunes.
+   Manual de identidad gráfica IBERO 2024.
+   ========================================================= */
+:root{
+  --rojo:#E00034;         /* PMS 185 C, color principal */
+  --gris:#82786F;         /* Warm Gray 9 C, secundario */
+  --negro:#000000;
+  --blanco:#FFFFFF;
+
+  /* Neutros derivados, solo para interfaz (nunca para marcas) */
+  --papel:#F4F2F0;
+  --linea:#D6D0CA;
+  --gris-tenue:#6E655D;
+
+  /* Sin fuentes web externas: la aplicación debe funcionar sin conexión. */
+  --texto:"Myriad Pro","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--texto);
+  background:var(--papel);
+  color:var(--negro);
+  font-size:16px;
+  line-height:1.45;
+  -webkit-font-smoothing:antialiased;
+}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--rojo)}
+[hidden]{display:none!important}
+.oculto{display:none!important}
+.solo-impresion{display:none}
+
+/* Foco visible en todo control, no solo en los botones. */
+:focus-visible{outline:2px solid var(--negro);outline-offset:2px}
+
+.btn{
+  background:transparent;border:1px solid currentColor;color:inherit;
+  padding:7px 13px;cursor:pointer;font-size:13px;
+  transition:background .15s,color .15s;
+}
+.btn:hover{background:var(--blanco);color:var(--rojo)}
+.btn:focus-visible{outline:2px solid var(--negro);outline-offset:2px}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.btn[disabled]:hover{background:transparent;color:inherit}
+.btn-solido{background:var(--rojo);border-color:var(--rojo);color:var(--blanco)}
+.btn-solido:hover{background:var(--negro);border-color:var(--negro);color:var(--blanco)}
+.btn-solido[disabled]:hover{background:var(--rojo);border-color:var(--rojo);color:var(--blanco)}
+
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+}

@@ -1,0 +1,20 @@
+# Datos personales: nunca deben salir de esta computadora.
+# Los respaldos contienen ligas de OneDrive con tokens de uso compartido.
+*.json
+!package.json
+!package-lock.json
+!.vscode/*.json
+datos-locales/
+respaldos/
+panel-de-clases*.json
+plantilla-*.json
+*.md.bak
+
+# Dependencias y build
+node_modules/
+dist/
+.vite/
+
+# Sistema
+.DS_Store
+Thumbs.db

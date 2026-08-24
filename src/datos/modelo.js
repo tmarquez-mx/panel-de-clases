@@ -1,0 +1,257 @@
+/* =========================================================
+   Modelo de datos y migración de respaldos.
+
+   Estructura vigente (versión 2):
+
+   {
+     "version": 2,
+     "tipos": ["podcast"],            // tipos propios, además de los de base
+     "materias": [{
+       id, nombre, clave, carpeta, cuaderno,
+       sesiones: [{
+         num, fecha, titulo, proposito, bitacora,
+         recursos: [{ titulo, tipo, momento, url, nota, estado }]
+       }]
+     }]
+   }
+
+   Los respaldos anteriores (el prototipo de un solo archivo, sin campo
+   "version") entran por migrar(): se les completan los campos que falten con
+   valores por omisión y nunca se pierde información existente.
+   ========================================================= */
+
+import { aFecha } from "../util/fechas.js";
+
+export const VERSION_DATOS = 2;
+
+export const TIPOS_BASE = [
+  "lectura", "artefacto", "presentación", "liga", "apunte", "video", "actividad",
+];
+
+export const ESTADOS = ["pendiente", "listo", "usado"];
+
+/** Ciclo de tres pasos: pendiente → listo → usado → pendiente. */
+export function siguienteEstado(estado) {
+  const i = ESTADOS.indexOf(estado);
+  return ESTADOS[(i + 1) % ESTADOS.length];
+}
+
+/** Error con mensaje legible para la usuaria, no para la consola. */
+export class ErrorDeDatos extends Error {
+  constructor(mensaje) {
+    super(mensaje);
+    this.name = "ErrorDeDatos";
+  }
+}
+
+/* ---------- Normalización ---------- */
+
+/** Devuelve siempre una cadena, aunque el respaldo traiga números u objetos. */
+const texto = (v) => (typeof v === "string" ? v : typeof v === "number" ? String(v) : "");
+
+const identificador = () => `m${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+
+const esObjeto = (v) => !!v && typeof v === "object" && !Array.isArray(v);
+
+/** Solo las entradas que son objetos: la basura del respaldo se descarta en vez
+ *  de convertirse en materias o recursos vacíos que aparentan ser buenos. */
+const soloObjetos = (lista) => (Array.isArray(lista) ? lista.filter(esObjeto) : []);
+
+function normalizarRecurso(entrada) {
+  const r = entrada;
+  const estado = texto(r.estado).toLowerCase();
+  return {
+    titulo: texto(r.titulo).trim() || "Recurso sin título",
+    tipo: texto(r.tipo).trim().toLowerCase() || "liga",
+    momento: texto(r.momento).trim(),
+    url: texto(r.url).trim(),
+    nota: texto(r.nota).trim(),
+    estado: ESTADOS.includes(estado) ? estado : "pendiente",
+  };
+}
+
+function normalizarSesion(entrada, posicion) {
+  const s = entrada;
+  const num = Number.parseInt(s.num, 10);
+  // Se acepta también la forma con hora ("2026-09-08T10:00:00"): se recorta el día.
+  const fecha = texto(s.fecha).trim().split("T")[0];
+  return {
+    num: Number.isFinite(num) && num > 0 ? num : posicion + 1,
+    // Una fecha ilegible se vacía: el panel la marca en rojo y se puede corregir.
+    fecha: aFecha(fecha) ? fecha : "",
+    titulo: texto(s.titulo).trim() || "Sesión sin título",
+    proposito: texto(s.proposito).trim(),
+    bitacora: texto(s.bitacora),
+    recursos: soloObjetos(s.recursos).map(normalizarRecurso),
+  };
+}
+
+function normalizarMateria(entrada, posicion) {
+  const m = entrada;
+  const materia = {
+    id: texto(m.id).trim() || identificador(),
+    nombre: texto(m.nombre).trim() || `Materia ${posicion + 1}`,
+    clave: texto(m.clave).trim(),
+    carpeta: texto(m.carpeta).trim(),
+    cuaderno: texto(m.cuaderno).trim(),
+    sesiones: soloObjetos(m.sesiones).map(normalizarSesion),
+  };
+  ordenarSesiones(materia);
+  return materia;
+}
+
+/**
+ * Acepta cualquier respaldo del panel, de esta versión o de la anterior,
+ * y devuelve datos completos en la versión vigente.
+ * Lanza ErrorDeDatos con un mensaje legible si el archivo no es un respaldo.
+ */
+export function migrar(entrada) {
+  if (!entrada || typeof entrada !== "object" || Array.isArray(entrada)) {
+    throw new ErrorDeDatos("El archivo no contiene un respaldo del panel: se esperaba un objeto JSON.");
+  }
+  if (!Array.isArray(entrada.materias)) {
+    throw new ErrorDeDatos('El archivo no tiene la lista "materias". No es un respaldo del panel.');
+  }
+  if (entrada.materias.length === 0) {
+    throw new ErrorDeDatos("El respaldo no tiene ninguna materia. No se cargó nada para no borrar lo que ya tienes.");
+  }
+
+  const materias = soloObjetos(entrada.materias).map(normalizarMateria);
+  if (!materias.length) {
+    throw new ErrorDeDatos("Ninguna materia del respaldo se pudo leer: el archivo está dañado.");
+  }
+
+  // Tipos propios: los declarados en el respaldo más los que aparezcan en los
+  // recursos y no estén entre los de base. Así nunca se pierde un tipo propio.
+  const declarados = Array.isArray(entrada.tipos) ? entrada.tipos.map((t) => texto(t).trim().toLowerCase()) : [];
+  const usados = materias.flatMap((m) => m.sesiones.flatMap((s) => s.recursos.map((r) => r.tipo)));
+  const tipos = [...new Set([...declarados, ...usados])].filter((t) => t && !TIPOS_BASE.includes(t)).sort();
+
+  return { version: VERSION_DATOS, tipos, materias };
+}
+
+/* ---------- Operaciones sobre el modelo ---------- */
+
+/** Todos los tipos disponibles: los de base más los propios. */
+export function tiposDisponibles(datos) {
+  return [...TIPOS_BASE, ...(datos?.tipos || [])];
+}
+
+/** Registra un tipo propio si aún no existe. Devuelve el tipo normalizado. */
+export function registrarTipo(datos, nombre) {
+  const tipo = texto(nombre).trim().toLowerCase();
+  if (!tipo) return "";
+  if (!TIPOS_BASE.includes(tipo) && !datos.tipos.includes(tipo)) {
+    datos.tipos.push(tipo);
+    datos.tipos.sort();
+  }
+  return tipo;
+}
+
+/**
+ * Minutos desde el inicio de la sesión que declara un campo "momento".
+ * Reconoce "0:15–0:40", "1:05", "45 min" y "45". Devuelve null cuando el texto
+ * no empieza con un tiempo ("previa", "referencia", "cierre", vacío).
+ */
+export function minutosDe(momento) {
+  const texto = String(momento || "").trim();
+  if (!texto) return null;
+
+  const conHoras = texto.match(/^(\d{1,2})\s*[:.]\s*([0-5]?\d)/);
+  if (conHoras) return Number(conHoras[1]) * 60 + Number(conHoras[2]);
+
+  const soloMinutos = texto.match(/^(\d{1,3})(?!\s*[:.]?\d)/);
+  return soloMinutos ? Number(soloMinutos[1]) : null;
+}
+
+/**
+ * Acomoda los recursos de la sesión según el minuto que declara cada uno.
+ *
+ * Los que no declaran minuto ("previa", "referencia") no se van al final: se
+ * quedan pegados al recurso con minuto que los precede, y viajan con él. Los
+ * que están antes de cualquier minuto se quedan al principio.
+ *
+ * El orden es estable: entre dos recursos con el mismo minuto se respeta el
+ * orden que ya tenían, que es el que se fijó con Subir y Bajar.
+ */
+export function ordenarRecursosPorMomento(sesion) {
+  if (!sesion?.recursos?.length) return;
+
+  let heredado = -1; // antes del primer minuto declarado
+  const marcados = sesion.recursos.map((recurso, orden) => {
+    const propio = minutosDe(recurso.momento);
+    if (propio !== null) heredado = propio;
+    return { recurso, clave: propio !== null ? propio : heredado, orden };
+  });
+
+  marcados.sort((a, b) => a.clave - b.clave || a.orden - b.orden);
+  sesion.recursos = marcados.map((m) => m.recurso);
+}
+
+/**
+ * Mete un recurso en la sesión, en el lugar que le toca por sus minutos, sin
+ * reacomodar nada más: el orden que la sesión ya tenía se queda como estaba.
+ * Un recurso sin minutos se va al final. Devuelve la posición en que quedó.
+ */
+export function insertarPorMomento(sesion, recurso) {
+  const minutos = minutosDe(recurso.momento);
+  if (minutos === null) {
+    sesion.recursos.push(recurso);
+    return sesion.recursos.length - 1;
+  }
+
+  let heredado = -1;
+  const claves = sesion.recursos.map((r) => {
+    const propio = minutosDe(r.momento);
+    if (propio !== null) heredado = propio;
+    return heredado;
+  });
+
+  const siguiente = claves.findIndex((clave) => clave > minutos);
+  const posicion = siguiente === -1 ? sesion.recursos.length : siguiente;
+  sesion.recursos.splice(posicion, 0, recurso);
+  return posicion;
+}
+
+/** Ordena las sesiones por fecha. Las que no tienen fecha quedan al final. */
+export function ordenarSesiones(materia) {
+  if (!materia?.sesiones) return;
+  materia.sesiones.sort((a, b) => {
+    const da = aFecha(a.fecha);
+    const db = aFecha(b.fecha);
+    if (da && db) return da - db;
+    if (da) return -1;
+    if (db) return 1;
+    return 0;
+  });
+}
+
+/** La sesión vigente es la primera cuya fecha aún no pasa.
+ *  Si todas ya pasaron, es la última. Si ninguna tiene fecha, la primera. */
+export function indiceVigente(materia) {
+  const sesiones = materia?.sesiones || [];
+  if (!sesiones.length) return 0;
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+  const i = sesiones.findIndex((s) => {
+    const d = aFecha(s.fecha);
+    return d && d >= hoy;
+  });
+  return i >= 0 ? i : sesiones.length - 1;
+}
+
+/** Copia una sesión con sus recursos, con los estados reiniciados. */
+export function copiaDeSesion(sesion, { num, fecha, titulo }) {
+  return {
+    num,
+    fecha: fecha || "",
+    titulo: titulo || sesion.titulo,
+    proposito: sesion.proposito,
+    bitacora: "",
+    recursos: sesion.recursos.map((r) => ({ ...r, estado: "pendiente" })),
+  };
+}
+
+export function materiaNueva(campos) {
+  return { id: identificador(), sesiones: [], ...campos };
+}
