@@ -355,5 +355,3 @@ Agosto, 2026.
 Los colores del encabezado son los de la Universidad Iberoamericana. Quien reutilice el
 proyecto en otro contexto debe cambiar la paleta y la palabra del encabezado: la
 identidad gráfica de una institución no se hereda con el código.
-
-<!-- despliegue continuo verificado -->
