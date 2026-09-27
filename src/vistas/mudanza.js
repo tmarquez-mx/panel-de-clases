@@ -19,7 +19,10 @@ import { $ } from "../util/dom.js";
 const CLAVE = "panel-de-clases:mudanza-vista";
 
 /** Dirección anterior, solo para que la usuaria pueda volver a exportar. */
-export const DIRECCION_ANTERIOR = "https://panel-de-clases.netlify.app";
+/* La raíz de la dirección anterior ya reenvía aquí, así que enviar ahí sería
+   un rebote. /rescatar es la excepción al reenvío: la única página desde la
+   que se puede leer lo que quedó guardado en aquel origen. */
+export const DIRECCION_ANTERIOR = "https://panel-de-clases.netlify.app/rescatar";
 
 /** Dónde vive ahora. Si se abre aquí, no hay ninguna mudanza que anunciar. */
 const DIRECCION_ACTUAL = "pauta-docente.netlify.app";
@@ -41,7 +44,7 @@ export function montarMudanza() {
   }
   if (yaVisto) return;
 
-  $("#mudanza-vieja").textContent = DIRECCION_ANTERIOR.replace(/^https?:\/\//, "");
+  $("#mudanza-vieja").textContent = "panel-de-clases.netlify.app";
   $("#mudanza-ir").href = DIRECCION_ANTERIOR;
   caja.hidden = false;
 

@@ -20,6 +20,20 @@
 #
 # 301 es permanente y :splat conserva la ruta, así que /ayuda del viejo
 # llega a /ayuda del nuevo. Va antes que todo lo demás.
+# Excepción, y va primero porque gana la primera regla que coincide.
+# /rescatar es el único lugar desde el que se puede leer lo que quedó
+# guardado en el navegador bajo la dirección anterior: si también se
+# reenviara, esos datos quedarían inalcanzables para siempre.
+[[redirects]]
+  from = "https://panel-de-clases.netlify.app/rescatar"
+  to = "/rescatar.html"
+  status = 200
+
+[[redirects]]
+  from = "http://panel-de-clases.netlify.app/rescatar"
+  to = "/rescatar.html"
+  status = 200
+
 [[redirects]]
   from = "https://panel-de-clases.netlify.app/*"
   to = "https://pauta-docente.netlify.app/:splat"
@@ -35,6 +49,11 @@
 # Guía de uso, independiente del panel: /ayuda.html vive en public/ y Netlify
 # ya la sirve tal cual porque el archivo existe; este alias solo da una URL
 # limpia. Debe ir antes del comodín de abajo.
+[[redirects]]
+  from = "/rescatar"
+  to = "/rescatar.html"
+  status = 200
+
 [[redirects]]
   from = "/ayuda"
   to = "/ayuda.html"

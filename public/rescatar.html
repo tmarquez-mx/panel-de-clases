@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="robots" content="noindex">
+<title>Rescatar tu planeación · Pauta</title>
+<style>
+  :root{
+    --rojo:#A62237; --negro:#1D1D1F; --gris:#55555C;
+    --papel:#F5F5F7; --blanco:#FFFFFF; --linea:rgba(60,60,67,.13);
+    --relleno:rgba(118,118,128,.12);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;padding:12vh 24px;background:var(--papel);color:var(--negro);
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-size:16.5px;line-height:1.55;
+  }
+  main{max-width:36rem;margin:0 auto}
+  h1{font-size:1.75rem;line-height:1.15;letter-spacing:-.022em;margin:0 0 .6em;font-weight:700}
+  p{margin:0 0 1em;max-width:50ch}
+  .apagado{color:var(--gris)}
+  .caja{background:var(--blanco);border-radius:12px;padding:20px 22px;box-shadow:0 1px 3px rgba(0,0,0,.05);margin:24px 0}
+  .btn{
+    border:0;background:var(--relleno);color:var(--negro);font:inherit;font-size:15px;
+    font-weight:500;padding:10px 18px;border-radius:8px;cursor:pointer;
+    text-decoration:none;display:inline-block;
+  }
+  .btn:hover{background:rgba(118,118,128,.2)}
+  .btn-solido{background:var(--rojo);color:#fff;font-weight:600}
+  .btn-solido:hover{background:#8A1C2D}
+  .acciones{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+  code{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:.9em}
+</style>
+</head>
+<body>
+<main>
+  <h1>Rescatar tu planeación</h1>
+
+  <p>Pauta cambió de dirección. Lo que guardaste «en este navegador» quedó atado a la
+  dirección anterior, y por eso no aparece en la nueva. <strong>No se perdió:</strong> está
+  aquí, y esta página existe para que te lo lleves.</p>
+
+  <div class="caja" id="caja">
+    <p id="estado" class="apagado">Buscando…</p>
+    <div class="acciones" id="acciones" hidden>
+      <button class="btn btn-solido" id="descargar">Descargar mi planeación</button>
+      <a class="btn" href="https://pauta-docente.netlify.app/">Ir a Pauta</a>
+    </div>
+  </div>
+
+  <p class="apagado">Después, en la dirección nueva, entra a <em>Archivo → Importar
+  respaldo</em> y elige el archivo que acabas de descargar.</p>
+</main>
+
+<script>
+/* Esta página vive en el origen anterior a propósito: es el único lugar desde
+   el que se puede leer lo que quedó guardado ahí. No hace nada más que
+   leerlo y ofrecerlo como archivo. */
+(function () {
+  const estado = document.getElementById("estado");
+  const acciones = document.getElementById("acciones");
+
+  let crudo = null;
+  try {
+    crudo = localStorage.getItem("panel-de-clases:datos");
+  } catch {
+    estado.textContent = "Este navegador no permite leer el almacenamiento local, así que no hay nada que rescatar aquí.";
+    return;
+  }
+
+  if (!crudo) {
+    estado.innerHTML = "No hay nada guardado en este navegador con la dirección anterior. " +
+      "Si usabas Pauta con un archivo vinculado, no tienes que rescatar nada: ábrelo desde la dirección nueva.";
+    acciones.hidden = false;
+    document.getElementById("descargar").hidden = true;
+    return;
+  }
+
+  let resumen = "";
+  try {
+    const datos = JSON.parse(crudo);
+    const materias = datos.materias?.length || 0;
+    const sesiones = (datos.materias || []).reduce((n, m) => n + (m.sesiones?.length || 0), 0);
+    const recursos = (datos.materias || []).reduce(
+      (n, m) => n + (m.sesiones || []).reduce((k, s) => k + (s.recursos?.length || 0), 0), 0);
+    resumen = `Encontré ${materias} materia${materias === 1 ? "" : "s"}, ` +
+      `${sesiones} sesión${sesiones === 1 ? "" : "es"} y ${recursos} recurso${recursos === 1 ? "" : "s"}.`;
+  } catch {
+    resumen = "Encontré datos guardados aquí.";
+  }
+
+  estado.textContent = resumen;
+  acciones.hidden = false;
+
+  document.getElementById("descargar").addEventListener("click", () => {
+    const url = URL.createObjectURL(new Blob([crudo], { type: "application/json" }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "pauta-rescate.json";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    estado.textContent = resumen + " Descargado: ahora impórtalo en la dirección nueva.";
+  });
+})();
+</script>
+</body>
+</html>
