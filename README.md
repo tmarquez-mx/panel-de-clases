@@ -26,22 +26,7 @@
 
 <br>
 
-<p align="center">
-  <img src="assets/capturas/modo-clase.png" alt="Modo clase: pantalla negra con el título del recurso en grande, la nota, la liga y un reloj que compara el tiempo transcurrido con el minuto planeado" width="900">
-</p>
-
-<p align="center">
-  <sub>Modo clase: un recurso a la vez, y un reloj que compara<br>
-  el tiempo transcurrido con el minuto que planeaste.</sub>
-</p>
-
-<p align="center">
-  <sub><em>Las capturas usan datos ficticios.</em></sub>
-</p>
-
 <br>
-
----
 
 ## En un minuto
 
@@ -63,6 +48,23 @@ No hay botón de guardar: cada cambio se guarda solo.
 
 La [guía completa](https://pauta-docente.netlify.app/ayuda) lo explica paso a paso, con
 ejemplos y demostraciones.
+
+<br>
+
+<p align="center">
+  <img src="assets/capturas/modo-clase.png" alt="Modo clase: pantalla negra con el título del recurso en grande, la nota, la liga y un reloj que compara el tiempo transcurrido con el minuto planeado" width="900">
+</p>
+
+<p align="center">
+  <sub>Modo clase: un recurso a la vez, y un reloj que compara<br>
+  el tiempo transcurrido con el minuto que planeaste.</sub>
+</p>
+
+<p align="center">
+  <sub><em>Las capturas usan datos ficticios.</em></sub>
+</p>
+
+<br>
 
 ---
 
