@@ -7,7 +7,7 @@
      "version": 2,
      "tipos": ["podcast"],            // tipos propios, además de los de base
      "materias": [{
-       id, nombre, clave, carpeta, cuaderno,
+       id, clase, nombre, clave, carpeta, cuaderno,   // clase: curso | taller | ponencia
        sesiones: [{
          num, fecha, titulo, proposito, bitacora,
          recursos: [{ titulo, tipo, momento, url, nota, estado }]
@@ -21,6 +21,7 @@
    ========================================================= */
 
 import { aFecha } from "../util/fechas.js";
+import { CLASES } from "./vocabulario.js";
 
 export const VERSION_DATOS = 2;
 
@@ -88,8 +89,12 @@ function normalizarSesion(entrada, posicion) {
 
 function normalizarMateria(entrada, posicion) {
   const m = entrada;
+  // Los respaldos anteriores no traen «clase»: todo lo que existía era un
+  // curso, así que ese es el valor por omisión y nada se pierde al migrar.
+  const clase = CLASES.includes(texto(m.clase).trim()) ? texto(m.clase).trim() : "curso";
   const materia = {
     id: texto(m.id).trim() || identificador(),
+    clase,
     nombre: texto(m.nombre).trim() || `Materia ${posicion + 1}`,
     clave: texto(m.clave).trim(),
     carpeta: texto(m.carpeta).trim(),

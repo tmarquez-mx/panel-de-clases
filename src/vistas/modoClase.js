@@ -86,6 +86,12 @@ export function entrarModoClase() {
   $("#envoltura").inert = true;
   document.querySelector(".barra").inert = true;
 
+  // Pantalla completa de verdad: en el proyector oculta la barra de
+  // direcciones y las pestañas. Si el navegador la niega (hace falta un
+  // gesto del usuario, y algunos equipos la bloquean), el modo clase
+  // funciona igual: solo se queda dentro de la ventana.
+  document.documentElement.requestFullscreen?.().catch(() => {});
+
   pintar();
   pintarReloj();
   $("#mc-siguiente").focus();
@@ -96,6 +102,7 @@ export function salirModoClase() {
   panel().classList.remove("activo");
   window.clearInterval(tic);
   tic = 0;
+  if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
   $("#envoltura").inert = false;
   document.querySelector(".barra").inert = false;
   recursos = [];

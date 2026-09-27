@@ -2,7 +2,7 @@
 
 import { $, esc, confirmar, avisar } from "../util/dom.js";
 import { fechaCorta, fechaLarga } from "../util/fechas.js";
-import { esLocal, esNube, esWeb, urlSegura } from "../util/urls.js";
+import { esLocal, esNube, esWeb, urlSegura, procedencia } from "../util/urls.js";
 import { copiar } from "../util/portapapeles.js";
 import { ordenarRecursosPorMomento, siguienteEstado, tiposDisponibles } from "../datos/modelo.js";
 import {
@@ -12,11 +12,33 @@ import { abrirDlgRecurso, abrirDlgSesion, abrirDlgDuplicar, abrirDlgMover, borra
 import { entrarModoClase } from "./modoClase.js";
 import { mostrarAviso } from "./aviso.js";
 import { recordarParaDeshacer, deshacer } from "../historial.js";
+import { abrirMenu, cerrarMenu } from "./menu.js";
+import { voz } from "../datos/vocabulario.js";
+import { abrirLectura, formatearTexto } from "./lectura.js";
 
 const CONTROLES_DE_SESION = [
   "#btn-editar-sesion", "#btn-borrar-sesion", "#btn-duplicar-sesion", "#btn-imprimir",
   "#btn-modo-clase", "#btn-abrir-todo", "#btn-nuevo", "#btn-nota", "#btn-ordenar",
+  "#btn-mas-sesion", "#btn-mas-acciones",
 ];
+
+/* Tras repintar, el riel se reconstruye entero y el foco se iría al principio
+   de la página. Se anota qué control lo tenía para devolvérselo. */
+let focoPendiente = null;
+
+/** Convierte un botón que vive oculto en el documento en opción de menú.
+ *  Hereda su título y su estado deshabilitado, así que no hay que
+ *  duplicar esa lógica en dos lugares. */
+function opcionDe(selector, etiqueta, extra = {}) {
+  const boton = $(selector);
+  return {
+    etiqueta,
+    titulo: boton?.title || "",
+    desactivado: !boton || boton.disabled,
+    accion: () => boton?.click(),
+    ...extra,
+  };
+}
 
 /** Abre un recurso. Las rutas locales no se pueden abrir desde el navegador:
  *  se copian al portapapeles para pegarlas en el explorador de archivos. */
@@ -60,31 +82,117 @@ function pintarFiltroDeTipos() {
   select.value = estado.filtroTipo;
 }
 
+const NOMBRE_ESTADO = { pendiente: "pendiente", listo: "listo", usado: "usado" };
+
+/* A partir de aquí una descripción se pliega: son unas seis líneas. */
+const LARGO_PLEGADO = 320;
+
+/* Una sola acción a la vista —abrir, que es lo que se necesita en clase—,
+   el estado en el propio punto del riel, y las seis restantes a un paso
+   dentro del menú. No se elimina ninguna función. */
 function tarjeta(recurso, indice, total) {
   const local = esLocal(recurso.url);
-  const siguiente = siguienteEstado(recurso.estado);
+  const actual = recurso.estado || "pendiente";
+  const siguiente = siguienteEstado(actual);
   return `
-  <article class="tarjeta" data-estado="${esc(recurso.estado || "pendiente")}" data-i="${indice}">
-    <div class="etiquetas">
-      <span class="tipo">${esc(recurso.tipo)}</span>
-      ${esNube(recurso.url) ? '<span class="tipo nube">OneDrive</span>' : ""}
-      ${recurso.momento ? `<span class="momento">${esc(recurso.momento)}</span>` : ""}
+  <article class="tarjeta" data-estado="${esc(actual)}" data-i="${indice}">
+    <button class="punto" data-acc="estado"
+      title="Ahora está ${esc(NOMBRE_ESTADO[actual] || actual)}. Marcar como ${esc(siguiente)}"
+      aria-label="Estado del recurso: ${esc(NOMBRE_ESTADO[actual] || actual)}. Marcar como ${esc(siguiente)}"></button>
+    <div class="cuerpo">
+      <div class="etiquetas">
+        <span class="tipo">${esc(recurso.tipo)}</span>
+        ${recurso.momento ? `<span class="momento">${esc(recurso.momento)}</span>` : ""}
+        ${actual !== "pendiente" ? `<span class="marca-estado">${esc(actual)}</span>` : ""}
+      </div>
+      <h3>${esc(recurso.titulo)}</h3>
+      ${
+        /* La descripción se muestra con formato —párrafos, viñetas y ligas con
+           nombre legible—, siempre escapada antes: nada de lo que se escriba
+           se ejecuta. Si es larga se pliega, y se despliega dentro de la
+           tarjeta, sin mover la posición de lectura. */
+        recurso.nota
+          ? `<div class="nota${(recurso.nota || "").length > LARGO_PLEGADO ? " plegable" : ""}">${formatearTexto(recurso.nota)}</div>
+             ${(recurso.nota || "").length > LARGO_PLEGADO
+               ? `<button class="mas-texto" data-acc="desplegar" aria-expanded="false">Leer más</button>`
+               : ""}`
+          : ""
+      }
+      ${
+        /* Procedencia, no la dirección entera: las ligas de OneDrive traen
+           claves larguísimas que tapaban la tarjeta. La dirección completa
+           sigue en el título del elemento y en «Copiar liga». */
+        recurso.url
+          ? `<span class="ruta" title="${esc(recurso.url)}">${esNube(recurso.url) ? "OneDrive · " : ""}${esc(procedencia(recurso.url))}</span>`
+          : ""
+      }
+      ${local ? `<p class="aviso">Ruta local: no abre con un clic desde el navegador y no existe en otra computadora. Súbelo a OneDrive y sustituye la liga.</p>` : ""}
     </div>
-    <h3>${esc(recurso.titulo)}</h3>
-    ${recurso.nota ? `<p class="nota">${esc(recurso.nota)}</p>` : ""}
-    ${recurso.url ? `<span class="ruta">${esc(recurso.url)}</span>` : ""}
-    ${local ? `<p class="aviso">Ruta local: no abre con un clic desde el navegador y no existe en otra computadora. Súbelo a OneDrive y sustituye la liga.</p>` : ""}
     <div class="acciones">
-      ${recurso.url ? `<button class="btn" data-acc="abrir" title="${local ? "Copiar la ruta: el navegador no abre archivos del disco" : "Abrir este recurso en otra pestaña"}">Abrir</button>` : ""}
-      ${recurso.url ? `<button class="btn" data-acc="copiar" title="Copiar la liga al portapapeles">Copiar liga</button>` : ""}
-      <button class="btn" data-acc="estado" title="Cambiar el estado: pendiente, listo, usado">Marcar como ${esc(siguiente)}</button>
-      <button class="btn" data-acc="subir" title="Subir un lugar en el orden de la clase" ${indice === 0 ? "disabled" : ""}>Subir</button>
-      <button class="btn" data-acc="bajar" title="Bajar un lugar en el orden de la clase" ${indice === total - 1 ? "disabled" : ""}>Bajar</button>
-      <button class="btn" data-acc="mover" title="Pasar este recurso a otra sesión de la materia">Mover a…</button>
-      <button class="btn" data-acc="editar" title="Cambiar título, tipo, minutos, liga y nota">Editar</button>
-      <button class="btn" data-acc="borrar" title="Quitar este recurso de la sesión. Se puede deshacer">Quitar</button>
+      ${recurso.nota ? `<button class="btn" data-acc="leer" title="Leer la descripción con texto amplio, sin nada alrededor">Leer</button>` : ""}
+      ${recurso.url ? `<button class="btn btn-tinte" data-acc="abrir" title="${local ? "Copiar la ruta: el navegador no abre archivos del disco" : "Abrir este recurso en otra pestaña"}">${local ? "Copiar ruta" : "Abrir"}</button>` : ""}
+      <button class="btn-icono" data-acc="menu" aria-haspopup="menu"
+        aria-label="Más acciones de «${esc(recurso.titulo)}»"
+        title="Copiar liga, editar, mover, reordenar o quitar">⋯</button>
     </div>
   </article>`;
+}
+
+/** Las seis acciones que dejaron de ocupar un botón propio. */
+function menuDeTarjeta(boton, recurso, indice, total) {
+  // Con un filtro puesto, el vecino de arriba o de abajo puede no estar a la
+  // vista: reordenar movería el recurso respecto de algo que no se ve.
+  const filtrado = !!(estado.busqueda.trim() || estado.filtroTipo);
+  const razonFiltro = "Quita la búsqueda y el filtro para reordenar: con ellos puestos el vecino podría no estar a la vista";
+
+  abrirMenu(boton, [
+    ...(recurso.url
+      ? [{ etiqueta: "Copiar liga", titulo: "Copiar la liga al portapapeles", accion: () => copiar(recurso.url, boton, "Copiada") }]
+      : []),
+    { etiqueta: "Editar…", titulo: "Cambiar título, tipo, minutos, liga y nota", accion: () => abrirDlgRecurso(indice) },
+    { etiqueta: "Mover a otra sesión…", titulo: "Pasar este recurso a otra sesión de la materia", accion: () => abrirDlgMover(indice) },
+    "---",
+    {
+      etiqueta: "Subir un lugar",
+      titulo: "Subir un lugar en el orden de la clase",
+      desactivado: filtrado || indice === 0,
+      razon: filtrado ? razonFiltro : "Ya es el primero de la sesión",
+      accion: () => moverRecurso(indice, -1),
+    },
+    {
+      etiqueta: "Bajar un lugar",
+      titulo: "Bajar un lugar en el orden de la clase",
+      desactivado: filtrado || indice === total - 1,
+      razon: filtrado ? razonFiltro : "Ya es el último de la sesión",
+      accion: () => moverRecurso(indice, 1),
+    },
+    "---",
+    { etiqueta: "Quitar de la sesión", peligro: true, titulo: "Quitar este recurso de la sesión. Se puede deshacer", accion: () => quitarRecurso(indice) },
+  ]);
+}
+
+function moverRecurso(i, paso) {
+  const recursos = sesion()?.recursos;
+  const destino = i + paso;
+  if (!recursos || destino < 0 || destino >= recursos.length) return;
+  recursos.splice(destino, 0, recursos.splice(i, 1)[0]);
+  focoPendiente = { i: destino, acc: "menu" };
+  actualizar();
+}
+
+function quitarRecurso(i) {
+  const recursos = sesion()?.recursos;
+  const r = recursos?.[i];
+  if (!r) return;
+  if (!confirmar(`¿Quitar "${r.titulo}" de esta sesión?`)) return;
+  recordarParaDeshacer();
+  recursos.splice(i, 1);
+  actualizar();
+  mostrarAviso(`Se quitó «${r.titulo}» de esta sesión.`, {
+    etiqueta: "Deshacer",
+    titulo: "Devolver el recurso a su lugar",
+    accion: deshacer,
+  });
 }
 
 function pintarSesion() {
@@ -94,16 +202,16 @@ function pintarSesion() {
 
   if (!hay) {
     $("#meta-sesion").textContent = materia()?.nombre || "";
-    $("#titulo-sesion").textContent = "Sin sesiones todavía";
-    $("#proposito-sesion").textContent = "Agrega la primera sesión desde el panel de la izquierda.";
+    $("#titulo-sesion").textContent = voz(materia()).sinEncuentros;
+    $("#proposito-sesion").textContent = voz(materia()).primerEncuentro;
     $("#conteo").textContent = "";
-    $("#riel").innerHTML = `<div class="vacio">Agrega una sesión para empezar a colgar recursos de ella.</div>`;
+    $("#riel").innerHTML = `<div class="vacio">${voz(materia()).primerEncuentro}</div>`;
     return;
   }
 
   const s = sesion();
   const num = String(s.num || estado.sesionActiva + 1).padStart(2, "0");
-  $("#meta-sesion").textContent = `Sesión ${num} · ${fechaLarga(s.fecha)}`;
+  $("#meta-sesion").textContent = `${voz(materia()).encuentro} ${num} · ${fechaLarga(s.fecha)}`;
   $("#titulo-sesion").textContent = s.titulo;
   $("#proposito-sesion").textContent = s.proposito || "";
 
@@ -121,6 +229,14 @@ function pintarSesion() {
   $("#riel").innerHTML = visibles.length
     ? visibles.map((r) => tarjeta(r, s.recursos.indexOf(r), s.recursos.length)).join("")
     : `<div class="vacio">No hay recursos que coincidan. Ajusta la búsqueda o agrega el primero.</div>`;
+
+  // Se acaba de reconstruir el riel entero: hay que devolver el foco al
+  // control que lo tenía, o quien usa teclado vuelve al inicio de la página.
+  if (focoPendiente) {
+    const { i, acc } = focoPendiente;
+    focoPendiente = null;
+    $(`#riel .tarjeta[data-i="${i}"] [data-acc="${acc}"]`)?.focus();
+  }
 }
 
 function accionEnTarjeta(e) {
@@ -136,43 +252,26 @@ function accionEnTarjeta(e) {
     case "abrir":
       abrirRecurso(r.url, boton);
       break;
-    case "copiar":
-      copiar(r.url, boton, "Copiada");
-      break;
     case "estado":
       r.estado = siguienteEstado(r.estado);
+      focoPendiente = { i, acc: "estado" }; // el punto sigue bajo el dedo
       actualizar();
       break;
-    case "subir":
-      if (i > 0) {
-        recursos.splice(i - 1, 0, recursos.splice(i, 1)[0]);
-        actualizar();
-      }
+    case "menu":
+      menuDeTarjeta(boton, r, i, recursos.length);
       break;
-    case "bajar":
-      if (i < recursos.length - 1) {
-        recursos.splice(i + 1, 0, recursos.splice(i, 1)[0]);
-        actualizar();
-      }
+    case "leer":
+      abrirLectura(r, sesion());
       break;
-    case "mover":
-      abrirDlgMover(i);
+    case "desplegar": {
+      /* Se despliega en el sitio, sin repintar: repintar reconstruiría el
+         riel y la lectora perdería el punto donde iba. */
+      const nota = tarjetaHtml.querySelector(".nota");
+      const abierta = nota.classList.toggle("abierta");
+      boton.textContent = abierta ? "Mostrar menos" : "Leer más";
+      boton.setAttribute("aria-expanded", String(abierta));
       break;
-    case "editar":
-      abrirDlgRecurso(i);
-      break;
-    case "borrar":
-      if (confirmar(`¿Quitar "${r.titulo}" de esta sesión?`)) {
-        recordarParaDeshacer();
-        recursos.splice(i, 1);
-        actualizar();
-        mostrarAviso(`Se quitó «${r.titulo}» de esta sesión.`, {
-          etiqueta: "Deshacer",
-          titulo: "Devolver el recurso a su lugar",
-          accion: deshacer,
-        });
-      }
-      break;
+    }
     default:
       break;
   }
@@ -208,6 +307,18 @@ export function montarVistaSesion() {
 
   $("#riel").addEventListener("click", accionEnTarjeta);
 
+  // La bitácora es plegable, y lo que está plegado no se imprime. Se abre
+  // para imprimir y se devuelve a como estaba.
+  let bitacoraEstaba = false;
+  addEventListener("beforeprint", () => {
+    const d = $("#bitacora");
+    bitacoraEstaba = d.open;
+    if ($("#txt-bitacora").value.trim()) d.open = true;
+  });
+  addEventListener("afterprint", () => {
+    $("#bitacora").open = bitacoraEstaba;
+  });
+
   $("#btn-nuevo").addEventListener("click", () => abrirDlgRecurso(null));
 
   $("#btn-ordenar").addEventListener("click", () => {
@@ -222,6 +333,24 @@ export function montarVistaSesion() {
     actualizar();
     mostrarAviso("Los recursos se acomodaron según sus minutos.");
   });
+  $("#btn-mas-sesion").addEventListener("click", (e) =>
+    abrirMenu(e.currentTarget, [
+      opcionDe("#btn-duplicar-sesion", "Duplicar sesión…"),
+      opcionDe("#btn-imprimir", "Imprimir guion"),
+      "---",
+      opcionDe("#btn-borrar-sesion", "Eliminar sesión", { peligro: true }),
+    ])
+  );
+
+  $("#btn-mas-acciones").addEventListener("click", (e) =>
+    abrirMenu(e.currentTarget, [
+      opcionDe("#btn-abrir-todo", "Abrir todas las ligas"),
+      opcionDe("#btn-ordenar", "Ordenar por minutos"),
+      "---",
+      opcionDe("#btn-nota", "Nueva nota en Word"),
+    ])
+  );
+
   $("#btn-editar-sesion").addEventListener("click", () => abrirDlgSesion(estado.sesionActiva));
   $("#btn-borrar-sesion").addEventListener("click", () => borrarSesion(estado.sesionActiva));
   $("#btn-duplicar-sesion").addEventListener("click", () => abrirDlgDuplicar(estado.sesionActiva));
@@ -230,6 +359,7 @@ export function montarVistaSesion() {
   $("#btn-imprimir").addEventListener("click", () => window.print());
 
   suscribir(() => {
+    cerrarMenu(); // el menú cuelga de un botón que está por desaparecer
     const enSemestre = estado.vistaSemestre;
     $("#vista-sesion").hidden = enSemestre;
     $("#vista-semestre").hidden = !enSemestre;

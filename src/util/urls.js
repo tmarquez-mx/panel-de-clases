@@ -80,3 +80,22 @@ export function revisarUrl(u) {
   }
   return { clase: "ok", mensaje: "" };
 }
+
+/**
+ * Procedencia legible de una liga: el dominio, o el nombre del archivo si es
+ * una ruta local. Sirve para mostrar de dónde viene un recurso sin desplegar
+ * una URL entera —las de OneDrive traen claves larguísimas—, sin perder el
+ * acceso a la dirección completa, que sigue en el título y en «Copiar liga».
+ */
+export function procedencia(u) {
+  const texto = String(u || "").trim();
+  if (!texto) return "";
+  if (esLocal(texto)) {
+    const partes = texto.split(/[\\/]/).filter(Boolean);
+    return partes[partes.length - 1] || "archivo local";
+  }
+  const url = analizar(texto);
+  if (!url) return "";
+  if (!/^https?:$/i.test(url.protocol)) return url.protocol.replace(":", "");
+  return url.hostname.replace(/^www\./i, "");
+}

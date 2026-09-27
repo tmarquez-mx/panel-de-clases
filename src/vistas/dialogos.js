@@ -12,6 +12,7 @@ import {
   estado, materia, sesion, actualizar, irAMateria, irASesion, repintar,
 } from "../estado.js";
 import { mostrarAviso } from "./aviso.js";
+import { voz } from "../datos/vocabulario.js";
 import { recordarParaDeshacer, deshacer } from "../historial.js";
 
 /* Índices de lo que se está editando. null = se está creando algo nuevo. */
@@ -170,8 +171,7 @@ function guardarMovimiento() {
     etiqueta: "Ir a esa sesión",
     titulo: "Abrir la sesión de destino",
     accion: () => {
-      irASesion(iDestino);
-      estado.vistaSemestre = false;
+      irASesion(iDestino); // ya sale de la vista de semestre
       repintar();
     },
   });
@@ -286,14 +286,28 @@ export function abrirDlgMateria(indice) {
   if (!m) return;
   materiaEnEdicion = indice;
 
-  $("#mat-titulo-dlg").textContent = indice === null ? "Agregar materia" : "Editar materia";
+  const clase = m.clase || "curso";
+  $("#m-clase").value = clase;
+  $("#mat-titulo-dlg").textContent =
+    indice === null ? voz({ clase }).nueva : `Editar ${voz({ clase }).etiqueta.toLowerCase()}`;
   $("#m-nombre").value = m.nombre || "";
   $("#m-clave").value = m.clave || "";
   $("#m-carpeta").value = m.carpeta || "";
   $("#m-cuaderno").value = m.cuaderno || "";
   $("#btn-borrar-materia").hidden = indice === null || estado.datos.materias.length < 2;
+  rotularDlgMateria();
   $("#dlg-materia").showModal();
   $("#m-nombre").focus();
+}
+
+/** Los rótulos del formulario siguen a lo que se eligió arriba. */
+function rotularDlgMateria() {
+  const v = voz({ clase: $("#m-clase").value });
+  $("#lbl-m-nombre").textContent = v.campoNombre;
+  $("#lbl-m-clave").textContent = v.campoClave;
+  $("#m-clave").placeholder = v.ejemploClave;
+  $("#mat-titulo-dlg").textContent =
+    materiaEnEdicion === null ? v.nueva : `Editar ${v.etiqueta.toLowerCase()}`;
 }
 
 function guardarMateria() {
@@ -301,6 +315,7 @@ function guardarMateria() {
   if (!nombre) return;
 
   const campos = {
+    clase: $("#m-clase").value,
     nombre,
     clave: $("#m-clave").value.trim(),
     carpeta: $("#m-carpeta").value.trim(),
@@ -413,5 +428,6 @@ export function montarDialogos() {
     b.addEventListener("click", () => pegarEn($(`#${b.dataset.pegar}`)))
   );
   $("#btn-borrar-materia").addEventListener("click", borrarMateria);
+  $("#m-clase").addEventListener("change", rotularDlgMateria);
   conectar("#dlg-materia", guardarMateria, () => { materiaEnEdicion = null; });
 }

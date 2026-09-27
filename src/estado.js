@@ -51,15 +51,26 @@ export const materia = () => estado.datos.materias[estado.materiaActiva] || null
 export const sesion = () => materia()?.sesiones[estado.sesionActiva] || null;
 export const haySesion = () => !!sesion();
 
+/* Ir a una materia o a una sesión significa querer verla: si se estaba en la
+   vista de semestre, se sale de ella. La regla vive aquí y no en cada botón
+   que navega, porque repartida entre las vistas ya se olvidó una vez —elegir
+   una sesión desde el lateral dejaba la tabla del semestre encima y los
+   recursos fuera de alcance. */
+function salirDeVistasQueTapan() {
+  estado.vistaSemestre = false;
+}
+
 /** Deja los índices dentro de rango y selecciona la sesión vigente. */
 export function irAMateria(indice) {
   const total = estado.datos.materias.length;
   estado.materiaActiva = total ? Math.min(Math.max(indice, 0), total - 1) : 0;
   estado.verTodasLasSesiones = false;
   estado.sesionActiva = indiceVigente(materia());
+  salirDeVistasQueTapan();
 }
 
 export function irASesion(indice) {
   const total = materia()?.sesiones.length || 0;
   estado.sesionActiva = total ? Math.min(Math.max(indice, 0), total - 1) : 0;
+  salirDeVistasQueTapan();
 }

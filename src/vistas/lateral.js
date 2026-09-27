@@ -5,16 +5,20 @@ import { fechaCorta } from "../util/fechas.js";
 import { urlSegura } from "../util/urls.js";
 import { indiceVigente } from "../datos/modelo.js";
 import { estado, materia, irAMateria, irASesion, repintar, suscribir } from "../estado.js";
+import { voz, rotuloDeLaLista } from "../datos/vocabulario.js";
 import { abrirDlgMateria, abrirDlgSesion } from "./dialogos.js";
 import { abrirRevision } from "./revision.js";
 
 function pintarMaterias() {
+  // El rótulo sigue a lo que hay: «Materias» si todo son cursos, «Talleres»
+  // si todo son talleres, y «Actividades» cuando está mezclado.
+  $("#rotulo-materias").textContent = rotuloDeLaLista(estado.datos.materias);
   $("#lista-materias").innerHTML = estado.datos.materias
     .map(
       (m, i) => `
     <div class="fila materia" data-activo="${i === estado.materiaActiva}">
-      <button class="principalbtn" data-ir="${i}" title="Abrir esta materia">${esc(m.nombre)}<small>${esc(m.clave || "")}</small></button>
-      <button class="lapiz" data-editar="${i}" title="Editar nombre, periodo, carpeta y cuaderno de la materia" aria-label="Editar la materia ${esc(m.nombre)}">editar</button>
+      <button class="principalbtn" data-ir="${i}" title="Abrir ${esc(voz(m).etiqueta.toLowerCase())}">${esc(m.nombre)}${m.clase && m.clase !== "curso" ? `<span class="clase">${esc(voz(m).etiqueta)}</span>` : ""}<small>${esc(m.clave || "")}</small></button>
+      <button class="lapiz" data-editar="${i}" title="Editar nombre, periodo, carpeta y cuaderno" aria-label="Editar ${esc(voz(m).etiqueta.toLowerCase())} ${esc(m.nombre)}">editar</button>
     </div>`
     )
     .join("");
@@ -28,12 +32,18 @@ function pintarMaterias() {
     return `<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(texto)}</a>`;
   };
 
-  $("#enlaces-materia").innerHTML = m
-    ? [
-        enlace(m.carpeta, "Carpeta del curso en OneDrive", "Sin carpeta de OneDrive"),
-        enlace(m.cuaderno, "Cuaderno del curso en OneNote", "Sin cuaderno de OneNote"),
-      ].join("")
-    : "";
+  /* Cuando no hay nada vinculado, dos renglones diciendo «sin esto» y «sin
+     aquello» son ruido: se sustituyen por una sola opción de configuración. */
+  const sinEnlaces = m && !m.carpeta && !m.cuaderno;
+  $("#enlaces-materia").innerHTML = !m
+    ? ""
+    : sinEnlaces
+      ? `<button class="config-materia" data-configurar title="Agregar la carpeta de OneDrive y el cuaderno de OneNote">Vincular carpeta y cuaderno…</button>`
+      : [
+          m.carpeta ? enlace(m.carpeta, "Carpeta en OneDrive", "") : "",
+          m.cuaderno ? enlace(m.cuaderno, "Cuaderno en OneNote", "") : "",
+          `<button class="config-materia" data-configurar title="Cambiar la carpeta y el cuaderno vinculados">Configurar…</button>`,
+        ].join("");
 }
 
 function pintarSesiones() {
@@ -42,10 +52,13 @@ function pintarSesiones() {
   const vigente = indiceVigente(m);
   const verTodas = estado.verTodasLasSesiones;
 
-  $("#rotulo-sesiones").textContent = verTodas ? "Sesiones del curso" : "Sesión vigente";
+  const v = voz(m);
+  $("#rotulo-sesiones").textContent = verTodas ? v.encuentrosDe : v.vigente;
+  $("#btn-sesion-nueva").textContent = v.nuevoEncuentro;
+  $("#btn-sesion-nueva").title = `Crear ${v.encuentro.toLowerCase()} en esto`;
 
   if (!sesiones.length) {
-    $("#lista-sesiones").innerHTML = `<p class="sin-sesiones">Esta materia aún no tiene sesiones.</p>`;
+    $("#lista-sesiones").innerHTML = `<p class="sin-sesiones">${v.sinEncuentros}.</p>`;
     $("#btn-ver-todas").hidden = true;
     return;
   }
@@ -55,21 +68,28 @@ function pintarSesiones() {
     .map((i) => {
       const s = sesiones[i];
       const num = String(s.num || i + 1).padStart(2, "0");
+      /* El título se abrevia a una línea para que el número y la fecha se
+         recorran de un vistazo; completo sigue en los datos, en el atributo
+         title y en la cabecera de la vista principal. */
       return `
     <div class="fila sesion" data-activo="${i === estado.sesionActiva}">
-      <button class="principalbtn" data-ir="${i}" title="Abrir esta sesión">
-        ${esc(s.titulo)}${i === vigente ? '<span class="vigente">vigente</span>' : ""}
-        <small><span class="fecha-chip${s.fecha ? "" : " sin-fecha"}">S${num} · ${esc(fechaCorta(s.fecha))}</span></small>
+      <button class="principalbtn" data-ir="${i}" title="${esc(s.titulo)}">
+        <span class="linea-meta">
+          <span class="num-ses">${esc(v.encuentro.slice(0, 1).toUpperCase())}${num}</span>
+          <span class="fecha-chip${s.fecha ? "" : " sin-fecha"}">${esc(fechaCorta(s.fecha))}</span>
+          ${i === vigente ? '<span class="vigente">vigente</span>' : ""}
+        </span>
+        <span class="titulo-ses">${esc(s.titulo)}</span>
       </button>
-      <button class="lapiz" data-editar="${i}" title="Editar número, fecha, título y propósito de la sesión" aria-label="Editar la sesión ${esc(s.titulo)}">editar</button>
+      <button class="lapiz" data-editar="${i}" title="Editar número, fecha, título y propósito" aria-label="Editar ${esc(v.encuentro.toLowerCase())} ${esc(s.titulo)}">editar</button>
     </div>`;
     })
     .join("");
 
   $("#btn-ver-todas").hidden = sesiones.length <= 1;
   $("#btn-ver-todas").textContent = verTodas
-    ? "Mostrar solo la sesión vigente"
-    : `Ver las ${sesiones.length} sesiones del curso`;
+    ? v.verVigente
+    : `Ver ${sesiones.length} ${v.encuentros.toLowerCase()}`;
 }
 
 export function montarLateral() {
@@ -81,8 +101,7 @@ export function montarLateral() {
     }
     const ir = e.target.closest("[data-ir]");
     if (ir) {
-      irAMateria(Number(ir.dataset.ir));
-      estado.vistaSemestre = false;
+      irAMateria(Number(ir.dataset.ir)); // ya sale de la vista de semestre
       repintar();
     }
   });
@@ -105,6 +124,39 @@ export function montarLateral() {
     repintar();
   });
 
+  $("#enlaces-materia").addEventListener("click", (e) => {
+    if (e.target.closest("[data-configurar]")) abrirDlgMateria(estado.materiaActiva);
+  });
+
+  /* La barra de arriba cambia de alto según el logotipo y según si se
+     envuelve en pantallas angostas. Se mide y se publica, para que el lateral
+     pegajoso empiece justo debajo en lugar de confiar en un número escrito
+     a mano que se quedaba viejo a cada cambio de cabecera. */
+  const barra = document.querySelector(".barra");
+  const medirBarra = () =>
+    document.documentElement.style.setProperty("--alto-barra", `${Math.round(barra.getBoundingClientRect().height)}px`);
+  medirBarra();
+  if (window.ResizeObserver) new ResizeObserver(medirBarra).observe(barra);
+  else addEventListener("resize", medirBarra);
+
+  /* Plegado de la barra lateral. La preferencia vive en el navegador, no en
+     los datos: es de esta pantalla y de este equipo, no del curso. */
+  const CLAVE_PLEGADO = "panel-de-clases:lateral-plegado";
+  const boton = $("#btn-plegar");
+  const aplicarPlegado = (plegado) => {
+    document.body.classList.toggle("lateral-plegado", plegado);
+    boton.setAttribute("aria-expanded", String(!plegado));
+    boton.title = plegado ? "Mostrar la barra lateral" : "Ocultar la barra lateral";
+  };
+  let plegado = false;
+  try { plegado = localStorage.getItem(CLAVE_PLEGADO) === "1"; } catch { /* sin memoria */ }
+  aplicarPlegado(plegado);
+  boton.addEventListener("click", () => {
+    plegado = !plegado;
+    aplicarPlegado(plegado);
+    try { localStorage.setItem(CLAVE_PLEGADO, plegado ? "1" : "0"); } catch { /* sin memoria */ }
+  });
+
   $("#btn-materia-nueva").addEventListener("click", () => abrirDlgMateria(null));
   $("#btn-sesion-nueva").addEventListener("click", () => abrirDlgSesion(null));
 
@@ -118,6 +170,9 @@ export function montarLateral() {
   suscribir(() => {
     pintarMaterias();
     pintarSesiones();
-    $("#btn-semestre").textContent = estado.vistaSemestre ? "Volver a la sesión" : "Vista de semestre";
+    const vm = voz(materia());
+    $("#btn-semestre").textContent = estado.vistaSemestre
+      ? `Volver a ${vm.encuentro.toLowerCase() === "sesión" ? "la sesión" : "lo anterior"}`
+      : vm.vistaGeneral;
   });
 }

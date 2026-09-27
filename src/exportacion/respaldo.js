@@ -21,6 +21,9 @@ export function exportarPlantilla(materia) {
     materias: [
       {
         id: materia.id,
+        // La clase viaja con la plantilla: un taller compartido debe llegar
+        // como taller, no convertirse en curso al importarlo.
+        clase: materia.clase || "curso",
         nombre: materia.nombre,
         clave: materia.clave,
         carpeta: "",

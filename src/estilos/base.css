@@ -3,29 +3,75 @@
    Manual de identidad gráfica IBERO 2024.
    ========================================================= */
 :root{
-  --rojo:#E00034;         /* PMS 185 C, color principal */
-  --gris:#82786F;         /* Warm Gray 9 C, secundario */
-  --negro:#000000;
-  --blanco:#FFFFFF;
+  /* ---- Acento interactivo -------------------------------------------
+     El rojo institucional IBERO (PMS 185 C) hace aquí el papel que el azul
+     hace en el sistema: selección, acción principal, enlaces y foco.
+     Un solo punto de cambio para toda la interfaz. */
+  /* El rojo del logotipo «Secuencia» (#A62237). La interfaz adopta el rojo
+     de la marca para no poner dos rojos distintos en la misma pantalla.
+     El institucional sigue abajo, para la pleca de IBERO. */
+  --acento:#A62237;
+  --acento-hundido:#8A1C2D;
+  --acento-tenue:rgba(166,34,55,.11);
+  /* Fondo de lo seleccionado: rojo muy diluido con texto oscuro encima,
+     en vez del bloque sólido que gritaba desde el lateral. */
+  --seleccion:rgba(166,34,55,.09);
+  --seleccion-fuerte:rgba(166,34,55,.15);
 
-  /* Neutros derivados, solo para interfaz (nunca para marcas) */
-  --papel:#F4F2F0;
-  --linea:#D6D0CA;
-  --gris-tenue:#6E655D;
+  /* Mismo color, nombrado aparte para lo que es identidad y no interacción:
+     la palabra IBERO, la pleca del pie, el distintivo de sesión vigente. */
+  --rojo:#A62237;
+  --rojo-tenue:rgba(166,34,55,.11);
+  /* Rojo institucional IBERO (PMS 185 C), solo para la pleca del pie. */
+  --rojo-ibero:#E00034;
 
-  /* Sin fuentes web externas: la aplicación debe funcionar sin conexión. */
-  --texto:"Myriad Pro","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  /* ---- Neutros ------------------------------------------------------
+     Grises de sistema: el fondo es apenas más frío que el blanco y los
+     separadores son translúcidos, no líneas sólidas. */
+  --papel:#F5F5F7;        /* fondo de la aplicación */
+  --blanco:#FFFFFF;       /* superficies elevadas */
+  --negro:#1D1D1F;        /* texto principal; nunca negro puro */
+  --gris:#767680;
+  --gris-tenue:#55555C;   /* texto secundario, oscurecido para leerse sin esfuerzo */
+  --linea:rgba(60,60,67,.13);
+  --relleno:rgba(118,118,128,.12);      /* fondo de controles en reposo */
+  --relleno-fuerte:rgba(118,118,128,.2);
+
+  /* ---- Forma --------------------------------------------------------- */
+  --e1:8px; --e2:12px; --e3:16px; --e4:24px; --e5:32px;
+  /* Ancho de lectura: entre 60 y 75 caracteres reales. La unidad ch mide
+     el ancho del cero, más estrecho que la letra media en una proporcional,
+     así que 74ch daba casi 90 caracteres por línea. */
+  --ancho-lectura:50ch;
+  --ancho-contenido:920px;
+  --r-tarjeta:12px;
+  --r-control:8px;
+  --r-chip:6px;
+  --sombra:0 1px 2px rgba(0,0,0,.04), 0 1px 3px rgba(0,0,0,.05);
+  --sombra-alta:0 10px 32px rgba(0,0,0,.13), 0 2px 8px rgba(0,0,0,.07);
+
+  /* Tipografía del sistema: San Francisco en Mac, Segoe UI Variable en
+     Windows. Ninguna se descarga, así que el panel sigue abriendo sin
+     conexión. */
+  --texto:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI Variable Text","Segoe UI","Helvetica Neue",Arial,sans-serif;
   --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
 }
 
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
+
+/* Tamaño de lectura ajustable.
+   El texto que se lee —títulos de recurso, descripciones, propósitos,
+   bitácora— está en rem y crece con esta raíz; el mobiliario de la interfaz
+   (botones, rótulos, barras) se queda en px para no desmontarse. La
+   preferencia la guarda lectura.js en este navegador. */
+html{font-size:calc(16px * var(--escala-texto, 1))}
 body{
   font-family:var(--texto);
   background:var(--papel);
   color:var(--negro);
-  font-size:16px;
-  line-height:1.45;
+  font-size:1.03rem;
+  line-height:1.55;
   -webkit-font-smoothing:antialiased;
 }
 button,input,select,textarea{font:inherit;color:inherit}
@@ -35,21 +81,52 @@ a{color:var(--rojo)}
 .solo-impresion{display:none}
 
 /* Foco visible en todo control, no solo en los botones. */
-:focus-visible{outline:2px solid var(--negro);outline-offset:2px}
+:focus-visible{outline:2px solid var(--acento);outline-offset:2px}
 
+/* ---- Botones -------------------------------------------------------
+   Tres grados, como en el sistema: relleno gris para lo secundario,
+   relleno de color para la acción principal, y tinte translúcido para
+   la acción propia de una tarjeta. Ninguno lleva borde. */
 .btn{
-  background:transparent;border:1px solid currentColor;color:inherit;
-  padding:7px 13px;cursor:pointer;font-size:13px;
-  transition:background .15s,color .15s;
-  display:inline-block;text-decoration:none;
+  background:var(--relleno);border:0;color:var(--negro);
+  padding:7px 14px;cursor:pointer;font-size:13.5px;font-weight:500;
+  border-radius:var(--r-control);line-height:1.3;
+  transition:background .18s ease,color .18s ease,transform .1s ease;
+  display:inline-block;text-decoration:none;white-space:nowrap;
 }
-.btn:hover{background:var(--blanco);color:var(--rojo)}
-.btn:focus-visible{outline:2px solid var(--negro);outline-offset:2px}
-.btn[disabled]{opacity:.4;cursor:not-allowed}
-.btn[disabled]:hover{background:transparent;color:inherit}
-.btn-solido{background:var(--rojo);border-color:var(--rojo);color:var(--blanco)}
-.btn-solido:hover{background:var(--negro);border-color:var(--negro);color:var(--blanco)}
-.btn-solido[disabled]:hover{background:var(--rojo);border-color:var(--rojo);color:var(--blanco)}
+.btn:hover{background:var(--relleno-fuerte)}
+.btn:active{transform:scale(.97)}
+.btn:focus-visible{outline:2px solid var(--acento);outline-offset:2px}
+.btn[disabled]{opacity:.35;cursor:not-allowed}
+.btn[disabled]:hover{background:var(--relleno)}
+.btn[disabled]:active{transform:none}
+
+.btn-solido{background:var(--acento);color:var(--blanco);font-weight:600}
+.btn-solido:hover{background:var(--acento-hundido)}
+.btn-solido[disabled]:hover{background:var(--acento)}
+
+.btn-tinte{background:var(--acento-tenue);color:var(--acento);font-weight:600}
+.btn-tinte:hover{background:rgba(0,122,255,.18)}
+.btn-tinte[disabled]:hover{background:var(--acento-tenue)}
+
+/* Botón de icono: el disparador de los menús «⋯». */
+.btn-icono{
+  background:transparent;border:0;cursor:pointer;color:var(--gris-tenue);
+  width:30px;height:30px;border-radius:var(--r-control);
+  font-size:17px;line-height:1;padding:0;flex:none;
+  display:inline-flex;align-items:center;justify-content:center;
+  transition:background .18s ease,color .18s ease;
+}
+.btn-icono:hover{background:var(--relleno);color:var(--negro)}
+.btn-icono:focus-visible{outline:2px solid var(--acento);outline-offset:2px}
+.btn-icono[disabled]{opacity:.35;cursor:not-allowed}
+.btn-icono[disabled]:hover{background:transparent;color:var(--gris-tenue)}
+
+/* Para etiquetas que solo necesitan existir para el lector de pantalla. */
+.oculto-visual{
+  position:absolute;width:1px;height:1px;overflow:hidden;
+  clip-path:inset(50%);white-space:nowrap;
+}
 
 @media (prefers-reduced-motion:reduce){
   *{transition:none!important;animation:none!important;scroll-behavior:auto!important}

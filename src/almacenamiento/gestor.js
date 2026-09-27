@@ -97,6 +97,13 @@ export function crearGestor({ alCambiarEstado = () => {} } = {}) {
     }
 
     ultimaHora = new Date();
+
+    // Copia de seguridad mientras se trabaja. No es con cada dato capturado:
+    // se toma como mucho una cada pocos minutos, para que las ranuras no se
+    // llenen de versiones casi idénticas de hace un rato y siga siendo
+    // posible volver a ayer. Nunca estorba al guardado, que ya ocurrió.
+    local.archivarCopia(datos, "mientras trabajabas", local.MINUTOS_ENTRE_COPIAS);
+
     // Si mientras se escribía entró otro cambio, el rótulo lo dice el nuevo aviso.
     if (temporizador) return;
     anunciar("guardado", problemaLocal);

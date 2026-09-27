@@ -20,6 +20,9 @@ import { montarVistaSemestre } from "./vistas/semestre.js";
 import { montarModoClase } from "./vistas/modoClase.js";
 import { montarDialogos } from "./vistas/dialogos.js";
 import { montarAviso, mostrarAviso } from "./vistas/aviso.js";
+import { abrirMenu } from "./vistas/menu.js";
+import { montarEscalaDeTexto, montarLectura } from "./vistas/lectura.js";
+import { montarMudanza } from "./vistas/mudanza.js";
 import { exportarMarkdown } from "./exportacion/markdown.js";
 import { exportarPlantilla, exportarRespaldo } from "./exportacion/respaldo.js";
 
@@ -43,22 +46,35 @@ function pintarIndicador({ modo, situacion, hora, detalle, necesitaReconectar, n
   const caja = $("#estado-guardado");
   caja.dataset.modo = modo;
 
-  let texto;
-  if (situacion === "guardando") texto = "Guardando…";
-  else if (situacion === "pendiente") texto = "Cambios sin guardar…";
-  else if (situacion === "error") texto = detalle || "No se pudo guardar.";
-  else if (situacion === "sin-guardar" || modo === "memoria") texto = "Sin guardado automático: exporta un respaldo.";
-  else if (hora) texto = `Guardado ${horaCorta(hora)} ${modo === "archivo" ? `en ${nombreArchivo}` : TEXTO_DE_MODO[modo]}`;
-  else texto = `Se guardará ${TEXTO_DE_MODO[modo]}`;
+  /* Dos textos distintos. En la cabecera va el breve, que cabe siempre y no
+     se mueve con cada tecla; la hora y el porqué esperan a que se pulse.
+     El estado nunca se comunica solo por color: cambia la palabra y cambia
+     el signo del indicador, para quien no distingue los matices de rojo. */
+  let breve;
+  let signo = "guardado";
+  if (situacion === "guardando") { breve = "Guardando…"; signo = "trabajando"; }
+  else if (situacion === "pendiente") { breve = "Cambios sin guardar"; signo = "pendiente"; }
+  else if (situacion === "error") { breve = "No se pudo guardar"; signo = "error"; }
+  else if (situacion === "sin-guardar" || modo === "memoria") { breve = "Sin guardado automático"; signo = "error"; }
+  else if (modo === "archivo") breve = `Guardado en ${nombreArchivo || "tu archivo"}`;
+  else breve = "Guardado en este navegador";
 
-  // Lo que sigue pendiente se dice junto al estado, no en lugar de él.
+  if (necesitaReconectar) { breve = "Falta permiso del archivo"; signo = "pendiente"; }
+
+  let largo;
+  if (situacion === "error") largo = detalle || "No se pudo guardar.";
+  else if (hora) largo = `Guardado a las ${horaCorta(hora)} ${modo === "archivo" ? `en ${nombreArchivo}` : TEXTO_DE_MODO[modo]}.`;
+  else largo = `Se guardará ${TEXTO_DE_MODO[modo]}.`;
+
   const pendientes = [];
   if (necesitaReconectar) pendientes.push("el archivo vinculado necesita permiso");
   if (detalle && situacion !== "error") pendientes.push(detalle);
-  if (pendientes.length) texto += ` · ${pendientes.join(" · ")}`;
+  if (pendientes.length) largo += ` Pendiente: ${pendientes.join(" · ")}.`;
 
-  caja.innerHTML = `<span class="punto"></span>${esc(texto)}`;
-  caja.title = texto;
+  caja.dataset.situacion = signo;
+  caja.innerHTML = `<span class="punto"></span><span class="rot">${esc(breve)}</span>`;
+  caja.title = `${largo} Pulsa para ver dónde se guarda y las copias de seguridad.`;
+  caja.setAttribute("aria-label", `${breve}. ${largo} Pulsa para ver dónde se guarda.`);
 
   // El pie solo se rehace cuando cambia el modo: si no, cada tecla de la bitácora
   // reescribiría ese bloque y rompería cualquier selección de texto.
@@ -83,13 +99,21 @@ function pintarPie(modo, nombreArchivo) {
       salir e <em>Importar respaldo</em> al volver.</p>`,
   };
 
-  $("#pie-pagina").innerHTML = `
+  /* Estas explicaciones vivían repetidas al pie de cada sesión, donde se
+     leían una vez y después solo ocupaban sitio. Ahora están en «Guardado y
+     respaldos», dentro del diálogo que abre el indicador de guardado, y en
+     la guía. Al pie solo se queda lo que es un problema concreto y ahora. */
+  $("#alm-ayuda-cuerpo").innerHTML = `
     ${donde[modo] || donde.navegador}
     <p><strong>Para que funcione en cualquier computadora,</strong> usa ligas de OneDrive en lugar de rutas del
     disco. Las rutas locales (<span class="ruta" style="display:inline">file://</span>) no abren con un clic desde
     el navegador. El botón <em>Revisar enlaces</em> las encuentra todas antes de la clase.</p>
     <p><strong>Tus ligas son privadas.</strong> Los respaldos incluyen las ligas de OneDrive, que llevan claves de
     uso compartido. No los subas a un repositorio abierto.</p>`;
+
+  // El aviso al pie solo aparece cuando hay algo que resolver.
+  $("#pie-pagina").innerHTML = modo === "memoria" ? donde.memoria : "";
+  $("#pie-pagina").hidden = modo !== "memoria";
 }
 
 /* ========================= Carga de datos ========================= */
@@ -252,10 +276,37 @@ function montarDialogoAlmacen() {
     if (boton) restaurarCopia(Number(boton.dataset.restaurar));
   });
 
-  $("#btn-vincular").addEventListener("click", () => {
+  const abrirAlmacen = () => {
     pintarDialogoAlmacen();
     $("#dlg-almacen").showModal();
-  });
+  };
+  $("#btn-vincular").addEventListener("click", abrirAlmacen);
+  // El indicador de guardado es la puerta al detalle: dónde se guarda,
+  // a qué hora y qué copias de seguridad hay.
+  $("#estado-guardado").addEventListener("click", abrirAlmacen);
+
+  /* Menú «Archivo». Los botones siguen en el documento, ocultos: el menú
+     los acciona, así que conservan nombre, título y confirmaciones. */
+  const opcionDe = (selector, etiqueta) => {
+    const boton = $(selector);
+    return {
+      etiqueta,
+      titulo: boton?.title || "",
+      desactivado: !boton || boton.disabled,
+      accion: () => boton?.click(),
+    };
+  };
+  $("#btn-archivo").addEventListener("click", (e) =>
+    abrirMenu(e.currentTarget, [
+      opcionDe("#btn-vincular", "Vincular archivo…"),
+      "---",
+      opcionDe("#btn-importar", "Importar respaldo…"),
+      opcionDe("#btn-json", "Guardar respaldo"),
+      "---",
+      opcionDe("#btn-md", "Exportar a Markdown"),
+      opcionDe("#btn-plantilla", "Plantilla del curso"),
+    ])
+  );
 
   $("#btn-alm-nuevo").addEventListener("click", async () => {
     try {
@@ -313,6 +364,9 @@ function montarDialogoAlmacen() {
 async function arrancar() {
   montarLateral();
   montarVistaSesion();
+  montarEscalaDeTexto();
+  montarLectura();
+  montarMudanza();
   montarVistaSemestre();
   montarModoClase();
   montarDialogos();

@@ -50,10 +50,21 @@ export function borrar() {
 /* ---------------------------------------------------------
    Copias de seguridad rotativas.
 
-   Se guardan las últimas tres versiones distintas, para poder volver atrás si
-   se importa el respaldo equivocado o si se descubre tarde que faltaba algo.
-   No se archiva con cada tecla: solo al abrir el panel y antes de las
-   operaciones que sustituyen todo.
+   Sirven para volver atrás: se importó el respaldo equivocado, se borró algo
+   sin darse cuenta, o se descubre el martes que el lunes faltaba media sesión.
+
+   El reparto importa más que el número. Guardar una copia con cada dato que
+   se captura suena a más seguridad y es lo contrario: en diez minutos de
+   trabajo las tres ranuras quedarían ocupadas por tres versiones casi
+   idénticas de hace un rato, y el estado de ayer —el único al que de verdad
+   se querría volver— ya se habría perdido. Por eso se conserva en dos
+   tramos:
+
+     · las últimas seis versiones, densas, para deshacer lo reciente;
+     · una por día de los siete días anteriores, para volver más atrás.
+
+   Mientras se trabaja se archiva sola cada pocos minutos, no con cada tecla.
+   Antes de una operación que sustituye todo se archiva siempre, sin esperar.
 
    Este archivo de copias nunca debe estorbar al guardado normal: si no cabe,
    se sacrifican las copias viejas, y si aun así no cabe, se abandona en
@@ -61,7 +72,11 @@ export function borrar() {
    --------------------------------------------------------- */
 
 const CLAVE_COPIAS = "panel-de-clases:copias";
-const MAXIMO_COPIAS = 3;
+const MAXIMO_RECIENTES = 6;
+const DIAS_CONSERVADOS = 7;
+
+/** Minutos mínimos entre dos copias tomadas mientras se trabaja. */
+export const MINUTOS_ENTRE_COPIAS = 4;
 
 export function leerCopias() {
   try {
@@ -72,8 +87,26 @@ export function leerCopias() {
   }
 }
 
+const diaDe = (iso) => String(iso || "").slice(0, 10); // AAAA-MM-DD
+
+/** Deja las recientes completas y, de lo anterior, la última de cada día. */
+function podar(copias) {
+  const recientes = copias.slice(0, MAXIMO_RECIENTES);
+  const diasYaVistos = new Set(recientes.map((c) => diaDe(c.fecha)));
+  const porDia = [];
+
+  for (const copia of copias.slice(MAXIMO_RECIENTES)) {
+    const dia = diaDe(copia.fecha);
+    if (diasYaVistos.has(dia)) continue; // ya hay una de ese día
+    diasYaVistos.add(dia);
+    porDia.push(copia);
+    if (porDia.length >= DIAS_CONSERVADOS) break;
+  }
+  return [...recientes, ...porDia];
+}
+
 function escribirCopias(copias) {
-  let lista = copias.slice(0, MAXIMO_COPIAS);
+  let lista = podar(copias);
   while (lista.length) {
     try {
       window.localStorage.setItem(CLAVE_COPIAS, JSON.stringify(lista));
@@ -89,16 +122,32 @@ function escribirCopias(copias) {
   }
 }
 
-/** Archiva el estado actual, si es distinto del último archivado. */
-export function archivarCopia(datos, motivo) {
-  if (!datos || !disponible()) return;
+/**
+ * Archiva el estado actual, si es distinto del último archivado.
+ * @param {object} datos
+ * @param {string} motivo        qué provocó la copia, para la lista
+ * @param {number} minutosMinimos  si ya hay una copia más nueva que esto, no
+ *                                 se archiva. Cero o sin valor: archiva siempre.
+ * @returns {boolean} si llegó a archivar
+ */
+export function archivarCopia(datos, motivo, minutosMinimos = 0) {
+  if (!datos || !disponible()) return false;
   try {
     const copias = leerCopias();
+
+    if (minutosMinimos > 0 && copias.length) {
+      const desde = Date.now() - new Date(copias[0].fecha).getTime();
+      if (desde < minutosMinimos * 60_000) return false;
+    }
+
     const texto = JSON.stringify(datos);
-    if (copias.length && JSON.stringify(copias[0].datos) === texto) return;
+    if (copias.length && JSON.stringify(copias[0].datos) === texto) return false;
+
     copias.unshift({ fecha: new Date().toISOString(), motivo, datos: JSON.parse(texto) });
     escribirCopias(copias);
+    return true;
   } catch {
     /* el archivo de copias es un extra: nunca detiene nada */
+    return false;
   }
 }

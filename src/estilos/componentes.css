@@ -1,182 +1,530 @@
 /* =========================================================
    Componentes de la interfaz.
-   Lenguaje visual: tipografía y líneas finas.
-   Sin sombras difusas, sin esquinas redondeadas grandes, sin degradados.
+   Lenguaje visual de sistema: superficies claras con esquinas suaves,
+   separadores translúcidos, sombras muy bajas y una sola acción
+   destacada por zona. La jerarquía la carga la tipografía.
    ========================================================= */
 
-/* ---------- Encabezado ---------- */
-.barra{background:var(--rojo);color:var(--blanco);padding:14px 20px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
-/* Palabra IBERO en blanco sobre el rojo institucional.
-   Es texto vivo compuesto con una serif del sistema, no un redibujo del
-   logotipo: cuando esté el archivo autorizado por la DCI, se sustituye aquí.
-   No se carga ninguna fuente web: el panel debe abrir sin conexión. */
-.marca{
-  flex:none;
-  font-family:"Times New Roman","Liberation Serif",Times,Georgia,serif;
-  font-size:38px;line-height:1;font-weight:700;
-  letter-spacing:.03em;color:var(--blanco);
-  padding-right:6px;
+/* ---------- Encabezado ----------
+   Barra de herramientas clara y translúcida. El nombre y el descriptor
+   viven aquí; «Artefacto epistémico» pasó a la guía, y la palabra IBERO
+   bajó a la pleca del pie. */
+.barra{
+  background:rgba(255,255,255,.72);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);
+  backdrop-filter:saturate(180%) blur(20px);
+  color:var(--negro);
+  padding:11px var(--e4);display:flex;align-items:center;gap:var(--e3);flex-wrap:wrap;
+  border-bottom:1px solid var(--linea);
+  position:sticky;top:0;z-index:20;
 }
-.barra .titulo{min-width:0}
-.barra .eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.22em;opacity:.88}
-.barra h1{font-size:21px;font-weight:700;margin:1px 0 0;letter-spacing:.01em}
-.barra .der{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+/* Logotipo «Secuencia», tal cual viene del original: trae el símbolo, el
+   nombre y el descriptor, así que no se repiten como texto al lado.
+   Se fija solo la altura para que nunca se deforme. */
+/* El descriptor ocupa el 13.9% de la altura del logotipo: a 40px sus letras
+   median 5.6px y no se leían. A 76px rondan los 11px, que es donde la frase
+   se aprecia. En pantalla angosta se reduce: ahí el alto vale más. */
+.logo{flex:none;height:76px;width:auto;display:block}
+/* En pantalla angosta la barra deja de ser pegajosa (más abajo), así que
+   un logotipo alto ya no cuesta espacio permanente: se sube a 70px para
+   que el descriptor siga rondando los 10px y no quede decorativo. */
+@media (max-width:860px){ .logo{height:70px} }
+.barra .der{margin-left:auto;display:flex;gap:var(--e1);flex-wrap:wrap;align-items:center}
+.barra .btn{font-size:14px;padding:7px 14px}
 
-.guardado{margin:0;font-size:11.5px;letter-spacing:.04em;opacity:.95;max-width:26ch;line-height:1.25}
-.guardado .punto{display:inline-block;width:7px;height:7px;border:1px solid var(--blanco);margin-right:6px;vertical-align:0}
-.guardado[data-modo="archivo"] .punto{background:var(--blanco)}
-.guardado[data-modo="navegador"] .punto{background:rgba(255,255,255,.5)}
-.guardado[data-modo="memoria"] .punto{background:transparent}
+/* Estado del guardado: pastilla que se pulsa para ver el detalle real.
+   El estado no depende solo del color — cambia la palabra y el signo. */
+.chip-guardado{
+  display:inline-flex;align-items:center;gap:8px;cursor:pointer;
+  font:inherit;font-size:13.5px;line-height:1.3;color:var(--gris-tenue);
+  background:var(--relleno);border:0;padding:6px 13px;border-radius:999px;
+  max-width:34ch;transition:background .18s ease;
+}
+.chip-guardado:hover{background:var(--relleno-fuerte);color:var(--negro)}
+.chip-guardado:focus-visible{outline:2px solid var(--acento);outline-offset:2px}
+.chip-guardado .rot{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip-guardado .punto{
+  flex:none;width:9px;height:9px;border-radius:50%;background:var(--gris);
+  position:relative;
+}
+.chip-guardado[data-situacion="guardado"] .punto{background:#248A3D}
+.chip-guardado[data-situacion="trabajando"] .punto{background:var(--gris)}
+/* Pendiente y error llevan además una marca de forma, no solo color. */
+.chip-guardado[data-situacion="pendiente"]{color:#8A5300;background:rgba(191,120,0,.12)}
+.chip-guardado[data-situacion="pendiente"] .punto{background:#B77400;border-radius:2px}
+.chip-guardado[data-situacion="error"]{color:var(--rojo);background:var(--rojo-tenue);font-weight:500}
+.chip-guardado[data-situacion="error"] .punto{
+  background:var(--rojo);border-radius:2px;transform:rotate(45deg);
+}
 
 /* ---------- Estructura ---------- */
-.envoltura{display:flex;align-items:flex-start;min-height:calc(100vh - 82px)}
-.lateral{width:280px;flex:none;border-right:1px solid var(--linea);padding:22px 18px;background:var(--blanco);min-height:calc(100vh - 82px)}
-.principal{flex:1;padding:24px 28px 80px;min-width:0}
+/* --alto-barra lo mide y lo escribe lateral.js: la cabecera cambia de alto
+   al crecer el logotipo y al envolverse en pantallas angostas, y antes
+   estaba escrito a mano como 60px en tres reglas. */
+.envoltura{display:flex;align-items:flex-start;min-height:calc(100vh - var(--alto-barra,99px))}
+.lateral{
+  width:272px;flex:none;border-right:1px solid var(--linea);
+  padding:20px 12px;background:transparent;
+  min-height:calc(100vh - var(--alto-barra,99px));
+  position:sticky;top:var(--alto-barra,99px);
+  max-height:calc(100vh - var(--alto-barra,99px));overflow-y:auto;
+}
+/* El contenido no se estira sin límite en pantallas anchas: las tarjetas
+   dejarían líneas demasiado largas para leerse con comodidad. */
+.principal{flex:1;padding:var(--e4) var(--e5) 80px;min-width:0}
 
-.rotulo{font-size:10px;text-transform:uppercase;letter-spacing:.2em;color:var(--gris-tenue);margin:0 0 10px;font-weight:700;display:flex;align-items:center;gap:8px}
-.rotulo .mas{margin-left:auto;border:1px solid var(--linea);background:none;cursor:pointer;font-size:12px;line-height:1;padding:3px 8px;letter-spacing:0;color:var(--gris-tenue)}
-.rotulo .mas:hover{background:var(--negro);color:var(--blanco);border-color:var(--negro)}
+/* Plegado de la barra lateral: se oculta el ancho, no el contenido, para que
+   al volver todo siga donde estaba. */
+.lateral{transition:width .2s ease,opacity .18s ease}
+body.lateral-plegado .lateral{
+  /* min-width:0 es imprescindible: todo elemento flexible trae min-width:auto,
+     que le impide encoger por debajo de su contenido, y el width:0 no bastaba. */
+  width:0;min-width:0;padding-left:0;padding-right:0;
+  overflow:hidden;opacity:0;border-right:0;pointer-events:none;
+}
+.plegar svg{width:19px;height:19px}
+body.lateral-plegado .plegar{background:var(--acento-tenue);color:var(--acento)}
 
-.fila{display:flex;align-items:stretch;border-left:3px solid transparent;margin-bottom:3px}
-.fila:hover{background:var(--papel)}
-.fila[data-activo="true"]{background:var(--papel)}
-.fila.materia[data-activo="true"]{border-left-color:var(--rojo)}
-.fila.sesion[data-activo="true"]{border-left-color:var(--negro)}
-.fila .principalbtn{flex:1;text-align:left;background:none;border:0;padding:9px 10px;cursor:pointer;font-size:13.5px;min-width:0}
-.fila[data-activo="true"] .principalbtn{font-weight:700}
-.fila .principalbtn small{display:block;color:var(--gris-tenue);font-size:11.5px;font-weight:400}
-.fila .lapiz{border:0;background:none;cursor:pointer;padding:0 9px;color:var(--gris-tenue);font-size:12px;opacity:0}
-.fila:hover .lapiz,.fila[data-activo="true"] .lapiz,.fila .lapiz:focus-visible{opacity:1}
-.fila .lapiz:hover{color:var(--rojo)}
+/* Tres grupos separados: materias, sesiones y herramientas del curso. */
+.grupo-lat + .grupo-lat{
+  margin-top:var(--e4);padding-top:var(--e3);border-top:1px solid var(--linea);
+}
 
-.fecha-chip{font-family:var(--mono);font-size:10.5px;color:var(--gris-tenue);text-transform:uppercase;letter-spacing:.04em}
+/* Configurar carpeta y cuaderno: una sola entrada discreta en lugar de dos
+   renglones anunciando lo que falta. */
+.config-materia{
+  border:0;background:transparent;cursor:pointer;font:inherit;font-size:13.5px;
+  color:var(--acento);padding:5px 8px;text-align:left;border-radius:var(--r-chip);
+  transition:background .18s ease;
+}
+.config-materia:hover{background:var(--acento-tenue)}
+.config-materia:focus-visible{outline:2px solid var(--acento);outline-offset:2px}
+
+/* Fila de sesión: número y fecha arriba para recorrer, título abreviado a
+   una línea. El completo vive en el atributo title y en la vista principal. */
+.fila .linea-meta{
+  display:flex;align-items:center;gap:7px;flex-wrap:wrap;
+  font-size:12.5px;color:var(--gris-tenue);margin-bottom:2px;
+}
+.fila .num-ses{
+  font-family:var(--mono);font-variant-numeric:tabular-nums;
+  font-weight:600;color:var(--negro);letter-spacing:-.02em;
+}
+.fila .titulo-ses{
+  display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font-size:14.5px;line-height:1.35;
+}
+.principal > section{max-width:var(--ancho-contenido)}
+
+/* Encabezado de sección del lateral: caja alta y tracking amplio eran del
+   lenguaje editorial anterior. Aquí van en redonda, seminegra y gris. */
+.rotulo{
+  font-size:12.5px;letter-spacing:0;
+  color:var(--gris-tenue);margin:0 0 6px;font-weight:600;
+  display:flex;align-items:center;gap:8px;padding:0 8px;
+}
+/* Área sensible de al menos 26px: antes medía unos 20 y quedaba por
+   debajo del mínimo recomendable para tocar con el dedo. */
+.rotulo .mas{
+  margin-left:auto;border:0;background:transparent;cursor:pointer;
+  font-size:12.5px;line-height:1;padding:7px 9px;min-height:26px;
+  letter-spacing:0;color:var(--acento);font-weight:500;
+  border-radius:var(--r-chip);transition:background .18s ease;
+}
+.rotulo .mas:hover{background:var(--acento-tenue)}
+
+/* Filas del lateral: selección como pastilla, al modo de las barras
+   laterales del sistema. Sin filete de color a la izquierda. */
+.fila{
+  display:flex;align-items:stretch;margin-bottom:1px;
+  border-radius:var(--r-control);overflow:hidden;
+  transition:background .15s ease;
+}
+.fila:hover{background:var(--relleno)}
+/* Seleccionado: rojo muy diluido, texto oscuro y un filete a la izquierda.
+   Tres señales —fondo, filete y seminegra— para no depender del color. */
+.fila{position:relative}
+.fila[data-activo="true"]{background:var(--seleccion);color:var(--negro)}
+.fila[data-activo="true"]:hover{background:var(--seleccion-fuerte)}
+.fila[data-activo="true"]::before{
+  content:"";position:absolute;left:0;top:6px;bottom:6px;width:3px;
+  border-radius:0 3px 3px 0;background:var(--rojo);
+}
+.fila .principalbtn{
+  flex:1;text-align:left;background:none;border:0;padding:8px 10px 8px 12px;
+  cursor:pointer;font-size:14.5px;min-width:0;color:inherit;line-height:1.35;
+}
+.fila[data-activo="true"] .principalbtn{font-weight:600}
+.fila .principalbtn small{display:block;color:var(--gris-tenue);font-size:13px;font-weight:400;margin-top:2px}
+.fila[data-activo="true"] .principalbtn small{color:var(--gris-tenue)}
+/* El lápiz ya no aparece al pasar el cursor: está siempre, en voz baja, para
+   que también exista al tocar y para no competir con el nombre. */
+.fila .lapiz{
+  border:0;background:none;cursor:pointer;padding:0 11px;
+  color:var(--gris);font-size:12.5px;opacity:1;
+}
+.fila:hover .lapiz,.fila[data-activo="true"] .lapiz,.fila .lapiz:focus-visible{color:var(--gris-tenue)}
+.fila[data-activo="true"] .lapiz{color:var(--gris-tenue)}
+.fila .lapiz:hover{color:var(--acento)}
+.fila[data-activo="true"] .lapiz:hover{color:var(--rojo)}
+
+.fecha-chip{font-family:var(--mono);font-size:11.5px;color:inherit;letter-spacing:0}
 .sin-fecha{color:var(--rojo)}
-.vigente{display:inline-block;font-size:9px;letter-spacing:.14em;text-transform:uppercase;background:var(--rojo);color:var(--blanco);padding:1px 6px;margin-left:6px;vertical-align:1px}
-.sin-sesiones{font-size:13px;color:var(--gris-tenue)}
+.fila[data-activo="true"] .sin-fecha{color:var(--rojo)}
+/* Distintivo de sesión vigente: rojo IBERO, uno de los detalles donde
+   la identidad se conserva. */
+.vigente{
+  display:inline-block;font-size:10.5px;letter-spacing:.02em;font-weight:600;
+  text-transform:none;background:var(--rojo);color:var(--blanco);
+  padding:1px 7px;margin-left:6px;vertical-align:1px;border-radius:999px;
+}
+.fila[data-activo="true"] .vigente{background:var(--rojo);color:var(--blanco)}
+/* Distintivo de taller o ponencia en la lista lateral. Los cursos no lo
+   llevan: son el caso corriente y no necesitan anunciarse. */
+.fila .clase{
+  display:inline-block;font-size:10.5px;font-weight:500;margin-left:6px;
+  padding:1px 7px;border-radius:999px;vertical-align:1px;
+  background:var(--relleno);color:var(--gris-tenue);
+}
+.fila[data-activo="true"] .clase{background:var(--relleno);color:var(--gris-tenue)}
+.sin-sesiones{font-size:13px;color:var(--gris-tenue);padding:0 8px}
 
-.ver-todas{width:100%;margin-top:6px;border:1px solid var(--linea);background:none;cursor:pointer;font-size:12px;padding:6px;color:var(--gris-tenue)}
-.ver-todas:hover{background:var(--negro);color:var(--blanco);border-color:var(--negro)}
-.enlaces-materia{margin-top:14px;font-size:12.5px;display:flex;flex-direction:column;gap:4px}
+.ver-todas{
+  width:100%;margin-top:5px;border:0;background:transparent;cursor:pointer;
+  font-size:13px;padding:7px 10px;color:var(--acento);text-align:left;
+  border-radius:var(--r-control);transition:background .18s ease;
+}
+.ver-todas:hover{background:var(--acento-tenue)}
+.enlaces-materia{margin-top:14px;font-size:12.5px;display:flex;flex-direction:column;gap:5px;padding:0 8px}
 .enlaces-materia a{word-break:break-all}
 .enlaces-materia span{color:var(--gris-tenue)}
 
 /* ---------- Cabecera de sesión ---------- */
-.cabecera{border-bottom:2px solid var(--negro);padding-bottom:14px;display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap}
-.cabecera .meta{font-size:11px;text-transform:uppercase;letter-spacing:.18em;color:var(--gris-tenue)}
-.cabecera h2{font-size:26px;margin:6px 0 4px;line-height:1.2;font-weight:700}
-.cabecera p{margin:0;color:var(--gris-tenue);max-width:62ch;font-size:14.5px}
-.cabecera .acciones-sesion{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
-.cabecera .acciones-sesion .btn{border-color:var(--linea);font-size:12.5px;padding:5px 11px}
-.cabecera .acciones-sesion .btn:hover{background:var(--negro);color:var(--blanco);border-color:var(--negro)}
+.cabecera{border-bottom:1px solid var(--linea);padding-bottom:18px;display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap}
+.cabecera .meta{font-size:13.5px;color:var(--gris-tenue);font-weight:500;letter-spacing:0}
+.cabecera h2{font-size:clamp(1.63rem,2.4vw,1.88rem);margin:4px 0 6px;line-height:1.15;font-weight:700;letter-spacing:-.022em;text-wrap:balance}
+.cabecera p{margin:0;color:var(--gris-tenue);max-width:var(--ancho-lectura);font-size:.97rem;line-height:1.55}
+.cabecera .acciones-sesion{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 
-.controles{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:14px 0 18px;border-bottom:1px solid var(--linea);margin-bottom:22px}
-.controles input[type=search],.controles select{border:1px solid var(--linea);background:var(--blanco);padding:7px 10px;font-size:13.5px}
-.controles input[type=search]{min-width:180px}
-.conteo{font-size:12.5px;color:var(--gris-tenue);margin-left:auto}
+/* Barra de controles: buscar a la izquierda, acciones a la derecha, el
+   conteo entre las dos. Tres grupos legibles en vez de siete botones
+   seguidos. */
+.controles{
+  display:flex;gap:14px;align-items:center;flex-wrap:wrap;
+  padding:16px 0 18px;margin-bottom:8px;
+}
+.grupo-buscar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.grupo-acciones{display:flex;gap:7px;align-items:center;margin-left:auto}
+.controles input[type=search],.controles select{
+  border:0;background:var(--relleno);padding:8px 13px;font-size:14.5px;
+  border-radius:var(--r-control);color:var(--negro);
+  -webkit-appearance:none;appearance:none;
+}
+.controles select{padding-right:28px;cursor:pointer;
+  background-image:linear-gradient(45deg,transparent 50%,var(--gris-tenue) 50%),linear-gradient(135deg,var(--gris-tenue) 50%,transparent 50%);
+  background-position:calc(100% - 15px) 52%,calc(100% - 10px) 52%;
+  background-size:5px 5px,5px 5px;background-repeat:no-repeat;
+}
+.controles input[type=search]{min-width:210px}
+.controles input[type=search]::placeholder{color:var(--gris)}
+.controles input[type=search]:focus-visible,.controles select:focus-visible{outline:2px solid var(--acento);outline-offset:1px}
+.conteo{font-size:13.5px;color:var(--gris-tenue)}
 
-/* ---------- Bitácora ---------- */
-.bitacora{border:1px solid var(--linea);border-left:4px solid var(--rojo);background:var(--blanco);padding:16px 18px;margin-bottom:24px}
-.bitacora .cabeza{display:flex;align-items:baseline;gap:10px;margin-bottom:8px;flex-wrap:wrap}
-.bitacora label{font-size:11px;text-transform:uppercase;letter-spacing:.18em;color:var(--rojo);font-weight:700}
-.bitacora .cabeza .aclara{font-size:12px;color:var(--gris-tenue)}
-.bitacora textarea{width:100%;border:1px solid var(--linea);background:var(--papel);resize:vertical;min-height:88px;font-size:14px;line-height:1.55;padding:10px 12px;font-family:inherit}
-.bitacora textarea:focus{outline:2px solid var(--rojo);outline-offset:-2px;background:var(--blanco)}
-.bitacora .pie-bit{font-size:11.5px;color:var(--gris-tenue);margin:6px 0 0}
-
-/* ---------- Riel de sesión ---------- */
+/* ---------- Riel de sesión ----------
+   Las tarjetas son superficies elevadas, sin borde: las separa la sombra
+   y el aire, no una línea. */
 .riel{position:relative;padding-left:44px}
-.riel::before{content:"";position:absolute;left:13px;top:6px;bottom:6px;width:1px;background:var(--linea)}
-.tarjeta{position:relative;margin-bottom:14px;background:var(--blanco);border:1px solid var(--linea);padding:16px 18px}
-.tarjeta::before{content:"";position:absolute;left:-37px;top:20px;width:13px;height:13px;border-radius:50%;background:var(--blanco);border:2px solid var(--gris)}
-.tarjeta[data-estado="listo"]::before{border-color:var(--rojo);background:var(--rojo)}
-.tarjeta[data-estado="usado"]::before{border-color:var(--negro);background:var(--negro)}
-.tarjeta[data-estado="usado"]{opacity:.62}
-/* El momento va dentro de la tarjeta, pegado al margen derecho: como todas las
-   tarjetas miden lo mismo, los tiempos se alinean en una columna a la derecha.
-   Antes colgaba fuera de la tarjeta y se montaba encima de la barra lateral. */
-.tarjeta .momento{margin-left:auto;align-self:center;font-family:var(--mono);font-size:11.5px;color:var(--gris-tenue);white-space:nowrap;padding-left:10px}
-.tarjeta h3{margin:0 0 4px;font-size:16.5px;font-weight:700;line-height:1.3}
-.etiquetas{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
-.tipo{display:inline-block;font-size:10px;text-transform:uppercase;letter-spacing:.14em;border:1px solid var(--gris);color:var(--gris-tenue);padding:2px 7px}
-.tipo.nube{border-color:var(--rojo);color:var(--rojo)}
-.tarjeta .nota{margin:6px 0 0;font-size:14px;color:var(--gris-tenue);max-width:70ch}
-.ruta{font-family:var(--mono);font-size:11.5px;color:var(--gris-tenue);word-break:break-all;margin-top:8px;display:block}
-.acciones{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
-.acciones .btn{padding:5px 11px;font-size:12.5px;border-color:var(--linea)}
-.acciones .btn:hover{background:var(--negro);color:var(--blanco);border-color:var(--negro)}
-.aviso{margin-top:10px;font-size:12.5px;border-left:3px solid var(--rojo);padding:6px 10px;background:var(--papel);color:var(--gris-tenue)}
-.vacio{border:1px dashed var(--linea);padding:26px;text-align:center;color:var(--gris-tenue);font-size:14px}
+.riel::before{content:"";position:absolute;left:13px;top:10px;bottom:10px;width:2px;border-radius:2px;background:var(--linea)}
+.tarjeta{
+  position:relative;margin-bottom:var(--e2);background:var(--blanco);
+  border-radius:var(--r-tarjeta);padding:var(--e3) var(--e4) var(--e3) var(--e3);box-shadow:var(--sombra);
+  display:flex;gap:14px;align-items:flex-start;
+  transition:box-shadow .2s ease,transform .1s ease;
+}
+.tarjeta:hover{box-shadow:0 2px 6px rgba(0,0,0,.07), 0 1px 3px rgba(0,0,0,.05)}
+.tarjeta .cuerpo{flex:1;min-width:0}
+
+/* El punto del riel ES el control de estado: se pulsa para avanzar de
+   pendiente a listo y de listo a usado. El área sensible es mayor que el
+   círculo que se ve. */
+.tarjeta .punto{
+  position:absolute;left:-45px;top:12px;width:28px;height:28px;
+  border:0;background:transparent;cursor:pointer;padding:0;
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  transition:background .18s ease;
+}
+.tarjeta .punto::before{
+  content:"";width:13px;height:13px;border-radius:50%;
+  background:var(--blanco);border:2px solid var(--gris);
+  transition:background .18s ease,border-color .18s ease,transform .18s ease;
+}
+.tarjeta .punto:hover{background:var(--relleno)}
+.tarjeta .punto:hover::before{transform:scale(1.18)}
+.tarjeta .punto:focus-visible{outline:2px solid var(--acento);outline-offset:1px}
+/* Listo y usado en rojo IBERO y negro: otro de los detalles donde se
+   conserva la identidad. */
+.tarjeta[data-estado="listo"] .punto::before{border-color:var(--rojo);background:var(--rojo)}
+.tarjeta[data-estado="usado"] .punto::before{border-color:var(--negro);background:var(--negro)}
+/* Lo usado se atenúa, pero el texto sigue siendo legible: antes bajaba a
+   un contraste de 2.6:1 y dejaba de leerse. */
+.tarjeta[data-estado="usado"]{background:#FBFBFD;box-shadow:none}
+.tarjeta[data-estado="usado"] h3{color:var(--gris-tenue);text-decoration:line-through;text-decoration-color:var(--linea)}
+
+/* El momento acompaña al tipo en la línea de metadatos. Antes se empujaba al
+   borde derecho y quedaba pegado a los botones de acción. */
+.tarjeta .momento{
+  font-family:var(--mono);font-size:13px;color:var(--gris-tenue);
+  white-space:nowrap;font-variant-numeric:tabular-nums;
+}
+.etiquetas > * + *::before{content:"·";margin:0 8px 0 0;color:var(--gris)}
+/* El estado también se dice con palabras, no solo con el color del punto. */
+.marca-estado{font-size:12.5px;color:var(--gris-tenue)}
+.tarjeta[data-estado="listo"] .marca-estado{color:var(--acento);font-weight:500}
+.tarjeta h3{margin:0 0 4px;font-size:1.09rem;font-weight:600;line-height:1.3;letter-spacing:-.012em;text-wrap:pretty}
+.etiquetas{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:7px}
+.tipo{
+  display:inline-block;font-size:12.5px;letter-spacing:0;font-weight:400;
+  background:transparent;color:var(--gris-tenue);
+  padding:0;border-radius:0;text-transform:lowercase;
+}
+.tipo.nube{background:transparent;color:var(--rojo)}
+.tipo.nube{background:var(--rojo-tenue);color:var(--rojo)}
+.tarjeta .nota{margin:6px 0 0;font-size:1rem;color:var(--gris-tenue);max-width:var(--ancho-lectura);line-height:1.58}
+.tarjeta .nota p{margin:0 0 .6em}
+.tarjeta .nota p:last-child{margin-bottom:0}
+.tarjeta .nota ul{margin:.3em 0;padding-left:1.25em}
+.tarjeta .nota li{margin-bottom:.25em}
+.tarjeta .nota a{color:var(--acento)}
+/* Descripción larga: se recorta con un desvanecido y se despliega en el
+   sitio, sin repintar, para no perder el punto de lectura. */
+.tarjeta .nota.plegable{max-height:9.5em;overflow:hidden;position:relative}
+.tarjeta .nota.plegable::after{
+  content:"";position:absolute;inset:auto 0 0 0;height:2.6em;
+  background:linear-gradient(to bottom,rgba(255,255,255,0),var(--blanco));
+}
+.tarjeta .nota.plegable.abierta{max-height:none}
+.tarjeta .nota.plegable.abierta::after{display:none}
+.mas-texto{
+  border:0;background:transparent;cursor:pointer;font:inherit;font-size:.87rem;
+  color:var(--acento);font-weight:500;padding:5px 0 0;margin-top:2px;
+}
+.mas-texto:hover{text-decoration:underline}
+.mas-texto:focus-visible{outline:2px solid var(--acento);outline-offset:2px}
+
+/* ---------- Vista de lectura ----------
+   Texto amplio y nada alrededor. No trae contenido de fuera: enseña la
+   descripción que ya está guardada en el recurso. */
+.dlg-lectura{
+  max-width:min(760px,94vw);width:100%;max-height:88vh;
+  padding:0;border-radius:16px;overflow:auto;
+}
+.dlg-lectura .lec-barra{
+  position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:var(--e3);
+  padding:var(--e2) var(--e4);border-bottom:1px solid var(--linea);
+  background:rgba(255,255,255,.86);
+  -webkit-backdrop-filter:saturate(180%) blur(18px);backdrop-filter:saturate(180%) blur(18px);
+}
+.dlg-lectura .lec-meta{font-size:13.5px;color:var(--gris-tenue);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dlg-lectura #lec-cerrar{margin-left:auto;flex:none}
+.dlg-lectura .lec-cuerpo{padding:var(--e4) var(--e5) var(--e5)}
+.dlg-lectura h2{
+  font-size:1.75rem;line-height:1.18;letter-spacing:-.022em;margin:0 0 var(--e3);
+  font-weight:700;text-wrap:balance;max-width:var(--ancho-lectura);
+}
+.dlg-lectura #lec-cuerpo{font-size:1.12rem;line-height:1.65;color:var(--negro);max-width:var(--ancho-lectura)}
+.dlg-lectura #lec-cuerpo p{margin:0 0 1em}
+.dlg-lectura #lec-cuerpo ul{margin:.8em 0;padding-left:1.3em}
+.dlg-lectura #lec-cuerpo li{margin-bottom:.45em}
+.dlg-lectura #lec-cuerpo a{color:var(--acento)}
+.dlg-lectura .sin-texto{color:var(--gris-tenue);font-style:italic}
+.dlg-lectura #lec-origen{margin-top:var(--e4);padding-top:var(--e3);border-top:1px solid var(--linea)}
+.dlg-lectura .lec-origen{font-size:.94rem;color:var(--acento);text-decoration:none}
+.dlg-lectura .lec-origen:hover{text-decoration:underline}
+
+/* Gris tenue, no gris medio: en monoespaciada a 12px el gris medio se
+   quedaba en 3.3:1, por debajo del mínimo legible. */
+.ruta{font-family:var(--mono);font-size:13px;color:var(--gris-tenue);word-break:break-all;margin-top:8px;display:block}
+.acciones{display:flex;gap:6px;align-items:center;flex:none}
+.aviso{
+  margin-top:9px;font-size:12.5px;padding:7px 11px;border-radius:var(--r-chip);
+  background:var(--rojo-tenue);color:var(--rojo);line-height:1.4;
+}
+.vacio{
+  border:0;background:var(--blanco);border-radius:var(--r-tarjeta);
+  padding:34px 26px;text-align:center;color:var(--gris-tenue);font-size:14px;
+  box-shadow:var(--sombra);
+}
+
+/* ---------- Bitácora ----------
+   Debajo de los recursos y plegada: en clase estorbaba arriba, empujando
+   hacia abajo lo que de verdad se usa. */
+.bitacora{
+  margin-top:26px;background:var(--blanco);border-radius:var(--r-tarjeta);
+  box-shadow:var(--sombra);overflow:hidden;
+}
+.bitacora summary{
+  display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
+  padding:14px 18px;cursor:pointer;list-style:none;
+  transition:background .15s ease;
+}
+.bitacora summary::-webkit-details-marker{display:none}
+.bitacora summary:hover{background:var(--relleno)}
+.bitacora summary:focus-visible{outline:2px solid var(--acento);outline-offset:-2px}
+.bitacora .rotulo-bit{font-size:14px;font-weight:600;color:var(--negro)}
+.bitacora .rotulo-bit::before{
+  content:"›";display:inline-block;margin-right:9px;color:var(--gris);
+  transition:transform .2s ease;font-weight:400;
+}
+.bitacora[open] .rotulo-bit::before{transform:rotate(90deg)}
+.bitacora summary .aclara{font-size:12.5px;color:var(--gris-tenue)}
+.bitacora .cuerpo-bit{padding:0 18px 16px}
+.bitacora textarea{
+  width:100%;border:0;background:var(--relleno);resize:vertical;min-height:96px;
+  font-size:.94rem;line-height:1.55;padding:11px 13px;font-family:inherit;
+  border-radius:var(--r-control);color:var(--negro);
+}
+.bitacora textarea:focus-visible{outline:2px solid var(--acento);outline-offset:1px}
+.bitacora .pie-bit{font-size:12px;color:var(--gris-tenue);margin:8px 0 0}
 
 /* ---------- Vista de semestre ---------- */
-.semestre{width:100%;border-collapse:collapse;margin-top:22px;font-size:14px;background:var(--blanco)}
+.semestre{width:100%;border-collapse:collapse;margin-top:22px;font-size:14px;
+  background:var(--blanco);border-radius:var(--r-tarjeta);overflow:hidden;box-shadow:var(--sombra)}
 .semestre th{
-  text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:var(--gris-tenue);
-  border-bottom:1px solid var(--negro);padding:8px 10px;font-weight:700;
+  text-align:left;font-size:12.5px;letter-spacing:0;color:var(--gris-tenue);
+  border-bottom:1px solid var(--linea);padding:9px 10px;font-weight:600;
 }
 .semestre td{border-bottom:1px solid var(--linea);padding:10px;vertical-align:top}
 .semestre tr[data-activo="true"] td{background:var(--papel)}
-.semestre .col-num{width:64px;font-family:var(--mono);font-size:12px;color:var(--gris-tenue);white-space:nowrap}
-.semestre .col-fecha{width:132px;font-family:var(--mono);font-size:12px;color:var(--gris-tenue);white-space:nowrap}
-.semestre .col-conteo{width:118px;font-size:12.5px;color:var(--gris-tenue);white-space:nowrap}
-.semestre .liga-sesion{background:none;border:0;padding:0;text-align:left;cursor:pointer;font:inherit;font-weight:700}
+/* El título es la columna ancha; fecha y conteo se estrechan y se apagan. */
+.semestre .col-titulo{padding-right:var(--e4)}
+.semestre .ses-num{
+  font-family:var(--mono);font-size:12.5px;color:var(--gris-tenue);
+  font-variant-numeric:tabular-nums;margin-right:8px;
+}
+.semestre .col-fecha{width:104px;font-family:var(--mono);font-size:13px;color:var(--gris-tenue);white-space:nowrap;vertical-align:top}
+.semestre .col-conteo{width:112px;font-size:13px;color:var(--gris-tenue);white-space:nowrap;vertical-align:top}
+/* Propósito largo: dos líneas y un desplegable, para poder recorrer. */
+.semestre .prop.recortado{
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.semestre .prop.recortado.abierto{display:block;overflow:visible}
+.semestre .mas-texto{font-size:.85rem;padding-top:2px}
+.semestre .liga-sesion{background:none;border:0;padding:0;text-align:left;cursor:pointer;font:inherit;font-size:1.03rem;font-weight:600;letter-spacing:-.01em;color:var(--negro)}
 .semestre .liga-sesion:hover{color:var(--rojo)}
-.semestre .prop{display:block;font-weight:400;color:var(--gris-tenue);font-size:13px;margin-top:2px;max-width:70ch}
+.semestre .prop{display:block;font-weight:400;color:var(--gris-tenue);font-size:.94rem;line-height:1.5;margin-top:4px;max-width:var(--ancho-lectura)}
 
 /* ---------- Modo clase ---------- */
-.modo-clase{position:fixed;inset:0;background:var(--negro);color:var(--blanco);display:none;flex-direction:column;padding:40px 6vw;z-index:50}
-.modo-clase.activo{display:flex}
-.modo-clase .progreso{display:flex;gap:5px;margin-bottom:34px}
-.modo-clase .paso{height:3px;flex:1;background:rgba(255,255,255,.22)}
-.modo-clase .paso.hecho{background:var(--rojo)}
-.modo-clase .mc-cabeza{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap}
-.modo-clase .eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--rojo)}
-.modo-clase .reloj{
-  margin-left:auto;font-family:var(--mono);font-size:13px;letter-spacing:.04em;
-  color:#CFC9C3;border:1px solid rgba(255,255,255,.28);padding:3px 10px;white-space:nowrap;
+.modo-clase{
+  position:fixed;inset:0;background:#0B0B0C;color:var(--blanco);
+  display:none;flex-direction:column;padding:44px 6vw 36px;z-index:50;
 }
-.modo-clase .reloj[data-situacion="tarde"]{color:var(--blanco);border-color:var(--rojo);background:var(--rojo)}
-.modo-clase .reloj[data-situacion="adelante"]{color:#9A928B}
-.modo-clase h2{font-size:clamp(26px,4.6vw,48px);margin:12px 0 14px;line-height:1.12;max-width:20ch}
-.modo-clase .nota{font-size:clamp(15px,1.6vw,19px);color:#CFC9C3;max-width:52ch}
-.modo-clase .ruta{color:#9A928B;margin-top:16px}
-.modo-clase .pie{margin-top:auto;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.modo-clase .btn{border-color:rgba(255,255,255,.5)}
-.modo-clase .btn:hover{background:var(--blanco);color:var(--negro)}
+.modo-clase.activo{display:flex}
+.modo-clase .progreso{display:flex;gap:5px;margin-bottom:38px}
+.modo-clase .paso{height:3px;flex:1;background:rgba(255,255,255,.18);border-radius:3px}
+.modo-clase .paso.hecho{background:var(--rojo)}
+.modo-clase .mc-cabeza{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.modo-clase .eyebrow{font-size:12.5px;letter-spacing:0;color:#FF6B86;font-weight:500}
+/* Pastilla de reloj, sin borde: el material translúcido ya la separa. */
+.modo-clase .reloj{
+  margin-left:auto;font-family:var(--mono);font-size:13px;letter-spacing:0;
+  color:rgba(255,255,255,.72);background:rgba(255,255,255,.12);border:0;
+  padding:5px 13px;white-space:nowrap;border-radius:999px;
+  font-variant-numeric:tabular-nums;
+}
+.modo-clase .reloj[data-situacion="tarde"]{color:var(--blanco);background:var(--rojo)}
+.modo-clase .reloj[data-situacion="adelante"]{color:rgba(255,255,255,.5)}
+.modo-clase h2{
+  font-size:clamp(30px,5.2vw,56px);margin:18px 0 16px;line-height:1.06;
+  max-width:20ch;font-weight:700;letter-spacing:-.028em;text-wrap:balance;
+}
+.modo-clase .nota{font-size:clamp(1rem,1.7vw,1.31rem);color:rgba(255,255,255,.72);max-width:52ch;line-height:1.45}
+.modo-clase .ruta{color:rgba(255,255,255,.45);margin-top:18px}
+.modo-clase .pie{margin-top:auto;display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+/* Sobre el negro del modo clase los botones necesitan su propio material:
+   el relleno gris translúcido y el texto oscuro del resto de la interfaz
+   desaparecerían contra el fondo. */
+.modo-clase .btn{background:rgba(255,255,255,.16);color:var(--blanco);font-weight:500}
+.modo-clase .btn:hover{background:rgba(255,255,255,.28);color:var(--blanco)}
 .modo-clase .btn:focus-visible{outline:2px solid var(--blanco);outline-offset:3px}
-.modo-clase .tecla{font-family:var(--mono);font-size:11.5px;color:#8C847D;margin-left:auto}
+.modo-clase .btn[disabled]{opacity:.4}
+.modo-clase .btn[disabled]:hover{background:rgba(255,255,255,.16)}
+.modo-clase .tecla{font-family:var(--mono);font-size:12px;color:rgba(255,255,255,.5);margin-left:auto}
 
 /* ---------- Diálogos ---------- */
-dialog{border:1px solid var(--negro);padding:0;max-width:560px;width:92vw;background:var(--blanco);color:var(--negro)}
-dialog::backdrop{background:rgba(0,0,0,.45)}
+dialog{
+  border:0;padding:0;max-width:560px;width:92vw;
+  background:var(--blanco);color:var(--negro);
+  border-radius:14px;box-shadow:var(--sombra-alta);
+}
+dialog::backdrop{background:rgba(0,0,0,.28);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
 .dlg-cuerpo{padding:22px 24px;max-height:72vh;overflow:auto}
-.dlg-cuerpo h3{margin:0 0 4px;font-size:18px}
-.dlg-cuerpo .sub{margin:0 0 16px;font-size:13px;color:var(--gris-tenue)}
-.campo{margin-bottom:13px}
-.campo label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--gris-tenue);margin-bottom:4px;font-weight:700}
-.campo input,.campo select,.campo textarea{width:100%;border:1px solid var(--linea);padding:8px 10px;background:var(--papel);font-size:14px}
-.campo textarea{min-height:64px;resize:vertical}
+.dlg-cuerpo h3{margin:0 0 4px;font-size:19px;font-weight:600;letter-spacing:-.015em}
+.dlg-cuerpo .sub{margin:0 0 16px;font-size:13.5px;color:var(--gris-tenue);line-height:1.45}
+.campo{margin-bottom:14px}
+.campo label{display:block;font-size:12.5px;letter-spacing:0;color:var(--gris-tenue);margin-bottom:5px;font-weight:500}
+.campo input,.campo select,.campo textarea{
+  width:100%;border:0;padding:9px 12px;background:var(--relleno);
+  font-size:14px;border-radius:var(--r-control);color:var(--negro);
+}
+.campo input:focus-visible,.campo select:focus-visible,.campo textarea:focus-visible{outline:2px solid var(--acento);outline-offset:1px}
+.campo textarea{min-height:64px;resize:vertical;line-height:1.5}
 .campo #f-tipo-nuevo{margin-top:6px}
-.pista{font-size:12px;color:var(--gris-tenue);margin:4px 0 0}
+.pista{font-size:12.5px;color:var(--gris-tenue);margin:5px 0 0;line-height:1.4}
 .dos{display:flex;gap:12px}
 .dos > *{flex:1}
 .url-fila{display:flex;gap:6px}
 .url-fila input{flex:1}
-.mini{border:1px solid var(--linea);background:var(--blanco);cursor:pointer;padding:6px 10px;font-size:12.5px;white-space:nowrap}
-.mini:hover{background:var(--negro);color:var(--blanco);border-color:var(--negro)}
+.mini{
+  border:0;background:var(--relleno);cursor:pointer;padding:7px 12px;
+  font-size:13px;white-space:nowrap;border-radius:var(--r-control);
+  color:var(--negro);font-weight:500;transition:background .18s ease;
+}
+.mini:hover{background:var(--relleno-fuerte)}
+.mini:focus-visible{outline:2px solid var(--acento);outline-offset:2px}
 .crear-fila{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:8px}
-.crear-fila .rot{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--gris-tenue);font-weight:700}
-.hecho{margin-top:8px;font-size:12.5px;border-left:3px solid var(--rojo);background:var(--papel);padding:7px 10px;color:var(--gris-tenue);display:none}
+.crear-fila .rot{font-size:12.5px;letter-spacing:0;color:var(--gris-tenue);font-weight:500}
+.hecho{
+  margin-top:9px;font-size:12.5px;background:var(--acento-tenue);
+  padding:8px 11px;color:var(--acento);display:none;border-radius:var(--r-chip);
+}
 .hecho.visible{display:block}
-.dlg-pie{display:flex;gap:8px;padding:14px 24px;border-top:1px solid var(--linea);background:var(--papel);flex-wrap:wrap}
+.dlg-pie{display:flex;gap:8px;padding:14px 24px;border-top:1px solid var(--linea);flex-wrap:wrap}
 .dlg-pie .derecha{margin-left:auto;display:flex;gap:8px}
-.peligro{border-color:var(--rojo);color:var(--rojo)}
-.peligro:hover{background:var(--rojo);color:var(--blanco)}
+/* Acción destructiva: rojo IBERO, sin relleno hasta que se apunta. */
+.peligro{background:transparent;color:var(--rojo)}
+.peligro:hover{background:var(--rojo-tenue)}
+
+/* ---------- Menú contextual («⋯») ----------
+   Lo que antes eran seis botones por tarjeta. Flota en la capa superior,
+   se cierra con Escape o con un clic fuera. */
+.menu{
+  position:fixed;margin:0;padding:5px;inset:auto;
+  min-width:212px;max-width:280px;
+  background:rgba(255,255,255,.86);
+  -webkit-backdrop-filter:saturate(180%) blur(22px);
+  backdrop-filter:saturate(180%) blur(22px);
+  border:.5px solid rgba(0,0,0,.12);border-radius:11px;
+  box-shadow:var(--sombra-alta);
+  display:flex;flex-direction:column;gap:1px;
+}
+.menu button{
+  display:block;width:100%;text-align:left;border:0;background:transparent;
+  padding:7px 11px;font:inherit;font-size:13.5px;color:var(--negro);
+  cursor:pointer;border-radius:6px;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;
+}
+.menu button:hover:not([disabled]){background:var(--acento);color:var(--blanco)}
+.menu button:focus-visible{outline:2px solid var(--acento);outline-offset:-2px}
+.menu button[disabled]{color:var(--gris);cursor:not-allowed}
+.menu button.peligro{color:var(--rojo)}
+.menu button.peligro:hover:not([disabled]){background:var(--rojo);color:var(--blanco)}
+.menu .menu-sep{border:0;border-top:1px solid var(--linea);margin:4px 7px}
 
 /* ---------- Revisión de enlaces ---------- */
 .rev-grupo{margin-bottom:16px}
 .rev-grupo h4{margin:0 0 6px;font-size:13px;letter-spacing:.02em}
 .rev-item{border-left:3px solid var(--rojo);background:var(--papel);padding:7px 10px;margin-bottom:6px;font-size:13px}
-.rev-item .donde{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--gris-tenue);margin-bottom:2px}
+.rev-item .donde{display:block;font-size:12px;letter-spacing:0;color:var(--gris-tenue);margin-bottom:2px;font-weight:500}
 .rev-item.leve{border-left-color:var(--gris)}
 .rev-bien{border:1px dashed var(--linea);padding:18px;text-align:center;color:var(--gris-tenue);font-size:14px}
 .rev-resumen{font-size:12.5px;color:var(--gris-tenue);margin:0 0 14px}
@@ -194,8 +542,12 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
   padding:12px 12px 12px 14px;font-size:13.5px;line-height:1.4;
 }
 .aviso-flotante .texto{min-width:0}
-.aviso-flotante .btn{border-color:rgba(255,255,255,.55);flex:none;font-size:12.5px;padding:5px 11px}
-.aviso-flotante .btn:hover{background:var(--blanco);color:var(--negro)}
+/* Mismo caso que el modo clase: fondo oscuro, material propio. */
+.aviso-flotante .btn{
+  background:rgba(255,255,255,.18);color:var(--blanco);
+  flex:none;font-size:12.5px;padding:5px 12px;font-weight:500;
+}
+.aviso-flotante .btn:hover{background:rgba(255,255,255,.3);color:var(--blanco)}
 .aviso-flotante .cerrar{
   border:0;background:none;color:var(--blanco);cursor:pointer;flex:none;
   font-size:17px;line-height:1;padding:2px 4px;opacity:.7;
@@ -203,7 +555,7 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
 .aviso-flotante .cerrar:hover{opacity:1}
 
 /* ---------- Copias de seguridad ---------- */
-.alm-titulo{margin:18px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:var(--gris-tenue)}
+.alm-titulo{margin:20px 0 4px;font-size:12.5px;letter-spacing:0;color:var(--gris-tenue);font-weight:600}
 .alm-copias{list-style:none;margin:10px 0 0;padding:0;font-size:13px}
 .alm-copias li{display:flex;align-items:center;gap:10px;border-top:1px solid var(--linea);padding:8px 0}
 .alm-copias .cuando{font-family:var(--mono);font-size:11.5px;color:var(--gris-tenue);flex:none;width:104px}
@@ -215,22 +567,75 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
 .pie-pagina p{margin:0 0 8px}
 
 /* ---------- Pleca de crédito ---------- */
+/* La palabra IBERO vive aquí ahora: identidad institucional al pie, no
+   compitiendo con el nombre de la app en la cabecera. */
 .pleca{
-  background:var(--rojo);color:var(--blanco);
-  padding:13px 20px;text-align:center;
-  font-size:12.5px;letter-spacing:.04em;line-height:1.4;
+  background:var(--rojo-ibero);color:var(--blanco);
+  padding:14px var(--e4);line-height:1.4;
+  display:flex;align-items:baseline;justify-content:center;gap:14px;flex-wrap:wrap;
 }
+.pleca-marca{
+  font-family:"Times New Roman","Liberation Serif",Times,Georgia,serif;
+  font-size:21px;font-weight:700;letter-spacing:.03em;line-height:1;
+}
+.pleca-texto{font-size:13px;letter-spacing:.01em;opacity:.95}
 
 /* ---------- Responsivo ---------- */
 @media (max-width:860px){
   .envoltura{flex-direction:column}
-  .lateral{width:100%;min-height:0;border-right:0;border-bottom:1px solid var(--linea)}
-  .principal{padding:20px 18px 60px;width:100%}
+  /* En columna el lateral deja de ser una barra fija: vuelve al flujo,
+     o quedaría como una caja con su propio desplazamiento. */
+  .lateral{
+    width:100%;min-height:0;max-height:none;overflow:visible;
+    position:static;border-right:0;border-bottom:1px solid var(--linea);
+    padding:16px 10px;
+  }
+  .principal{padding:20px 16px 60px;width:100%}
   .riel{padding-left:30px}
   .riel::before{left:7px}
-  .tarjeta::before{left:-30px}
+  .tarjeta .punto{left:-36px}
   .cabecera .acciones-sesion{margin-left:0}
   .fila .lapiz{opacity:1}
+  .barra{position:static}
   .barra .der{margin-left:0;width:100%}
   .guardado{max-width:none}
+  .grupo-acciones{margin-left:0}
+  .controles input[type=search]{min-width:0;flex:1}
+  .grupo-buscar{flex:1 1 100%}
 }
+
+/* ---------- Tamaño de texto ---------- */
+.escala-texto{display:flex;align-items:center;gap:1px;background:var(--relleno);border-radius:var(--r-control);padding:2px}
+.escala-texto .btn-icono{width:30px;height:28px;font-size:13.5px;font-weight:600;border-radius:6px}
+.escala-texto .btn-icono .menos,.escala-texto .btn-icono .mas-sig{font-size:11px;margin-left:1px}
+.escala-texto .btn-icono:hover{background:var(--blanco)}
+.escala-texto .btn-icono[disabled]{opacity:.3}
+#btn-texto-reset{font-size:15px}
+
+/* ---------- Guardado y respaldos (dentro del diálogo) ---------- */
+.alm-ayuda{margin-top:var(--e3);border-top:1px solid var(--linea);padding-top:var(--e2)}
+.alm-ayuda summary{
+  cursor:pointer;list-style:none;font-size:14px;font-weight:600;color:var(--negro);
+  padding:6px 0;display:flex;align-items:center;gap:8px;
+}
+.alm-ayuda summary::-webkit-details-marker{display:none}
+.alm-ayuda summary::before{content:"›";color:var(--gris);transition:transform .2s ease;display:inline-block}
+.alm-ayuda[open] summary::before{transform:rotate(90deg)}
+.alm-ayuda summary:focus-visible{outline:2px solid var(--acento);outline-offset:2px}
+.alm-ayuda-cuerpo{font-size:.9rem;line-height:1.55;color:var(--gris-tenue);max-width:var(--ancho-lectura)}
+.alm-ayuda-cuerpo p{margin:0 0 .7em}
+.alm-ayuda-liga{margin:.4em 0 0;font-size:.88rem}
+/* El pie solo se ve cuando hay un problema de verdad. */
+.pie-pagina{border-top:1px solid var(--linea);margin-top:var(--e5);padding-top:var(--e3);font-size:.9rem;color:var(--rojo);max-width:var(--ancho-lectura)}
+
+/* ---------- Aviso de mudanza ---------- */
+.mudanza{
+  display:flex;align-items:center;gap:var(--e4);flex-wrap:wrap;
+  padding:var(--e2) var(--e4);background:var(--acento-tenue);
+  border-bottom:1px solid var(--linea);
+}
+.mudanza-texto{flex:1;min-width:280px;font-size:.94rem;line-height:1.55;color:var(--negro);max-width:var(--ancho-lectura)}
+.mudanza-vieja{font-family:var(--mono);font-size:.88em}
+.mudanza-acciones{display:flex;gap:var(--e1);flex-wrap:wrap;align-items:center}
+.mudanza .btn{text-decoration:none}
+@media print{ .mudanza{display:none!important} }

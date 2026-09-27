@@ -9,7 +9,8 @@
   /* Fuera todo lo que sea interfaz */
   .barra, .lateral, .controles, .acciones, .acciones-sesion,
   .ver-todas, .rotulo, .modo-clase, .pie-pagina, .enlaces-materia,
-  dialog, .bitacora .pie-bit, .bitacora .aclara, .aviso-flotante{ display:none!important }
+  dialog, .menu, .btn-icono, .tarjeta .punto,
+  .bitacora .pie-bit, .bitacora .aclara, .aviso-flotante{ display:none!important }
 
   .envoltura{display:block;min-height:0}
   .principal{padding:0;width:auto}
@@ -24,9 +25,11 @@
   .riel::before{display:none}
   .tarjeta{
     border:0;border-top:.5pt solid #999;padding:8pt 0;margin:0;
+    border-radius:0;box-shadow:none!important;background:none!important;
     opacity:1!important;break-inside:avoid;page-break-inside:avoid;
+    display:block;
   }
-  .tarjeta::before{display:none}
+  .tarjeta[data-estado="usado"] h3{color:#000;text-decoration:none}
   .tarjeta .momento{font-size:9pt;color:#000}
   .tarjeta h3{font-size:12pt}
   .tarjeta .nota{color:#000;font-size:10pt;max-width:none}
@@ -35,7 +38,17 @@
   .aviso{border-left:1.5pt solid #000;background:none;color:#000}
   .vacio{border:.5pt dashed #999}
 
-  .bitacora{border:.5pt solid #999;border-left:2pt solid #000;padding:8pt;margin-bottom:12pt}
+  /* La bitácora es plegable en pantalla; al imprimir se abre siempre
+     (main.js le pone el atributo open antes de imprimir) y se ve entera. */
+  .bitacora{
+    border:.5pt solid #999;border-left:2pt solid #000;padding:8pt;
+    margin:12pt 0;border-radius:0;box-shadow:none;background:none;
+    break-inside:avoid;page-break-inside:avoid;
+  }
+  .bitacora summary{padding:0 0 4pt;background:none!important;cursor:auto}
+  .bitacora .rotulo-bit{font-size:9pt;font-weight:700;color:#000}
+  .bitacora .rotulo-bit::before{display:none}
+  .bitacora .cuerpo-bit{padding:0}
   .bitacora label{color:#000}
   /* El textarea recorta el texto largo al imprimir: se imprime una copia
      en párrafo, que sí fluye y se parte entre páginas. */
