@@ -183,7 +183,7 @@ anteriores: los campos que falten se completan con valores por omisión.
 
 ---
 
-## Limitaciones conocidas, dichas de frente
+## Limitaciones 
 
 - **Rutas locales (`file://`)**: no abren con un clic desde ningún navegador, por
   seguridad. Pauta las detecta y las marca; la solución de fondo es subir el archivo a
@@ -274,3 +274,5 @@ Universidad Iberoamericana Ciudad de México. Agosto, 2026.
 El logotipo «Secuencia» y el rojo de la pleca son identidad institucional. Quien
 reutilice el proyecto en otro contexto debe cambiar la marca: la identidad gráfica de
 una institución no se hereda con el código.
+
+* README generado con Claude-Code Opus 5.5 Bajo. Contenido supervisado y editado.
