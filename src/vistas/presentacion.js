@@ -235,8 +235,11 @@ function htmlDePortada(d) {
    ventana.document es de otro origen y ni siquiera se deja mirar. De ahí
    el reintento: se comprueba que el documento sea el about:blank propio
    antes de escribirle, y si todavía no lo es se espera un poco. */
-const ESPERA = 25;
-const INTENTOS = 60; // 1.5 s de margen, de sobra para una navegación local
+/* El primer intento es inmediato; los siguientes van pegados al repintado
+   del navegador, que es lo más pronto que puede estar listo el documento.
+   Antes esperaban 25 ms fijos entre intentos, y eso era retraso puro y
+   visible justo donde más se nota: al volver a la portada. */
+const INTENTOS = 90; // ~1.5 s de margen a 60 cuadros por segundo
 
 function escribirPortada(w, html, intentos = 0) {
   let doc = null;
@@ -252,7 +255,7 @@ function escribirPortada(w, html, intentos = 0) {
       avisar("La ventana de presentación no respondió. Ciérrala y vuelve a mostrar la portada.");
       return;
     }
-    window.setTimeout(() => escribirPortada(w, html, intentos + 1), ESPERA);
+    window.requestAnimationFrame(() => escribirPortada(w, html, intentos + 1));
     return;
   }
 
@@ -325,6 +328,15 @@ export function abrirEnPresentacion(url) {
   return llevarAPresentacion(url);
 }
 
-/* La ventana de presentación es de esta sesión de trabajo: si se cierra
-   Pauta, no tiene sentido dejarla huérfana en la pantalla. */
-addEventListener("pagehide", cerrarPresentacion);
+/* Aquí hubo un addEventListener("pagehide", cerrarPresentacion), para no
+   dejar ventanas huérfanas al cerrar Pauta. Era un error caro en clase:
+   «pagehide» no distingue cerrar de RECARGAR, así que recargar Pauta
+   cerraba la ventana compartida. La siguiente era una ventana nueva, y una
+   ventana nueva es otra cosa para Zoom: pedía compartir otra vez, en mitad
+   de la sesión y delante del grupo.
+   Ahora la ventana sobrevive a la recarga. Como lleva nombre, la Pauta
+   recién cargada vuelve a encontrarla y sigue usando la misma, así que lo
+   que se está compartiendo no se interrumpe. Solo se cierra cuando se apaga
+   el interruptor, que es cuando de verdad se quiso terminar. Si queda
+   abierta después de cerrar Pauta, se cierra como cualquier otra ventana:
+   es un estorbo menor comparado con perder lo compartido a media clase. */
