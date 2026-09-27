@@ -97,10 +97,12 @@
     <strong>El panel ahora se llama Pauta y esta es su nueva dirección.</strong>
     Guarda el marcador; la anterior seguirá trayéndote aquí.
     <span class="mudanza-rescate">¿Ya lo usabas y no ves tus materias?
-      <a id="mudanza-ir" target="_blank" rel="noopener">Recupéralas aquí</a>.</span>
+      <a id="mudanza-ir" target="_blank" rel="noopener"
+        title="Abrir la página de rescate: busca en este navegador las materias que guardó la dirección anterior y te las deja listas para traerlas">Recupéralas aquí</a>.</span>
   </div>
   <div class="mudanza-acciones">
-    <button class="btn btn-solido" id="mudanza-cerrar">Entendido</button>
+    <button class="btn btn-solido" id="mudanza-cerrar"
+      title="Cerrar este aviso. No vuelve a aparecer en este navegador">Entendido</button>
   </div>
 </div>
 
@@ -151,8 +153,10 @@
 
       <div class="controles">
         <div class="grupo-buscar">
-          <input type="search" id="buscar" placeholder="Buscar en esta sesión" aria-label="Buscar recursos de esta sesión">
-          <select id="filtro-tipo" aria-label="Filtrar por tipo">
+          <input type="search" id="buscar" placeholder="Buscar en esta sesión" aria-label="Buscar recursos de esta sesión"
+            title="Filtrar los recursos de esta sesión por su título o por lo que dice su nota. No busca en las otras sesiones">
+          <select id="filtro-tipo" aria-label="Filtrar por tipo"
+            title="Mostrar solo los recursos de un tipo: lecturas, videos, actividades…">
             <option value="">Todos los tipos</option>
           </select>
         </div>
@@ -171,13 +175,14 @@
       <div class="riel" id="riel"></div>
 
       <details class="bitacora" id="bitacora">
-        <summary>
+        <summary title="Abrir o cerrar la bitácora. Lo que escribas aquí se guarda solo, sale en la exportación a Markdown y se imprime con el guion">
           <span class="rotulo-bit">Bitácora de la sesión</span>
           <span class="aclara">Qué funcionó y con qué empezar la próxima vez</span>
         </summary>
         <div class="cuerpo-bit">
           <label class="oculto-visual" for="txt-bitacora">Bitácora de la sesión</label>
-          <textarea id="txt-bitacora" placeholder="Qué funcionó, qué quedó pendiente, con qué empezar la próxima vez."></textarea>
+          <textarea id="txt-bitacora" placeholder="Qué funcionó, qué quedó pendiente, con qué empezar la próxima vez."
+            title="Notas de después de la clase. Se guardan solas mientras escribes"></textarea>
           <p class="solo-impresion" id="bitacora-impresa"></p>
           <p class="pie-bit">Se guarda dentro del respaldo del panel (no en OneDrive) y sale en la exportación a Markdown.</p>
         </div>
@@ -252,17 +257,19 @@
       <p class="sub" id="rec-sub"></p>
       <div class="campo">
         <label for="f-titulo">Título</label>
-        <input id="f-titulo" required>
+        <input id="f-titulo" required title="Cómo quieres ver nombrado este recurso en la tarjeta de la sesión">
       </div>
       <div class="dos">
         <div class="campo">
           <label for="f-tipo">Tipo</label>
-          <select id="f-tipo"></select>
-          <input id="f-tipo-nuevo" class="oculto" placeholder="Nombre del tipo nuevo" aria-label="Nombre del tipo nuevo">
+          <select id="f-tipo" title="Qué clase de material es. Sirve para filtrar la sesión y se puede inventar uno nuevo"></select>
+          <input id="f-tipo-nuevo" class="oculto" placeholder="Nombre del tipo nuevo" aria-label="Nombre del tipo nuevo"
+            title="El nombre del tipo nuevo. Queda disponible para los demás recursos de todas tus materias">
         </div>
         <div class="campo">
           <label for="f-momento">Momento de la sesión</label>
-          <input id="f-momento" placeholder="0:15–0:40">
+          <input id="f-momento" placeholder="0:15–0:40"
+            title="En qué minuto de la clase entra, contado desde el arranque. Con esto el recurso se acomoda solo y el reloj del modo clase avisa si vas tarde">
           <p class="pista">Si escribes el minuto, el recurso se acomoda solo en ese punto de la
             clase. Lo que no lleva minuto («previa», «referencia») se queda junto al recurso al que
             sigue. El orden también se puede cambiar a mano, con Subir y Bajar.</p>
@@ -271,7 +278,8 @@
       <div class="campo">
         <label for="f-url">Liga de OneDrive o ruta</label>
         <div class="url-fila">
-          <input id="f-url" placeholder="Pega aquí la liga copiada de OneDrive">
+          <input id="f-url" placeholder="Pega aquí la liga copiada de OneDrive"
+            title="La dirección del archivo: una liga https de la nube, o la ruta del archivo en tu disco">
           <button type="button" class="mini" id="btn-pegar" title="Pegar aquí la liga que tengas copiada">Pegar</button>
         </div>
         <div class="crear-fila">
@@ -286,7 +294,7 @@
       </div>
       <div class="campo">
         <label for="f-nota">Para qué sirve en clase</label>
-        <textarea id="f-nota"></textarea>
+        <textarea id="f-nota" title="Para qué lo vas a usar en clase: la consigna, la pregunta de arranque, qué mirar. Es lo que se ve en la tarjeta y lo que se lee a pantalla amplia con «Leer»"></textarea>
       </div>
     </div>
     <div class="dlg-pie">
@@ -307,20 +315,20 @@
       <div class="dos">
         <div class="campo">
           <label for="s-num">Número</label>
-          <input id="s-num" type="number" min="1" step="1">
+          <input id="s-num" type="number" min="1" step="1" title="El número con que se nombra la sesión. No cambia el orden: ese lo da la fecha">
         </div>
         <div class="campo">
           <label for="s-fecha">Fecha</label>
-          <input id="s-fecha" type="date">
+          <input id="s-fecha" type="date" title="El día de la sesión. Con esto se ordenan solas y se decide cuál es la vigente">
         </div>
       </div>
       <div class="campo">
         <label for="s-titulo">Título de la sesión</label>
-        <input id="s-titulo" required>
+        <input id="s-titulo" required title="El tema de la sesión. Es lo que se ve grande arriba y lo que aparece en la portada de la ventana de presentación">
       </div>
       <div class="campo">
         <label for="s-proposito">Propósito</label>
-        <textarea id="s-proposito"></textarea>
+        <textarea id="s-proposito" title="Qué quieres que pase en esta clase. Se lee debajo del título y sale en la exportación"></textarea>
       </div>
     </div>
     <div class="dlg-pie">
@@ -342,16 +350,16 @@
       <div class="dos">
         <div class="campo">
           <label for="d-num">Número de la copia</label>
-          <input id="d-num" type="number" min="1" step="1">
+          <input id="d-num" type="number" min="1" step="1" title="El número que llevará la copia">
         </div>
         <div class="campo">
           <label for="d-fecha">Fecha de la copia</label>
-          <input id="d-fecha" type="date">
+          <input id="d-fecha" type="date" title="El día de la copia. Es lo que la coloca en su lugar entre las demás sesiones">
         </div>
       </div>
       <div class="campo">
         <label for="d-titulo">Título de la copia</label>
-        <input id="d-titulo" required>
+        <input id="d-titulo" required title="El tema de la copia. Llega propuesto con el de la sesión original">
       </div>
       <p class="pista">Se copian el propósito y todos los recursos, en el mismo orden y con el estado
         reiniciado a <em>pendiente</em>. La bitácora no se copia.</p>
@@ -373,7 +381,7 @@
       <p class="sub" id="mov-sub"></p>
       <div class="campo">
         <label for="mv-sesion">Sesión de destino</label>
-        <select id="mv-sesion"></select>
+        <select id="mv-sesion" title="A qué sesión de esta materia se lleva el recurso"></select>
       </div>
       <p class="pista">El recurso se coloca en la sesión de destino en el lugar que le corresponde por
         sus minutos, sin descolocar el orden que ya tenga esa sesión. Conserva su estado, su nota y su liga.</p>
@@ -395,7 +403,7 @@
       <p class="sub">La carpeta y el cuaderno quedan como enlaces fijos.</p>
       <div class="campo">
         <label for="m-clase">Qué vas a planear</label>
-        <select id="m-clase">
+        <select id="m-clase" title="Cambia las palabras del panel: sesiones para un curso, bloques para un taller, presentaciones para una ponencia">
           <option value="curso">Un curso, con sesiones a lo largo del periodo</option>
           <option value="taller">Un taller, con bloques concentrados</option>
           <option value="ponencia">Una ponencia, que puedes dar más de una vez</option>
@@ -404,23 +412,26 @@
       </div>
       <div class="campo">
         <label for="m-nombre" id="lbl-m-nombre">Nombre de la materia</label>
-        <input id="m-nombre" required>
+        <input id="m-nombre" required title="El nombre con que aparece en la lista de la izquierda y en la portada de la ventana de presentación">
       </div>
       <div class="campo">
         <label for="m-clave" id="lbl-m-clave">Nivel y periodo</label>
-        <input id="m-clave" placeholder="Posgrado · Otoño 2026">
+        <input id="m-clave" placeholder="Posgrado · Otoño 2026"
+          title="El dato que acompaña al nombre: nivel y periodo, sede y fecha, o el evento">
       </div>
       <div class="campo">
         <label for="m-carpeta">Carpeta de OneDrive del curso</label>
         <div class="url-fila">
-          <input id="m-carpeta" placeholder="Liga de la carpeta">
+          <input id="m-carpeta" placeholder="Liga de la carpeta"
+            title="La dirección de la carpeta donde viven los materiales de la materia. Queda como enlace fijo en la barra de la izquierda">
           <button type="button" class="mini" data-pegar="m-carpeta" title="Pegar aquí la liga que tengas copiada">Pegar</button>
         </div>
       </div>
       <div class="campo">
         <label for="m-cuaderno">Cuaderno de OneNote del curso</label>
         <div class="url-fila">
-          <input id="m-cuaderno" placeholder="Liga del cuaderno">
+          <input id="m-cuaderno" placeholder="Liga del cuaderno"
+            title="La dirección del cuaderno de la materia. El botón «Cuaderno OneNote» del formulario de recurso lo abre desde aquí">
           <button type="button" class="mini" data-pegar="m-cuaderno" title="Pegar aquí la liga que tengas copiada">Pegar</button>
         </div>
         <p class="pista">Un solo cuaderno con una página por sesión evita crear un archivo nuevo cada vez.</p>
@@ -462,9 +473,10 @@
       <div id="alm-cuerpo"></div>
 
       <details class="alm-ayuda" id="alm-ayuda">
-        <summary>Guardado y respaldos</summary>
+        <summary title="Desplegar la explicación de dónde quedan los datos y cómo volver a una copia anterior">Guardado y respaldos</summary>
         <div class="alm-ayuda-cuerpo" id="alm-ayuda-cuerpo"></div>
-        <p class="alm-ayuda-liga"><a href="/ayuda#como-guarda" target="_blank" rel="noopener">Ver la guía completa sobre guardado ↗</a></p>
+        <p class="alm-ayuda-liga"><a href="/ayuda#como-guarda" target="_blank" rel="noopener"
+          title="Abrir la guía de Pauta en otra pestaña, en la sección de guardado">Ver la guía completa sobre guardado ↗</a></p>
       </details>
     </div>
     <div class="dlg-pie">

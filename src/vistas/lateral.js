@@ -29,7 +29,10 @@ function pintarMaterias() {
   const enlace = (url, texto, sinLiga) => {
     if (!url) return `<span>${esc(sinLiga)}</span>`;
     if (!urlSegura(url)) return `<span>${esc(texto)}: la liga guardada no es válida</span>`;
-    return `<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(texto)}</a>`;
+    /* El cartelito lleva la dirección entera: el rótulo dice la nube, no
+       adónde apunta, y estas ligas no se ven en ningún otro lado. */
+    return `<a href="${esc(url)}" target="_blank" rel="noopener noreferrer"
+      title="Abrir en otra pestaña · ${esc(url)}">${esc(texto)}</a>`;
   };
 
   /* Cuando no hay nada vinculado, dos renglones diciendo «sin esto» y «sin

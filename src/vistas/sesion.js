@@ -134,7 +134,8 @@ function tarjeta(recurso, indice, total) {
         recurso.nota
           ? `<div class="nota${(recurso.nota || "").length > LARGO_PLEGADO ? " plegable" : ""}">${formatearTexto(recurso.nota)}</div>
              ${(recurso.nota || "").length > LARGO_PLEGADO
-               ? `<button class="mas-texto" data-acc="desplegar" aria-expanded="false">Leer más</button>`
+               ? `<button class="mas-texto" data-acc="desplegar" aria-expanded="false"
+                    title="Mostrar el resto de la nota aquí mismo, sin salir de la tarjeta">Leer más</button>`
                : ""}`
           : ""
       }

@@ -35,7 +35,8 @@ function pintarSemestre() {
           <span class="ses-num">${esc(v.encuentro.slice(0, 1).toUpperCase())}${num}</span>${i === vigente ? '<span class="vigente">vigente</span>' : ""}
           <button class="liga-sesion" data-ir="${i}" title="Abrir ${esc(v.encuentro.toLowerCase())}: ${esc(s.titulo)}">${esc(s.titulo)}</button>
           ${s.proposito ? `<span class="prop${largo ? " recortado" : ""}">${esc(s.proposito)}</span>` : ""}
-          ${largo ? `<button class="mas-texto" data-abrir-prop aria-expanded="false">Leer más</button>` : ""}
+          ${largo ? `<button class="mas-texto" data-abrir-prop aria-expanded="false"
+            title="Mostrar el propósito completo de esta sesión">Leer más</button>` : ""}
         </td>
         <td class="col-fecha ${s.fecha ? "" : "sin-fecha"}">${esc(fechaCorta(s.fecha))}</td>
         <td class="col-conteo">${total} recurso${total === 1 ? "" : "s"}<br>${revisados} revisado${revisados === 1 ? "" : "s"}</td>
