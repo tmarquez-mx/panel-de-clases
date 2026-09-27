@@ -5,6 +5,7 @@ import { $, avisar } from "../util/dom.js";
 import { minutosDe } from "../datos/modelo.js";
 import { sesion } from "../estado.js";
 import { abrirRecurso } from "./sesion.js";
+import { presentacionEncendida, mostrarPortada } from "./presentacion.js";
 import { ocultarAviso } from "./aviso.js";
 
 let indice = 0;
@@ -29,6 +30,16 @@ function pintar() {
   $("#mc-nota").textContent = r.nota || "";
   $("#mc-ruta").textContent = r.url || "";
   $("#mc-abrir").hidden = !r.url;
+
+  /* Con la ventana de presentación encendida, el recurso no va a una
+     pestaña nueva sino a la ventana compartida, y aparece el botón para
+     volver a la portada entre un recurso y el siguiente. */
+  const conVentana = presentacionEncendida();
+  $("#mc-abrir").title = conVentana
+    ? "Mostrar este recurso en la ventana de presentación, sin salir del modo clase"
+    : "Abrir este recurso en otra pestaña, sin salir del modo clase";
+  $("#mc-portada").hidden = !conVentana;
+
   $("#mc-anterior").disabled = indice === 0;
   $("#mc-siguiente").disabled = indice === recursos.length - 1;
 }
@@ -119,6 +130,7 @@ export function montarModoClase() {
   $("#mc-anterior").addEventListener("click", () => mover(-1));
   $("#mc-siguiente").addEventListener("click", () => mover(1));
   $("#mc-abrir").addEventListener("click", () => abrirRecurso(recursos[indice]?.url, $("#mc-abrir")));
+  $("#mc-portada").addEventListener("click", () => mostrarPortada());
 
   document.addEventListener("keydown", (e) => {
     if (!activo()) return;
