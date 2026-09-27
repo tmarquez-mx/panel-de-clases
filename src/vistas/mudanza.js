@@ -1,6 +1,13 @@
 /* =========================================================
    Aviso de mudanza.
 
+   Lo primero que dice sirve a cualquiera que llegue con la liga anterior,
+   incluida la mayoría que nunca llegó a usar el panel: cambió de nombre y
+   de dirección, guarda el marcador. Lo de rescatar la planeación va en una
+   segunda línea, más discreta, porque solo le toca a quien venía usándolo
+   sin archivo vinculado. Obligar a todos a leer sobre respaldos para poder
+   cerrar un aviso era pedirles que se enteraran de un problema ajeno.
+
    El panel cambió de dirección. Quien tenga la liga anterior llega aquí
    reenviado, pero el almacenamiento del navegador está atado al origen: lo
    que guardó allá no viaja. Vería el panel vacío y concluiría, con razón
@@ -44,7 +51,6 @@ export function montarMudanza() {
   }
   if (yaVisto) return;
 
-  $("#mudanza-vieja").textContent = "panel-de-clases.netlify.app";
   $("#mudanza-ir").href = DIRECCION_ANTERIOR;
   caja.hidden = false;
 
