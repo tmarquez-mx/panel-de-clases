@@ -8,7 +8,7 @@ artefactos hechos con IA, apuntes y actividades, repartidos entre la nube, el di
 media docena de pestañas. El panel no guarda los archivos: guarda **el orden en que
 los vas a usar**, y los abre cuando toca.
 
-**Demostración: https://panel-de-clases.netlify.app** — se abre con dos materias de
+**Demostración: https://pauta-docente.netlify.app** — se abre con dos materias de
 ejemplo; nada de lo que escribas ahí sale de tu navegador.
 
 - Sin servidor, sin cuentas, sin analítica. Todo corre en el cliente.

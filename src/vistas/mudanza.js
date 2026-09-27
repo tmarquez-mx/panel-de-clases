@@ -21,9 +21,15 @@ const CLAVE = "panel-de-clases:mudanza-vista";
 /** Dirección anterior, solo para que la usuaria pueda volver a exportar. */
 export const DIRECCION_ANTERIOR = "https://panel-de-clases.netlify.app";
 
+/** Dónde vive ahora. Si se abre aquí, no hay ninguna mudanza que anunciar. */
+const DIRECCION_ACTUAL = "pauta-docente.netlify.app";
+
 export function montarMudanza() {
   const caja = $("#mudanza");
   if (!caja) return;
+
+  // En la dirección anterior el aviso sobraría: apuntaría a sí misma.
+  if (!location.hostname.includes(DIRECCION_ACTUAL.split(".")[0])) return;
 
   let yaVisto = false;
   try {

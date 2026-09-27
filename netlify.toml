@@ -11,6 +11,27 @@
   # construcción de hoy y la de dentro de dos años den lo mismo.
   NODE_VERSION = "20"
 
+# Mudanza de dirección.
+#
+# Los dos sitios —el viejo y el nuevo— se construyen de este mismo
+# repositorio, así que la regla va condicionada al dominio: solo se dispara
+# cuando la petición llega a la dirección anterior. El sitio viejo conserva
+# su despliegue continuo y no hay nada que mantener a mano.
+#
+# 301 es permanente y :splat conserva la ruta, así que /ayuda del viejo
+# llega a /ayuda del nuevo. Va antes que todo lo demás.
+[[redirects]]
+  from = "https://panel-de-clases.netlify.app/*"
+  to = "https://pauta-docente.netlify.app/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://panel-de-clases.netlify.app/*"
+  to = "https://pauta-docente.netlify.app/:splat"
+  status = 301
+  force = true
+
 # Guía de uso, independiente del panel: /ayuda.html vive en public/ y Netlify
 # ya la sirve tal cual porque el archivo existe; este alias solo da una URL
 # limpia. Debe ir antes del comodín de abajo.
