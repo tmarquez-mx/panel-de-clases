@@ -71,7 +71,7 @@ ejemplos y demostraciones.
 
 <p align="center">
   <sub>Configurar una materia y dar clase en Zoom.<br>
-  Pauta no supone ninguna nube: deduce cuál es de la liga que pegas.</sub>
+  Pauta una portada para reservar ventana compartida, y puedes pasar de un recurso a otro, e incluso regresar a uno anterior de manera fluida y transparente.</sub>
 </p>
 
 <p align="center">
