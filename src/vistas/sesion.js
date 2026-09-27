@@ -51,19 +51,28 @@ function opcionDe(selector, etiqueta, extra = {}) {
  *  clase pasan los dos por aquí—, así que también es el único lugar donde
  *  hay que preguntar por la ventana de presentación. */
 export function abrirRecurso(url, boton) {
-  if (!url) return;
+  if (!url) return "sin-liga";
   if (esLocal(url)) {
     copiar(url, boton, "Liga copiada");
-    return;
+    return "copiada";
   }
   if (!urlSegura(url)) {
     avisar("Esa liga no tiene una forma que el panel pueda abrir. Revísala con «Revisar enlaces».");
-    return;
+    return "invalida";
   }
+
   // Con el modo encendido, la liga va a la ventana compartida. Si el modo
   // está apagado, o la liga no es una página web, se cae a lo de siempre.
-  if (abrirEnPresentacion(url)) return;
-  window.open(url, "_blank", "noopener,noreferrer");
+  const enLaVentana = abrirEnPresentacion(url);
+  if (enLaVentana) return enLaVentana;
+
+  /* window.open devuelve null cuando el navegador bloquea la ventana.
+     Antes se ignoraba, y eso era una falla muda: la liga no se abría y el
+     panel no decía nada, así que el botón parecía descompuesto. Peor en
+     modo clase, donde la pantalla completa tapa cualquier pestaña nueva y
+     ni siquiera se ve la que sí se abrió. */
+  const pestana = window.open(url, "_blank", "noopener,noreferrer");
+  return pestana ? "pestana" : "bloqueada";
 }
 
 function recursosVisibles() {

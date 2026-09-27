@@ -71,8 +71,40 @@ function pintarReloj() {
   caja.dataset.situacion = situacion;
 }
 
+/* En pantalla completa no se ve nada de lo que pasa fuera: ni la ventana
+   de presentación, ni una pestaña nueva, ni que el navegador bloqueó la
+   apertura. Sin esto, abrir un recurso y que no ocurra nada visible es
+   indistinguible de un botón descompuesto. */
+const LO_QUE_PASO = {
+  presentacion: ["Listo: el recurso ya está en la ventana de presentación.", "bien"],
+  portada: ["La ventana de presentación volvió a la portada.", "bien"],
+  pestana: ["Se abrió en otra pestaña, detrás de esta pantalla. Sal con Esc para verla.", "bien"],
+  copiada: ["Es una ruta del disco: se copió al portapapeles.", "bien"],
+  bloqueada: [
+    "El navegador bloqueó la ventana. Sal con Esc y permítele las ventanas emergentes a esta página.",
+    "problema",
+  ],
+  "sin-liga": ["Este recurso no tiene liga.", "problema"],
+};
+
+let borrarEstado = 0;
+
+function decirQuePaso(clave) {
+  const caja = $("#mc-estado");
+  if (!caja) return;
+  const [texto, clase] = LO_QUE_PASO[clave] || ["", "bien"];
+  caja.textContent = texto;
+  caja.dataset.clase = clase;
+  window.clearTimeout(borrarEstado);
+  // Un problema se queda hasta que se cambia de recurso; lo demás se va solo.
+  if (texto && clase === "bien") {
+    borrarEstado = window.setTimeout(() => { caja.textContent = ""; }, 4000);
+  }
+}
+
 function mover(paso) {
   indice = Math.min(recursos.length - 1, Math.max(0, indice + paso));
+  decirQuePaso("");
   pintar();
   pintarReloj();
 }
@@ -129,8 +161,12 @@ export function montarModoClase() {
   $("#mc-salir").addEventListener("click", salirModoClase);
   $("#mc-anterior").addEventListener("click", () => mover(-1));
   $("#mc-siguiente").addEventListener("click", () => mover(1));
-  $("#mc-abrir").addEventListener("click", () => abrirRecurso(recursos[indice]?.url, $("#mc-abrir")));
-  $("#mc-portada").addEventListener("click", () => mostrarPortada());
+  $("#mc-abrir").addEventListener("click", () => {
+    decirQuePaso(abrirRecurso(recursos[indice]?.url, $("#mc-abrir")));
+  });
+  $("#mc-portada").addEventListener("click", () => {
+    decirQuePaso(mostrarPortada() ? "portada" : "bloqueada");
+  });
 
   document.addEventListener("keydown", (e) => {
     if (!activo()) return;

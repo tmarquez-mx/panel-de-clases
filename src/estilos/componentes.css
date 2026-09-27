@@ -448,6 +448,11 @@ body.lateral-plegado .plegar{background:var(--acento-tenue);color:var(--acento)}
 .modo-clase .btn:focus-visible{outline:2px solid var(--blanco);outline-offset:3px}
 .modo-clase .btn[disabled]{opacity:.4}
 .modo-clase .btn[disabled]:hover{background:rgba(255,255,255,.16)}
+.mc-estado{
+  margin:14px 0 0;min-height:1.2em;font-size:13px;color:rgba(255,255,255,.72);
+  transition:opacity .2s;
+}
+.mc-estado[data-clase="problema"]{color:#FF9F9F}
 .modo-clase .tecla{font-family:var(--mono);font-size:12px;color:rgba(255,255,255,.5);margin-left:auto}
 
 /* ---------- Diálogos ---------- */

@@ -316,16 +316,23 @@ export function mostrarPortada() {
 
 /**
  * Abre un recurso en la ventana de presentación, si el modo está
- * encendido y la liga es web. Devuelve false cuando no le toca, para que
- * quien llama siga con la apertura de siempre.
+ * encendido y la liga es web.
+ *
+ * Devuelve qué pasó, no un sí o un no: "" cuando no le toca —y entonces
+ * quien llama sigue con la apertura de siempre—, "presentacion" cuando la
+ * ventana ya lleva el recurso, y "bloqueada" cuando el navegador no dejó
+ * abrirla. Los tres casos se distinguen porque quien llama tiene que poder
+ * decírselo a quien está dando clase: en pantalla completa no se ve nada
+ * de lo que pase fuera, y una apertura que falla en silencio parece que el
+ * botón no sirve.
  */
 export function abrirEnPresentacion(url) {
-  if (!encendida) return false;
+  if (!encendida) return "";
   /* Solo las ligas http(s). Las de aplicación de escritorio (ms-word:,
      obsidian:) no cargan una página: dejarían la ventana compartida en
      blanco mientras el programa abre aparte. */
-  if (!esWeb(url) || !urlSegura(url)) return false;
-  return llevarAPresentacion(url);
+  if (!esWeb(url) || !urlSegura(url)) return "";
+  return llevarAPresentacion(url) ? "presentacion" : "bloqueada";
 }
 
 /* Aquí hubo un addEventListener("pagehide", cerrarPresentacion), para no
