@@ -1,0 +1,208 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" width="900" height="560"
+     role="img" aria-labelledby="titulo desc">
+<title id="titulo">Configurar la materia y presentar en Zoom</title>
+<desc id="desc">Animación en dos actos. En el primero, el cursor se detiene sobre el campo «Carpeta del curso» y aparece su cartelito de ayuda: «La carpeta donde viven los materiales, en la nube que uses». Al pegar una carpeta de Google Drive, el desplegable «Con qué creas los archivos en blanco» pasa solo de Microsoft 365 a Google Workspace. En el segundo acto, una ventana compartida en Zoom muestra la portada de la sesión —filete rojo, nombre de la materia, sesión y fecha—, cambia a un recurso y vuelve a la portada, mientras la ventana de Pauta, con los tiempos y la bitácora de quien da la clase, se queda aparte y fuera de lo compartido.</desc>
+
+<style>
+  /* Todo el movimiento son animaciones CSS dentro del propio SVG: no hay
+     script, no hay archivo externo y GitHub las reproduce tal cual.
+     El ciclo completo dura 18 s y se repite. */
+  .t { font-family: -apple-system, "Segoe UI", system-ui, Helvetica, Arial, sans-serif; }
+  .fondo    { fill: #F5F5F7; }
+  .tarjeta  { fill: #FFFFFF; stroke: rgba(60,60,67,.14); }
+  .campo    { fill: #FFFFFF; stroke: rgba(60,60,67,.20); }
+  .rotulo   { fill: #55555C; font-size: 11px; }
+  .valor    { fill: #1D1D1F; font-size: 12.5px; }
+  .fantasma { fill: #96969E; font-size: 12.5px; }
+  .titulo   { fill: #1D1D1F; font-size: 15px; font-weight: 650; }
+  .pista    { fill: #6E6E76; font-size: 9.5px; }
+  .paso     { fill: #6E6E76; font-size: 10px; letter-spacing: .14em; }
+  .rojo     { fill: #A62237; }
+
+  /* --- Reparto de los dos actos --------------------------------------
+     Acto 1 (configurar)  0 – 8.4 s     Acto 2 (Zoom)  8.4 – 18 s      */
+  #acto1 { animation: acto1 18s linear infinite; }
+  #acto2 { animation: acto2 18s linear infinite; }
+  @keyframes acto1 { 0%,44% { opacity:1 } 46%,100% { opacity:0 } }
+  @keyframes acto2 { 0%,46% { opacity:0 } 48%,97% { opacity:1 } 100% { opacity:0 } }
+
+  /* --- Acto 1: el cursor ---------------------------------------------
+     Se detiene sobre el campo de la carpeta, baja al del cuaderno y
+     termina en el desplegable de ofimática. */
+  #cursor { animation: cursor 18s linear infinite; }
+  @keyframes cursor {
+    0%   { transform: translate(624px, 452px); }
+    6%   { transform: translate(332px, 148px); }   /* llega a la carpeta */
+    19%  { transform: translate(332px, 148px); }   /* se queda quieto: cartelito */
+    26%  { transform: translate(362px, 356px); }   /* baja al desplegable */
+    44%  { transform: translate(362px, 356px); }
+    46%,100% { transform: translate(362px, 356px); opacity: 0; }
+  }
+  /* El cartelito aparece cuando el cursor ya lleva un momento encima. */
+  #cartelito { opacity: 0; animation: cartelito 18s linear infinite; }
+  @keyframes cartelito { 0%,8% {opacity:0} 10%,18% {opacity:1} 20%,100% {opacity:0} }
+
+  /* La liga de Drive se pega de golpe, como un pegado real. */
+  #carpeta-vacia  { animation: seVa   18s linear infinite; }
+  #carpeta-puesta { animation: llega  18s linear infinite; }
+  @keyframes seVa  { 0%,20% {opacity:1} 21%,100% {opacity:0} }
+  @keyframes llega { 0%,20% {opacity:0} 21%,100% {opacity:1} }
+
+  /* Y el desplegable se mueve solo detrás: Microsoft → Google. */
+  #suite-ms     { animation: seVa2  18s linear infinite; }
+  #suite-google { animation: llega2 18s linear infinite; }
+  @keyframes seVa2  { 0%,21% {opacity:1} 23%,100% {opacity:0} }
+  @keyframes llega2 { 0%,21% {opacity:0} 23%,100% {opacity:1} }
+  #destello { opacity: 0; animation: destello 18s linear infinite; }
+  @keyframes destello { 0%,21% {opacity:0} 24% {opacity:1} 34%,100% {opacity:0} }
+
+  /* --- Acto 2: lo que ve el grupo -------------------------------------
+     portada → recurso → portada. La ventana de Pauta no cambia nunca. */
+  #portada-1 { animation: portada1 18s linear infinite; }
+  #recurso   { animation: recursoAnim 18s linear infinite; }
+  @keyframes portada1    { 0%,62% {opacity:1} 64%,86% {opacity:0} 88%,100% {opacity:1} }
+  @keyframes recursoAnim { 0%,62% {opacity:0} 64%,86% {opacity:1} 88%,100% {opacity:0} }
+
+  #pie-portada { animation: piePortada 18s linear infinite; }
+  #pie-recurso { animation: pieRecurso 18s linear infinite; }
+  @keyframes piePortada  { 0%,62% {opacity:1} 64%,86% {opacity:0} 88%,100% {opacity:1} }
+  @keyframes pieRecurso  { 0%,62% {opacity:0} 64%,86% {opacity:1} 88%,100% {opacity:0} }
+
+  /* Quien pidió menos movimiento ve los dos actos quietos, uno y otro. */
+  @media (prefers-reduced-motion: reduce) {
+    #acto1, #acto2, #cursor, #cartelito,
+    #carpeta-vacia, #carpeta-puesta, #suite-ms, #suite-google, #destello,
+    #portada-1, #recurso, #pie-portada, #pie-recurso { animation: none; }
+    #acto2, #carpeta-vacia, #suite-ms, #cartelito,
+    #destello, #recurso, #pie-recurso { opacity: 0; }
+    #acto1, #carpeta-puesta, #suite-google, #portada-1, #pie-portada { opacity: 1; }
+  }
+</style>
+
+<rect width="900" height="560" class="fondo"/>
+
+<!-- ================= ACTO 1 · Configurar la materia ================= -->
+<g id="acto1">
+  <text x="450" y="34" class="t paso" text-anchor="middle">1 · CONFIGURAR LA MATERIA</text>
+
+  <rect x="230" y="56" width="440" height="418" rx="12" class="tarjeta"/>
+  <text x="258" y="88" class="t titulo">Editar curso</text>
+
+  <!-- Carpeta del curso -->
+  <text x="258" y="124" class="t rotulo">Carpeta del curso</text>
+  <rect x="258" y="134" width="330" height="32" rx="7" class="campo"/>
+  <g id="carpeta-vacia">
+    <text x="271" y="155" class="t fantasma">Liga de la carpeta</text>
+  </g>
+  <g id="carpeta-puesta">
+    <text x="271" y="155" class="t valor">drive.google.com/drive/folders/1Ab…</text>
+  </g>
+  <rect x="596" y="134" width="48" height="32" rx="7" fill="rgba(118,118,128,.12)"/>
+  <text x="620" y="154" class="t rotulo" text-anchor="middle">Pegar</text>
+
+  <!-- Cuaderno del curso -->
+  <text x="258" y="228" class="t rotulo">Cuaderno del curso</text>
+  <rect x="258" y="238" width="330" height="32" rx="7" class="campo"/>
+  <text x="271" y="259" class="t fantasma">Liga del cuaderno</text>
+  <rect x="596" y="238" width="48" height="32" rx="7" fill="rgba(118,118,128,.12)"/>
+  <text x="620" y="258" class="t rotulo" text-anchor="middle">Pegar</text>
+  <text x="258" y="288" class="t pista">Un solo lugar con una página por sesión. No tiene que ser OneNote:</text>
+  <text x="258" y="302" class="t pista">sirve un documento largo, Dropbox Paper, Notas de Apple, Notion…</text>
+
+  <!-- Con qué creas los archivos en blanco -->
+  <text x="258" y="334" class="t rotulo">Con qué creas los archivos en blanco</text>
+  <rect x="258" y="344" width="386" height="32" rx="7" class="campo"/>
+  <rect id="destello" x="255" y="341" width="392" height="38" rx="9" fill="none"
+        stroke="#A62237" stroke-width="2"/>
+  <g id="suite-ms">
+    <text x="271" y="365" class="t valor">Microsoft 365 — Word, PowerPoint, Excel</text>
+  </g>
+  <g id="suite-google">
+    <text x="271" y="365" class="t valor">Google Workspace — Documentos, Presentaciones…</text>
+  </g>
+  <path d="M628 357 l6 7 6-7" fill="none" stroke="#6E6E76" stroke-width="1.6" stroke-linecap="round"/>
+  <text x="258" y="398" class="t pista">Se propone según la carpeta que hayas vinculado arriba.</text>
+
+  <!-- Pie del formulario -->
+  <rect x="470" y="426" width="80" height="30" rx="7" fill="rgba(118,118,128,.12)"/>
+  <text x="510" y="445" class="t rotulo" text-anchor="middle">Cancelar</text>
+  <rect x="558" y="426" width="110" height="30" rx="7" class="rojo"/>
+  <text x="613" y="445" class="t" fill="#FFFFFF" font-size="11" text-anchor="middle">Guardar materia</text>
+
+  <!-- Cartelitos: lo que aparece al pasar el cursor -->
+  <!-- El cartelito que aparece al detener el cursor sobre el campo. -->
+  <g id="cartelito">
+    <rect x="286" y="174" width="352" height="28" rx="6" fill="#1D1D1F"/>
+    <text x="298" y="192" class="t" fill="#FFFFFF" font-size="10">La carpeta donde viven los materiales, en la nube que uses</text>
+  </g>
+
+  <!-- El cursor -->
+  <g id="cursor">
+    <path d="M0 0 L0 17 L4.4 13.2 L7.2 19.4 L10.4 18 L7.6 11.9 L13.2 11.6 Z"
+          fill="#FFFFFF" stroke="#1D1D1F" stroke-width="1.5" stroke-linejoin="round"/>
+  </g>
+</g>
+
+<!-- ================= ACTO 2 · La clase en Zoom ================= -->
+<g id="acto2">
+  <text x="450" y="34" class="t paso" text-anchor="middle">2 · DAR LA CLASE EN ZOOM</text>
+
+  <!-- Izquierda: tu pantalla, que nadie ve -->
+  <text x="60" y="72" class="t pista" letter-spacing="1.4">TU PANTALLA</text>
+  <rect x="60" y="84" width="280" height="176" rx="8" class="tarjeta"/>
+  <rect x="60" y="84" width="280" height="30" rx="8" fill="#FFFFFF" stroke="rgba(60,60,67,.14)"/>
+  <text x="76" y="105" class="t rojo" font-size="13" font-weight="700">Pauta</text>
+  <rect x="76" y="132" width="200" height="7" rx="3.5" fill="rgba(118,118,128,.18)"/>
+  <rect x="76" y="148" width="150" height="7" rx="3.5" fill="rgba(118,118,128,.18)"/>
+  <rect x="76" y="164" width="110" height="7" rx="3.5" fill="rgba(118,118,128,.18)"/>
+  <text x="76" y="200" class="t pista">tus tiempos, tu bitácora,</text>
+  <text x="76" y="214" class="t pista">tus notas de clase</text>
+  <text x="76" y="240" class="t pista" font-style="italic">se queda contigo</text>
+
+  <!-- Derecha: la ventana compartida -->
+  <text x="392" y="72" class="t rojo" font-size="9.5" letter-spacing="1.4" font-weight="700">COMPARTIDA EN ZOOM</text>
+  <rect x="392" y="84" width="448" height="280" rx="8" fill="#FFFFFF" stroke="#A62237" stroke-width="2"/>
+
+  <!-- La portada -->
+  <g id="portada-1">
+    <rect x="394" y="86" width="444" height="276" rx="7" fill="#F2F1EF"/>
+    <rect x="432" y="268" width="44" height="4" rx="2" class="rojo"/>
+    <text x="432" y="308" class="t" fill="#1D1D1F" font-size="27" font-weight="650">Seminario de ejemplo</text>
+    <text x="432" y="330" class="t" fill="#1D1D1F" font-size="13">Cómo está armado este panel</text>
+    <text x="432" y="348" class="t" fill="#6E6E76" font-size="10.5">Sesión 03 · lunes, 8 de septiembre de 2026</text>
+  </g>
+
+  <!-- Un recurso cualquiera, que casi siempre es blanco -->
+  <g id="recurso">
+    <rect x="394" y="86" width="444" height="276" rx="7" fill="#FFFFFF"/>
+    <rect x="394" y="86" width="444" height="26" rx="7" fill="#F5F5F7"/>
+    <text x="410" y="104" class="t pista">Cave, S. (2020). The problem with intelligence.pdf</text>
+    <rect x="432" y="140" width="290" height="10" rx="5" fill="rgba(118,118,128,.22)"/>
+    <rect x="432" y="162" width="360" height="7" rx="3.5" fill="rgba(118,118,128,.14)"/>
+    <rect x="432" y="178" width="360" height="7" rx="3.5" fill="rgba(118,118,128,.14)"/>
+    <rect x="432" y="194" width="322" height="7" rx="3.5" fill="rgba(118,118,128,.14)"/>
+    <rect x="432" y="218" width="360" height="7" rx="3.5" fill="rgba(118,118,128,.14)"/>
+    <rect x="432" y="234" width="248" height="7" rx="3.5" fill="rgba(118,118,128,.14)"/>
+    <rect x="432" y="266" width="360" height="7" rx="3.5" fill="rgba(118,118,128,.14)"/>
+    <rect x="432" y="282" width="294" height="7" rx="3.5" fill="rgba(118,118,128,.14)"/>
+  </g>
+
+  <!-- Qué está pasando, en una línea -->
+  <g id="pie-portada">
+    <circle cx="404" cy="404" r="5" class="rojo"/>
+    <text x="418" y="409" class="t" fill="#1D1D1F" font-size="12.5">
+      <tspan font-weight="650">La portada</tspan><tspan> — la compartes antes de empezar, sin adelantar ningún material.</tspan>
+    </text>
+  </g>
+  <g id="pie-recurso">
+    <circle cx="404" cy="404" r="5" class="rojo"/>
+    <text x="418" y="409" class="t" fill="#1D1D1F" font-size="12.5">
+      <tspan font-weight="650">El recurso</tspan><tspan> — aparece en la MISMA ventana. No vuelves a compartir nada.</tspan>
+    </text>
+  </g>
+
+  <text x="60" y="470" class="t pista">Una sola ventana para toda la sesión: tú te quedas en Pauta y lo que el grupo ve cambia detrás,</text>
+  <text x="60" y="488" class="t pista">sin que la ventana te robe el foco. Entre un recurso y el siguiente puedes volver a la portada.</text>
+  <text x="60" y="516" class="t pista" font-style="italic">En el salón presencial, lo mismo con escritorio extendido en vez de duplicar pantalla.</text>
+</g>
+</svg>

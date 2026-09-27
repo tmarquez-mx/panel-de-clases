@@ -89,11 +89,12 @@ function pintarPie(modo, nombreArchivo) {
   const donde = {
     archivo: `<p><strong>Cómo guarda tu trabajo.</strong> Cada cambio se escribe solo en el archivo
       <em>${esc(nombreArchivo)}</em> y, además, queda una copia en este navegador. Si el archivo está en una
-      carpeta de OneDrive sincronizada, el respaldo viaja solo a tus otras computadoras.</p>`,
+      carpeta sincronizada —OneDrive, Google Drive, Dropbox, iCloud: la que uses—, el respaldo viaja solo a
+      tus otras computadoras.</p>`,
     navegador: `<p><strong>Cómo guarda tu trabajo.</strong> Cada cambio se guarda solo en este navegador y en
       esta computadora. No viaja a ningún servidor. Para pasar tus datos a la computadora del salón usa
       <em>Guardar respaldo</em> aquí e <em>Importar respaldo</em> allá; en Chrome o Edge también puedes usar
-      <em>Vincular archivo</em> y dejar el respaldo en OneDrive.</p>`,
+      <em>Vincular archivo</em> y dejar el respaldo en tu carpeta sincronizada.</p>`,
     memoria: `<p><strong>Atención: aquí no se guarda nada.</strong> Este navegador no permite almacenamiento
       local, así que todo lo que escribas se pierde al cerrar la pestaña. Usa <em>Guardar respaldo</em> antes de
       salir e <em>Importar respaldo</em> al volver.</p>`,
@@ -105,10 +106,14 @@ function pintarPie(modo, nombreArchivo) {
      la guía. Al pie solo se queda lo que es un problema concreto y ahora. */
   $("#alm-ayuda-cuerpo").innerHTML = `
     ${donde[modo] || donde.navegador}
-    <p><strong>Para que funcione en cualquier computadora,</strong> usa ligas de OneDrive en lugar de rutas del
+    <p><strong>Para que funcione en cualquier computadora,</strong> usa ligas de tu nube en lugar de rutas del
     disco. Las rutas locales (<span class="ruta" style="display:inline">file://</span>) no abren con un clic desde
     el navegador. El botón <em>Revisar enlaces</em> las encuentra todas antes de la clase.</p>
-    <p><strong>Tus ligas son privadas.</strong> Los respaldos incluyen las ligas de OneDrive, que llevan claves de
+    <p><strong>La carpeta tiene que estar en el disco, no solo en línea.</strong> Drive en modo transmisión,
+    la sincronización inteligente de Dropbox y «Optimizar almacenamiento» en iCloud pueden dejar el archivo
+    fuera de la computadora, y entonces Pauta no puede escribir en él. Marca esa carpeta como disponible sin
+    conexión.</p>
+    <p><strong>Tus ligas son privadas.</strong> Los respaldos incluyen las ligas de tu nube, que llevan claves de
     uso compartido. No los subas a un repositorio abierto.</p>`;
 
   // El aviso al pie solo aparece cuando hay algo que resolver.
@@ -202,7 +207,7 @@ function pintarDialogoAlmacen() {
   const disponible = soportaArchivo
     ? `<ul class="alm-lista">
          <li>Vincular un archivo <code>.json</code> deja tus datos en un archivo que tú controlas.</li>
-         <li>Si lo pones en tu carpeta de OneDrive sincronizada, el mismo respaldo llega a tus otras computadoras.</li>
+         <li>Si lo pones en una carpeta sincronizada —OneDrive, Drive, Dropbox, iCloud—, el mismo respaldo llega a tus otras computadoras.</li>
          <li>El navegador te pedirá permiso otra vez cada cierto tiempo. Es normal: se reconecta desde aquí.</li>
        </ul>`
     : `<ul class="alm-lista">

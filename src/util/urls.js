@@ -5,11 +5,9 @@
 export const esLocal = (u) => /^file:\/\//i.test(String(u || "").trim());
 export const esWeb = (u) => /^https?:\/\//i.test(String(u || "").trim());
 
-/** Ligas de la nube institucional, para la etiqueta visual. */
-export const esNube = (u) =>
-  /^https?:\/\/[^ ]*(sharepoint\.com|onedrive\.live\.com|1drv\.ms|office\.com|onenote\.com)/i.test(
-    String(u || "").trim()
-  );
+/* Reconocer de qué nube es una liga vive en datos/nubes.js: esto era
+   esNube(), que solo sabía de dominios de Microsoft y hacía que el panel
+   etiquetara «OneDrive» cualquier liga de la nube, fuera de quien fuera. */
 
 /* Esquemas que el panel acepta abrir o mostrar como enlace.
    Todo lo demás (javascript:, data:, vbscript:, blob:) se bloquea: un respaldo
@@ -84,7 +82,7 @@ export function revisarUrl(u) {
 /**
  * Procedencia legible de una liga: el dominio, o el nombre del archivo si es
  * una ruta local. Sirve para mostrar de dónde viene un recurso sin desplegar
- * una URL entera —las de OneDrive traen claves larguísimas—, sin perder el
+ * una URL entera —las de la nube traen claves larguísimas—, sin perder el
  * acceso a la dirección completa, que sigue en el título y en «Copiar liga».
  */
 export function procedencia(u) {

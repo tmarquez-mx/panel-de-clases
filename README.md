@@ -43,6 +43,9 @@ No se instala nada y no hay cuentas. Es una página que abres en **Chrome o Edge
    planeación te sigue a cualquier computadora.
 5. **El día de la clase, entra a Modo clase.** Pantalla completa, un recurso a la vez,
    flechas para avanzar y `Esc` para salir.
+6. **Si das clase en Zoom, enciende la ventana de presentación.** Todos los recursos se
+   abren en una sola ventana aparte: compartes esa y nada más, y tus alumnos no ven
+   Pauta cada vez que cambias de recurso.
 
 No hay botón de guardar: cada cambio se guarda solo.
 
@@ -60,8 +63,19 @@ ejemplos y demostraciones.
   el tiempo transcurrido con el minuto que planeaste.</sub>
 </p>
 
+<br>
+
 <p align="center">
-  <sub><em>Las capturas usan datos ficticios.</em></sub>
+  <img src="assets/capturas/configurar-y-presentacion.svg" alt="Animación en dos actos. Primero, el formulario de una materia: el cursor se detiene sobre «Carpeta del curso» y aparece su cartelito, «La carpeta donde viven los materiales, en la nube que uses»; al pegar una carpeta de Google Drive, el desplegable «Con qué creas los archivos en blanco» pasa solo de Microsoft 365 a Google Workspace. Después, una clase en Zoom: la ventana compartida muestra la portada de la sesión, cambia a un recurso y vuelve a la portada, mientras la ventana de Pauta se queda aparte, fuera de lo compartido." width="900">
+</p>
+
+<p align="center">
+  <sub>Configurar una materia y dar clase en Zoom.<br>
+  Pauta no supone ninguna nube: deduce cuál es de la liga que pegas.</sub>
+</p>
+
+<p align="center">
+  <sub><em>Las capturas usan datos ficticios. La tercera es un SVG animado, sin script ni archivos externos.</em></sub>
 </p>
 
 <br>
@@ -129,7 +143,7 @@ líneas, escrito dentro de `vite.config.js`, en lugar de agregar otra dependenci
 Pauta no manda nada a ningún servidor, no tiene analítica y no pide cuentas. Lo que
 escribes vive en tu navegador y, si lo vinculas, en tu archivo.
 
-**Cuidado con los respaldos.** Las ligas de OneDrive, SharePoint o Drive llevan claves
+**Cuidado con los respaldos.** Las ligas de OneDrive, Drive, Dropbox o SharePoint llevan claves
 de uso compartido y apuntan a una cuenta institucional: un respaldo publicado es una
 llave publicada.
 
@@ -157,6 +171,7 @@ llave publicada.
     "clave": "Posgrado · Otoño 2026",
     "carpeta": "URL de la carpeta del curso",
     "cuaderno": "URL del cuaderno del curso",
+    "ofimatica": "microsoft",
     "sesiones": [{
       "num": 3,
       "fecha": "2026-09-08",
@@ -179,6 +194,10 @@ llave publicada.
 `clase` puede ser `curso`, `taller` o `ponencia`, y solo cambia el vocabulario de la
 interfaz. Los respaldos anteriores, que no la traen, entran como `curso`.
 
+`ofimatica` puede ser `microsoft`, `google` o `ninguna`, y solo decide qué botones
+aparecen en «¿No existe todavía? Crear». Si falta, Pauta la deduce de la carpeta
+vinculada.
+
 *Importar respaldo* valida la estructura antes de tocar nada, dice cuántas materias y
 sesiones trae y pide confirmación, porque sustituye todo. Acepta respaldos de versiones
 anteriores: los campos que falten se completan con valores por omisión.
@@ -197,13 +216,15 @@ anteriores: los campos que falten se completan con valores por omisión.
 - **Incrustar no siempre se puede**: OneDrive, SharePoint y muchos sitios prohíben que
   otra página los muestre dentro de un marco. Por eso Pauta abre pestañas.
 - **«Abrir todo» y el bloqueador de ventanas emergentes**: la primera vez el navegador
-  bloqueará las pestañas; hay que permitirlas para esa página.
+  bloqueará las pestañas; hay que permitirlas para esa página. Lo mismo la primera vez
+  que se enciende la ventana de presentación.
+- **La ventana de presentación suelta `noopener`.** Reutilizar una ventana exige
+  conservar su referencia, y eso permite que la página abierta alcance `window.opener`.
+  Por eso nace apagada y se enciende a propósito: con el interruptor apagado, cada
+  recurso se abre como siempre, en una pestaña con `noopener,noreferrer`.
 - **Deshacer llega hasta la última eliminación**, no más atrás.
 - **La búsqueda abarca la sesión abierta**, no el curso entero. El filtro de tipos sí
   ofrece los tipos de toda la materia.
-- **El vocabulario todavía supone Microsoft** en algunos rótulos —«Carpeta de OneDrive»,
-  «Cuaderno de OneNote», los botones de Office— aunque el guardado no dependa de
-  ninguna nube. Está pendiente soltarlo.
 - **No hay pruebas automáticas.** Todo se verifica a mano.
 
 ---
@@ -214,7 +235,7 @@ anteriores: los campos que falten se completan con valores por omisión.
 index.html                  Todo el marcado de la página
 vite.config.js              Configuración y el plugin de un solo archivo
 netlify.toml                Construcción, el reenvío de la dirección anterior y /ayuda
-assets/                     Logotipo original y capturas del README
+assets/                     Logotipo original y capturas del README (una animada, en SVG)
 public/
   ayuda.html                Guía de uso, publicada en /ayuda
   rescatar.html             Rescate de datos de la dirección anterior
@@ -226,6 +247,7 @@ src/
   datos/
     modelo.js               Estructura, migración de respaldos y operaciones
     vocabulario.js          Curso, taller o ponencia: solo las palabras
+    nubes.js                Qué nube es cada liga y con qué se crean los archivos
     ejemplo.js              Materias ficticias, sin ligas reales
   almacenamiento/
     gestor.js               Decide dónde se guarda y en qué modo está
@@ -237,6 +259,7 @@ src/
     sesion.js               Cabecera, controles, riel de recursos y bitácora
     semestre.js             Todas las sesiones de un vistazo
     modoClase.js            Pantalla completa, un recurso a la vez, con reloj
+    presentacion.js         Ventana aparte para compartir en Zoom, con su portada
     lectura.js              Tamaño del texto y vista de lectura
     menu.js                 Menús «⋯», accesibles y con teclado
     dialogos.js             Formularios de recurso, sesión, duplicar, mover y materia
@@ -259,6 +282,9 @@ qué otras vistas existen.
 - Todo se puede usar con el teclado, y el foco siempre se ve. Los menús cierran con
   `Esc` y se recorren con las flechas.
 - Ningún control aparece solo al pasar el cursor.
+- **Cada control lleva su cartelito**: al pasar el cursor, cualquier botón, campo o
+  menú dice qué hace. Los que cambian de comportamiento lo dicen —«Abrir» anuncia si
+  va a una pestaña nueva o a la ventana de presentación—.
 - El estado nunca se comunica solo con color: cambia también la palabra o la forma.
 - Los tamaños de lectura se ajustan con **A− A A+** sin descuadrar la interfaz.
 - En modo clase, el resto de la página queda fuera del recorrido del teclado y del

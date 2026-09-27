@@ -168,7 +168,8 @@
         </div>
         <!-- Igual que arriba: viven aquí, se accionan desde el menú. -->
         <button class="btn" id="btn-abrir-todo" hidden title="Abrir en pestañas todas las ligas web de esta sesión">Abrir todo</button>
-        <button class="btn" id="btn-nota" hidden title="Abrir un Word en blanco y dejar listo el formulario para pegar su liga">Nueva nota en Word</button>
+        <!-- El rótulo y el cartelito los pone el panel: dependen de la suite de la materia. -->
+        <button class="btn" id="btn-nota" hidden></button>
         <button class="btn" id="btn-ordenar" hidden title="Acomodar los recursos de esta sesión según los minutos que declara cada uno">Ordenar por minutos</button>
       </div>
 
@@ -184,7 +185,7 @@
           <textarea id="txt-bitacora" placeholder="Qué funcionó, qué quedó pendiente, con qué empezar la próxima vez."
             title="Notas de después de la clase. Se guardan solas mientras escribes"></textarea>
           <p class="solo-impresion" id="bitacora-impresa"></p>
-          <p class="pie-bit">Se guarda dentro del respaldo del panel (no en OneDrive) y sale en la exportación a Markdown.</p>
+          <p class="pie-bit">Se guarda dentro del respaldo del panel (no en tu nube) y sale en la exportación a Markdown.</p>
         </div>
       </details>
     </section>
@@ -276,21 +277,17 @@
         </div>
       </div>
       <div class="campo">
-        <label for="f-url">Liga de OneDrive o ruta</label>
+        <label for="f-url">Liga del archivo o ruta</label>
         <div class="url-fila">
-          <input id="f-url" placeholder="Pega aquí la liga copiada de OneDrive"
-            title="La dirección del archivo: una liga https de la nube, o la ruta del archivo en tu disco">
+          <input id="f-url" placeholder="Pega aquí la liga copiada de tu nube"
+            title="La dirección del archivo: una liga https de tu nube —OneDrive, Google Drive, Dropbox, iCloud— o la ruta del archivo en tu disco">
           <button type="button" class="mini" id="btn-pegar" title="Pegar aquí la liga que tengas copiada">Pegar</button>
         </div>
-        <div class="crear-fila">
-          <span class="rot">¿No existe todavía? Crear</span>
-          <button type="button" class="mini" data-crear="word" title="Abrir un documento de Word en blanco en otra pestaña. Este formulario no se cierra">Word</button>
-          <button type="button" class="mini" data-crear="ppt" title="Abrir una presentación de PowerPoint en blanco en otra pestaña">PowerPoint</button>
-          <button type="button" class="mini" data-crear="excel" title="Abrir una hoja de cálculo de Excel en blanco en otra pestaña">Excel</button>
-          <button type="button" class="mini" data-crear="cuaderno" title="Abrir el cuaderno de esta materia y poner su liga en el campo">Cuaderno OneNote</button>
-        </div>
+        <!-- La fila de creación la pinta el panel: qué botones haya depende
+             de la suite de la materia (Microsoft, Google o ninguna). -->
+        <div class="crear-fila" id="crear-fila"></div>
         <p class="hecho" id="hecho-crear"></p>
-        <p class="pista">Para un archivo existente: en OneDrive, clic derecho → Compartir → Copiar vínculo.</p>
+        <p class="pista" id="pista-liga"></p>
       </div>
       <div class="campo">
         <label for="f-nota">Para qué sirve en clase</label>
@@ -420,21 +417,36 @@
           title="El dato que acompaña al nombre: nivel y periodo, sede y fecha, o el evento">
       </div>
       <div class="campo">
-        <label for="m-carpeta">Carpeta de OneDrive del curso</label>
+        <label for="m-carpeta" id="lbl-m-carpeta">Carpeta del curso</label>
         <div class="url-fila">
           <input id="m-carpeta" placeholder="Liga de la carpeta"
-            title="La dirección de la carpeta donde viven los materiales de la materia. Queda como enlace fijo en la barra de la izquierda">
+            title="La dirección de la carpeta donde viven los materiales de esta materia, en la nube que uses: OneDrive, Google Drive, Dropbox, iCloud. Queda como enlace fijo en la barra de la izquierda">
           <button type="button" class="mini" data-pegar="m-carpeta" title="Pegar aquí la liga que tengas copiada">Pegar</button>
         </div>
       </div>
       <div class="campo">
-        <label for="m-cuaderno">Cuaderno de OneNote del curso</label>
+        <label for="m-cuaderno" id="lbl-m-cuaderno">Cuaderno del curso</label>
         <div class="url-fila">
           <input id="m-cuaderno" placeholder="Liga del cuaderno"
-            title="La dirección del cuaderno de la materia. El botón «Cuaderno OneNote» del formulario de recurso lo abre desde aquí">
+            title="La dirección del lugar donde llevas una página por sesión. El botón «Cuaderno del curso» del formulario de recurso lo abre desde aquí y pega su liga">
           <button type="button" class="mini" data-pegar="m-cuaderno" title="Pegar aquí la liga que tengas copiada">Pegar</button>
         </div>
-        <p class="pista">Un solo cuaderno con una página por sesión evita crear un archivo nuevo cada vez.</p>
+        <p class="pista">Un solo lugar con una página por sesión, para no crear un archivo suelto cada vez.
+          No tiene que ser OneNote: sirve igual <strong>un documento largo de Google o de Word</strong> con un
+          apartado por sesión, <strong>Dropbox Paper</strong>, <strong>Notas de Apple</strong>,
+          <strong>Notion</strong>, <strong>Evernote</strong> o una nota de <strong>Obsidian</strong>. Pauta solo
+          guarda la liga y te la deja a un clic; lo que haya del otro lado lo eliges tú. Si no llevas nada así,
+          déjalo vacío: el campo es opcional.</p>
+      </div>
+      <div class="campo">
+        <label for="m-ofimatica">Con qué creas los archivos en blanco</label>
+        <select id="m-ofimatica" title="Qué se abre cuando pides un documento, una presentación o una hoja en blanco desde el formulario de recurso">
+          <option value="microsoft">Microsoft 365 — Word, PowerPoint, Excel</option>
+          <option value="google">Google Workspace — Documentos, Presentaciones, Hojas de cálculo</option>
+          <option value="ninguna">Ninguna — solo pego ligas de archivos que ya existen</option>
+        </select>
+        <p class="pista">Solo cambia los botones de «¿No existe todavía? Crear» del formulario de recurso.
+          Se propone según la carpeta que hayas vinculado arriba.</p>
       </div>
     </div>
     <div class="dlg-pie">

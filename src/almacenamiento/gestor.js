@@ -2,7 +2,7 @@
    Gestor de almacenamiento: decide dónde se guarda y avisa del estado.
 
    Tres modos, de más a menos duradero:
-     archivo    — hay un .json vinculado en disco (o en la carpeta de OneDrive
+     archivo    — hay un .json vinculado en disco (o en la carpeta sincronizada
                   sincronizada). Se escribe ahí y además se deja copia en el
                   navegador, por si el permiso se pierde.
      navegador  — localStorage. Sobrevive a cerrar el navegador, pero vive en

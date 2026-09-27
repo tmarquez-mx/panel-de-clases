@@ -13,6 +13,7 @@ import {
 } from "../estado.js";
 import { mostrarAviso } from "./aviso.js";
 import { voz } from "../datos/vocabulario.js";
+import { suiteDe, comoCopiarEn, rotuloDeCuaderno } from "../datos/nubes.js";
 import { recordarParaDeshacer, deshacer } from "../historial.js";
 
 /* Índices de lo que se está editando. null = se está creando algo nuevo. */
@@ -21,6 +22,9 @@ let recursoAMover = null;
 let sesionEnEdicion = null;
 let sesionADuplicar = null;
 let materiaEnEdicion = null;
+/* Si en esta apertura del formulario ya se eligió la suite a mano. Mientras
+   no se toque, la propuesta sigue a la carpeta que se escriba. */
+let suiteElegidaAMano = false;
 
 const numeroDe = (s, i) => String(s?.num || i + 1).padStart(2, "0");
 
@@ -53,6 +57,7 @@ export function abrirDlgRecurso(indice, precarga = {}) {
   $("#f-url").value = r.url || "";
   $("#f-nota").value = r.nota || "";
   $("#hecho-crear").classList.remove("visible");
+  pintarFilaDeCrear();
   $("#dlg-recurso").showModal();
   $("#f-titulo").focus();
 }
@@ -92,18 +97,39 @@ function guardarRecurso() {
   actualizar();
 }
 
-/* --- Crear un archivo que todavía no existe, sin salir del panel --- */
-const CREAR = {
-  word: { url: "https://word.new", nombre: "documento de Word" },
-  ppt: { url: "https://ppt.new", nombre: "presentación de PowerPoint" },
-  excel: { url: "https://xl.new", nombre: "hoja de cálculo de Excel" },
-};
+/* --- Crear un archivo que todavía no existe, sin salir del panel ---
+
+   Qué botones hay aquí depende de la suite de la materia: Word, PowerPoint
+   y Excel para quien trabaja en Microsoft 365; Documentos, Presentaciones y
+   Hojas de cálculo para quien trabaja en Google; ninguno para quien usa
+   Dropbox o iCloud, donde no hay suite que abrir desde el navegador y un
+   «Word en blanco» acabaría guardado en otra nube. El cuaderno va aparte:
+   no es un archivo nuevo, es el de la materia. */
+function pintarFilaDeCrear() {
+  const suite = suiteDe(materia());
+  const cuaderno = materia()?.cuaderno;
+
+  const botones = suite.crear.map(
+    (c) => `<button type="button" class="mini" data-crear="${esc(c.clave)}"
+      title="Abrir un ${esc(c.nombre)} en blanco en otra pestaña. Este formulario no se cierra">${esc(c.boton)}</button>`
+  );
+  if (cuaderno) {
+    botones.push(`<button type="button" class="mini" data-crear="cuaderno"
+      title="Abrir el cuaderno de esta materia y poner su liga en el campo">Cuaderno del curso</button>`);
+  }
+
+  $("#crear-fila").innerHTML = botones.length
+    ? `<span class="rot">¿No existe todavía? Crear</span>${botones.join("")}`
+    : "";
+  $("#crear-fila").hidden = !botones.length;
+  $("#pista-liga").textContent = comoCopiarEn(materia());
+}
 
 function crearArchivo(clave) {
   if (clave === "cuaderno") {
     const cuaderno = materia()?.cuaderno;
     if (!cuaderno) {
-      avisar("Esta materia todavía no tiene cuaderno de OneNote. Agrégalo al editar la materia.");
+      avisar("Esta materia todavía no tiene cuaderno. Agrégalo al editar la materia.");
       return;
     }
     // La liga puede venir de un respaldo ajeno: se valida el esquema antes de abrirla.
@@ -119,7 +145,7 @@ function crearArchivo(clave) {
     return;
   }
 
-  const cfg = CREAR[clave];
+  const cfg = suiteDe(materia()).crear.find((c) => c.clave === clave);
   if (!cfg) return;
   window.open(cfg.url, "_blank", "noopener,noreferrer");
   $("#hecho-crear").textContent =
@@ -285,6 +311,7 @@ export function abrirDlgMateria(indice) {
   const m = indice === null ? {} : estado.datos.materias[indice];
   if (!m) return;
   materiaEnEdicion = indice;
+  suiteElegidaAMano = false;
 
   const clase = m.clase || "curso";
   $("#m-clase").value = clase;
@@ -294,6 +321,8 @@ export function abrirDlgMateria(indice) {
   $("#m-clave").value = m.clave || "";
   $("#m-carpeta").value = m.carpeta || "";
   $("#m-cuaderno").value = m.cuaderno || "";
+  /* Sin nada escrito, se propone la que corresponde a la carpeta vinculada. */
+  $("#m-ofimatica").value = suiteDe(m).id;
   $("#btn-borrar-materia").hidden = indice === null || estado.datos.materias.length < 2;
   rotularDlgMateria();
   $("#dlg-materia").showModal();
@@ -308,6 +337,11 @@ function rotularDlgMateria() {
   $("#m-clave").placeholder = v.ejemploClave;
   $("#mat-titulo-dlg").textContent =
     materiaEnEdicion === null ? v.nueva : `Editar ${v.etiqueta.toLowerCase()}`;
+
+  /* La carpeta se queda con su rótulo genérico: lo que importa es que sea
+     la del curso, no de quién es la nube. El cuaderno sí dice OneNote
+     cuando lo es, que es como lo llama quien lo usa. */
+  $("#lbl-m-cuaderno").textContent = rotuloDeCuaderno($("#m-cuaderno").value);
 }
 
 function guardarMateria() {
@@ -320,6 +354,7 @@ function guardarMateria() {
     clave: $("#m-clave").value.trim(),
     carpeta: $("#m-carpeta").value.trim(),
     cuaderno: $("#m-cuaderno").value.trim(),
+    ofimatica: $("#m-ofimatica").value,
   };
 
   if (materiaEnEdicion === null) {
@@ -393,7 +428,10 @@ export function montarDialogos() {
     if (nuevo) $("#f-tipo-nuevo").focus();
   });
   $("#btn-pegar").addEventListener("click", () => pegarEn($("#f-url")));
-  $$("[data-crear]").forEach((b) => b.addEventListener("click", () => crearArchivo(b.dataset.crear)));
+  $("#crear-fila").addEventListener("click", (e) => {
+    const boton = e.target.closest("[data-crear]");
+    if (boton) crearArchivo(boton.dataset.crear);
+  });
   conectar("#dlg-recurso", guardarRecurso, () => { recursoEnEdicion = null; });
 
   /* Atajo: nota nueva de la sesión, ya prellenada. El formulario queda abierto. */
@@ -406,7 +444,7 @@ export function montarDialogos() {
       momento: "referencia",
       nota: "Notas de la sesión.",
     });
-    crearArchivo("word");
+    crearArchivo("doc");
   });
 
   /* --- Sesión --- */
@@ -429,5 +467,14 @@ export function montarDialogos() {
   );
   $("#btn-borrar-materia").addEventListener("click", borrarMateria);
   $("#m-clase").addEventListener("change", rotularDlgMateria);
+  $("#m-ofimatica").addEventListener("change", () => { suiteElegidaAMano = true; });
+  /* Pegar la carpeta es la señal más clara de qué nube usa: mientras no se
+     haya elegido otra cosa a mano, el rótulo y la suite siguen a la liga. */
+  $("#m-carpeta").addEventListener("input", () => {
+    if (!suiteElegidaAMano) {
+      $("#m-ofimatica").value = suiteDe({ carpeta: $("#m-carpeta").value }).id;
+    }
+  });
+  $("#m-cuaderno").addEventListener("input", rotularDlgMateria);
   conectar("#dlg-materia", guardarMateria, () => { materiaEnEdicion = null; });
 }

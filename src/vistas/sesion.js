@@ -2,7 +2,7 @@
 
 import { $, esc, confirmar, avisar } from "../util/dom.js";
 import { fechaCorta, fechaLarga } from "../util/fechas.js";
-import { esLocal, esNube, esWeb, urlSegura, procedencia } from "../util/urls.js";
+import { esLocal, esWeb, urlSegura, procedencia } from "../util/urls.js";
 import { copiar } from "../util/portapapeles.js";
 import { ordenarRecursosPorMomento, siguienteEstado, tiposDisponibles } from "../datos/modelo.js";
 import {
@@ -14,6 +14,7 @@ import { mostrarAviso } from "./aviso.js";
 import { recordarParaDeshacer, deshacer } from "../historial.js";
 import { abrirMenu, cerrarMenu } from "./menu.js";
 import { voz } from "../datos/vocabulario.js";
+import { nombreDeNube, suiteDe } from "../datos/nubes.js";
 import { abrirLectura, formatearTexto } from "./lectura.js";
 import {
   abrirEnPresentacion, presentacionEncendida, alternarPresentacion, mostrarPortada,
@@ -140,14 +141,17 @@ function tarjeta(recurso, indice, total) {
           : ""
       }
       ${
-        /* Procedencia, no la dirección entera: las ligas de OneDrive traen
+        /* Procedencia, no la dirección entera: las ligas de la nube traen
            claves larguísimas que tapaban la tarjeta. La dirección completa
-           sigue en el título del elemento y en «Copiar liga». */
+           sigue en el título del elemento y en «Copiar liga». Si la liga es
+           de una nube conocida basta con nombrarla —antes decía «OneDrive»
+           incluso en ligas de Drive, y además repetía el dominio al lado—;
+           si no se reconoce, el dominio es lo más informativo que hay. */
         recurso.url
-          ? `<span class="ruta" title="${esc(recurso.url)}">${esNube(recurso.url) ? "OneDrive · " : ""}${esc(procedencia(recurso.url))}</span>`
+          ? `<span class="ruta" title="${esc(recurso.url)}">${esc(nombreDeNube(recurso.url) || procedencia(recurso.url))}</span>`
           : ""
       }
-      ${local ? `<p class="aviso">Ruta local: no abre con un clic desde el navegador y no existe en otra computadora. Súbelo a OneDrive y sustituye la liga.</p>` : ""}
+      ${local ? `<p class="aviso">Ruta local: no abre con un clic desde el navegador y no existe en otra computadora. Súbelo a tu nube y sustituye la liga.</p>` : ""}
     </div>
     <div class="acciones">
       ${recurso.nota ? `<button class="btn" data-acc="leer" title="Leer la descripción con texto amplio, sin nada alrededor">Leer</button>` : ""}
@@ -216,6 +220,19 @@ function quitarRecurso(i) {
   });
 }
 
+/* «Nueva nota» abre un documento en blanco de la suite de la materia, así
+   que el rótulo tiene que decir cuál. Sin suite —Dropbox, iCloud— no hay
+   documento que abrir: el atajo se esconde en vez de mentir. */
+function rotularNotaNueva() {
+  const doc = suiteDe(materia()).crear.find((c) => c.clave === "doc");
+  const boton = $("#btn-nota");
+  boton.dataset.sinSuite = doc ? "" : "1";
+  boton.textContent = doc ? `Nueva nota en ${doc.boton}` : "Nueva nota";
+  boton.title = doc
+    ? `Abrir un ${doc.nombre} en blanco y dejar listo el formulario para pegar su liga`
+    : "Esta materia no tiene suite para crear archivos en blanco. Elígela al editar la materia";
+}
+
 function pintarSesion() {
   const hay = haySesion();
   for (const selector of CONTROLES_DE_SESION) $(selector).disabled = !hay;
@@ -242,6 +259,7 @@ function pintarSesion() {
   $("#bitacora-impresa").textContent = s.bitacora || "";
 
   pintarFiltroDeTipos();
+  rotularNotaNueva();
 
   const visibles = recursosVisibles();
   const revisados = s.recursos.filter((r) => r.estado === "listo" || r.estado === "usado").length;
@@ -405,7 +423,10 @@ export function montarVistaSesion() {
         accion: mostrarPortada,
       },
       "---",
-      opcionDe("#btn-nota", "Nueva nota en Word"),
+      opcionDe("#btn-nota", $("#btn-nota").textContent, {
+        desactivado: $("#btn-nota").disabled || $("#btn-nota").dataset.sinSuite === "1",
+        razon: "Elige una suite al editar la materia para crear archivos en blanco",
+      }),
     ])
   );
 

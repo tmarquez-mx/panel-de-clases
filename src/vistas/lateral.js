@@ -6,6 +6,7 @@ import { urlSegura } from "../util/urls.js";
 import { indiceVigente } from "../datos/modelo.js";
 import { estado, materia, irAMateria, irASesion, repintar, suscribir } from "../estado.js";
 import { voz, rotuloDeLaLista } from "../datos/vocabulario.js";
+import { rotuloDeCuaderno } from "../datos/nubes.js";
 import { abrirDlgMateria, abrirDlgSesion } from "./dialogos.js";
 import { abrirRevision } from "./revision.js";
 
@@ -41,10 +42,18 @@ function pintarMaterias() {
   $("#enlaces-materia").innerHTML = !m
     ? ""
     : sinEnlaces
-      ? `<button class="config-materia" data-configurar title="Agregar la carpeta de OneDrive y el cuaderno de OneNote">Vincular carpeta y cuaderno…</button>`
+      ? `<button class="config-materia" data-configurar title="Agregar la carpeta donde viven los materiales y el cuaderno del curso, estén en la nube que estén">Vincular carpeta y cuaderno…</button>`
       : [
-          m.carpeta ? enlace(m.carpeta, "Carpeta en OneDrive", "") : "",
-          m.cuaderno ? enlace(m.cuaderno, "Cuaderno en OneNote", "") : "",
+          /* La carpeta no lleva el nombre de la nube. Antes decía siempre
+             «OneDrive», que era falso la mitad de las veces; nombrarla de
+             verdad tampoco sirve —el OneDrive institucional se anuncia
+             como «SharePoint», que no es como nadie lo llama— y a fin de
+             cuentas la carpeta del curso es la carpeta del curso, esté
+             donde esté. La dirección entera vive en el cartelito.
+             El cuaderno es otra cosa: si es de OneNote se dice, porque
+             quien lo usa lo llama así y no tiene nombre genérico mejor. */
+          m.carpeta ? enlace(m.carpeta, "Carpeta del curso", "") : "",
+          m.cuaderno ? enlace(m.cuaderno, rotuloDeCuaderno(m.cuaderno), "") : "",
           `<button class="config-materia" data-configurar title="Cambiar la carpeta y el cuaderno vinculados">Configurar…</button>`,
         ].join("");
 }

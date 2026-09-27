@@ -1,9 +1,9 @@
 /* =========================================================
    Datos de ejemplo. Dos materias ficticias.
 
-   No hay ninguna liga real: las ligas de OneDrive y de SharePoint llevan
-   tokens de uso compartido y apuntan a una cuenta institucional, así que
-   nunca deben quedar escritas en el repositorio.
+   No hay ninguna liga real: las ligas de la nube —OneDrive, SharePoint,
+   Drive, Dropbox— llevan claves de uso compartido y apuntan a una cuenta
+   concreta, así que nunca deben quedar escritas en el repositorio.
 
    Estos datos solo se usan la primera vez que se abre el panel, cuando no hay
    nada guardado. En cuanto se guarda algo, dejan de aparecer.
@@ -91,7 +91,7 @@ export const DATOS_DE_EJEMPLO = {
               tipo: "presentación",
               momento: "0:00–0:15",
               url: "",
-              nota: "Sustituir por la liga de OneDrive del archivo real.",
+              nota: "Sustituir por la liga del archivo real, esté en la nube que esté.",
               estado: "pendiente",
             },
           ],

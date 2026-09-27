@@ -122,6 +122,9 @@ h3{font-size:15.5px;margin:0 0 4px}
 .oscuro-caja{background:var(--negro);color:var(--blanco);border-left:4px solid var(--rojo);padding:16px 18px;margin:20px 0;font-size:14.5px;line-height:1.55}
 .oscuro-caja strong{color:var(--blanco)}
 .oscuro-caja a{color:var(--blanco);text-decoration:underline}
+.oscuro-caja ul{margin:10px 0 0;padding-left:18px}
+.oscuro-caja li{margin:5px 0}
+.oscuro-caja em{font-style:normal;opacity:.82}
 
 code{font-family:var(--mono);font-size:.9em;background:var(--papel);color:var(--negro);padding:1px 5px;border:1px solid var(--linea)}
 kbd{font-family:var(--mono);font-size:.85em;background:var(--blanco);border:1px solid var(--linea);border-bottom-width:2px;padding:1px 6px}
@@ -140,6 +143,29 @@ kbd{font-family:var(--mono);font-size:.85em;background:var(--blanco);border:1px 
 .maqueta .m-guardado .punto{width:6px;height:6px;border-radius:50%;background:#248A3D}
 .maqueta .m-btn{border:0;background:rgba(118,118,128,.12);color:var(--negro);padding:5px 9px;font-size:10.5px;white-space:nowrap;border-radius:6px}
 .maqueta .m-btn.marcado{background:var(--blanco);color:var(--rojo);border-color:var(--blanco)}
+
+/* --- Maqueta de la ventana de presentación en Zoom --- */
+.m-zoom{display:flex;align-items:stretch;gap:14px;flex-wrap:wrap}
+.m-zoom-caja{flex:1;min-width:220px;display:flex;flex-direction:column;gap:7px}
+.m-zoom-rotulo{font-size:9px;text-transform:uppercase;letter-spacing:.16em;color:var(--gris-tenue)}
+.m-zoom-rotulo.compartida{color:var(--rojo);font-weight:700}
+.m-zoom-flecha{align-self:center;color:var(--gris-tenue);font-size:20px;flex:none}
+.m-zoom-pauta,.m-zoom-portada{border:1px solid var(--linea);aspect-ratio:16/10;overflow:hidden}
+.m-zoom-pauta{background:var(--blanco)}
+.m-zoom-barra{border-bottom:1px solid var(--linea);padding:6px 10px}
+.m-zoom-cuerpo{padding:12px 10px;display:flex;flex-direction:column;gap:6px}
+.m-zoom-linea{display:block;height:7px;width:62%;background:rgba(118,118,128,.16);border-radius:3px}
+.m-zoom-linea.larga{width:86%}
+.m-zoom-linea.media{width:44%}
+.m-zoom-nota{font-size:9.5px;color:var(--gris-tenue);margin-top:6px;line-height:1.45}
+/* La portada, en pequeño: el mismo anclaje abajo a la izquierda. */
+.m-zoom-portada{background:#F2F1EF;display:flex;flex-direction:column;justify-content:flex-end;padding:14px 15px;
+  border-color:var(--rojo)}
+.m-zoom-filete{width:26px;height:3px;background:var(--rojo);border-radius:2px;margin-bottom:9px}
+.m-zoom-nombre{font-size:15px;font-weight:650;letter-spacing:-.02em;line-height:1.1;color:var(--negro)}
+.m-zoom-titulo{font-size:10px;margin-top:5px;color:var(--negro)}
+.m-zoom-meta{font-size:8.5px;margin-top:4px;color:var(--gris-tenue)}
+@media (max-width:640px){ .m-zoom-flecha{transform:rotate(90deg)} }
 
 .maqueta .m-envoltura{display:flex}
 .maqueta .m-lateral{width:190px;flex:none;border-right:1px solid var(--linea);padding:14px 12px;background:var(--blanco)}
@@ -338,12 +364,13 @@ details[open] summary{border-bottom:1px solid var(--linea)}
   <div class="grupo">
     <p class="rotulo">Guardar</p>
     <a href="#como-guarda">Cómo se guarda tu trabajo</a>
-    <a href="#onedrive">Vincular con OneDrive</a>
+    <a href="#nube">Vincular con tu nube</a>
     <a href="#respaldos">Copias de seguridad</a>
   </div>
   <div class="grupo">
     <p class="rotulo">En clase</p>
     <a href="#modo-clase">Modo clase</a>
+    <a href="#presentacion">Clases en Zoom</a>
     <a href="#lectura">Leer con calma</a>
   </div>
   <div class="grupo">
@@ -482,7 +509,8 @@ details[open] summary{border-bottom:1px solid var(--linea)}
     <li class="tarjeta">
       <div class="etiquetas"><span class="tipo">Paso 2</span></div>
       <h3>Completa nombre, nivel y periodo</h3>
-      <p>Por ejemplo: nombre «Comunicación oral», y en «Nivel y periodo» algo como <code>Posgrado · Otoño 2026</code>. Puedes agregar también la carpeta de OneDrive del curso y el cuaderno de OneNote, si ya los tienes — quedan como enlaces fijos junto a la materia.</p>
+      <p>Por ejemplo: nombre «Comunicación oral», y en «Nivel y periodo» algo como <code>Posgrado · Otoño 2026</code>. Puedes agregar también la carpeta del curso y su cuaderno, si ya los tienes. Quedan como enlaces fijos junto a la materia, a un clic desde cualquier sesión.</p>
+      <p><strong>Qué es «el cuaderno».</strong> No es un producto: es <em>un solo lugar donde llevas una página por sesión</em>, para no acabar con un archivo suelto por clase. Un cuaderno de OneNote es la forma más conocida, pero funciona igual <strong>un documento largo de Google Docs o de Word</strong> con un apartado por sesión, <strong>Dropbox Paper</strong>, <strong>Notas de Apple</strong>, <strong>Notion</strong>, <strong>Evernote</strong> o una nota de <strong>Obsidian</strong>. Pauta solo guarda su dirección y te la deja a mano; lo que haya del otro lado lo decides tú. Y es opcional: si no llevas nada así, déjalo vacío.</p>
     </li>
     <li class="tarjeta">
       <div class="etiquetas"><span class="tipo">Paso 3</span></div>
@@ -592,8 +620,10 @@ details[open] summary{border-bottom:1px solid var(--linea)}
     </li>
     <li class="tarjeta">
       <div class="etiquetas"><span class="tipo">Paso 4</span></div>
-      <h3>Pega la liga de OneDrive</h3>
-      <p>En OneDrive: clic derecho sobre el archivo → <em>Compartir</em> → <em>Copiar vínculo</em>. Si el archivo todavía no existe, los botones <em>Word</em>, <em>PowerPoint</em>, <em>Excel</em> y <em>Cuaderno OneNote</em> lo crean en blanco y dejan el formulario abierto para pegar su liga después.</p>
+      <h3>Pega la liga del archivo</h3>
+      <p>En casi todas las nubes es lo mismo: clic derecho sobre el archivo → <em>Compartir</em> o <em>Copiar enlace</em>. En OneDrive y en Google Drive, <em>Compartir → Copiar vínculo</em>; en Dropbox, <em>Copiar enlace de Dropbox</em>; en iCloud, <em>Compartir → Copiar enlace</em>. Pauta reconoce de cuál viene y lo dice en la tarjeta.</p>
+      <p>Si el archivo todavía no existe, los botones de <em>¿No existe todavía? Crear</em> lo abren en blanco y dejan el formulario abierto para pegar su liga después. Cuáles aparezcan depende de la materia: <em>Word</em>, <em>PowerPoint</em> y <em>Excel</em> si trabajas en Microsoft 365; <em>Documentos</em>, <em>Presentaciones</em> y <em>Hojas de cálculo</em> si trabajas en Google. Se elige al editar la materia, en «Con qué creas los archivos en blanco», y Pauta lo propone solo según la carpeta que hayas vinculado.</p>
+      <p>Si la materia tiene cuaderno, aparece además <em>Cuaderno del curso</em>: abre el tuyo y pega su liga en el campo, para que crees ahí la página de esta sesión.</p>
     </li>
   </ol>
 
@@ -643,7 +673,7 @@ details[open] summary{border-bottom:1px solid var(--linea)}
     </div>
     <div class="item" style="border-color:var(--rojo)">
       <h4 style="color:var(--rojo)">Archivo vinculado <span style="color:var(--gris-tenue);font-weight:400">(recomendado)</span></h4>
-      <p>Vinculas un archivo <code>.json</code> propio y Pauta escribe ahí cada cambio, además de dejar una copia en el navegador. Es la base de la sección de OneDrive, más abajo.</p>
+      <p>Vinculas un archivo <code>.json</code> propio y Pauta escribe ahí cada cambio, además de dejar una copia en el navegador. Es la base de la sección de tu nube, más abajo.</p>
     </div>
     <div class="item">
       <h4>Sin guardado <span style="color:var(--gris-tenue);font-weight:400">(poco común)</span></h4>
@@ -659,16 +689,17 @@ details[open] summary{border-bottom:1px solid var(--linea)}
   </div>
 
   <div class="nota-caja">
-    Con «Guardar respaldo» descargas todo Pauta como <code>.json</code>, y con «Importar respaldo» lo cargas en otra computadora. Es la forma de pasar tus datos si no puedes vincular un archivo — pero hacerlo a mano cada vez es justo lo que <a href="#onedrive">vincular con OneDrive</a> evita.
+    Con «Guardar respaldo» descargas todo Pauta como <code>.json</code>, y con «Importar respaldo» lo cargas en otra computadora. Es la forma de pasar tus datos si no puedes vincular un archivo — pero hacerlo a mano cada vez es justo lo que <a href="#nube">vincular con tu nube</a> evita.
   </div>
 </section>
 
 <!-- ============================================================ -->
-<section class="seccion" id="onedrive">
+<section class="seccion" id="nube">
   <div class="cabecera">
     <div class="meta">Guardar · recomendado</div>
-    <h2>Vincular tu archivo con OneDrive</h2>
-    <p>Esto es lo único que necesitas configurar una vez. Después, Pauta guarda solo, y tu planeación te sigue a cualquier computadora con acceso a tu OneDrive.</p>
+    <h2>Vincular tu archivo con tu nube</h2>
+    <p>Esto es lo único que necesitas configurar una vez. Después, Pauta guarda solo, y tu planeación te sigue a cualquier computadora donde tengas esa carpeta.</p>
+    <p>Sirve <strong>cualquier nube que sincronice una carpeta con tu disco</strong>: OneDrive, Google Drive, Dropbox, iCloud Drive, Box. Pauta no habla con ninguna de ellas —escribe un archivo normal en tu computadora, con la API estándar del navegador— y es la aplicación de escritorio de tu nube la que lo sube. Por eso funciona igual en todas y no hay nada que conectar ni ninguna cuenta que dar.</p>
   </div>
 
   <ol class="riel">
@@ -689,8 +720,8 @@ details[open] summary{border-bottom:1px solid var(--linea)}
     </li>
     <li class="tarjeta">
       <div class="etiquetas"><span class="tipo">Paso 4</span></div>
-      <h3>Navega hasta tu carpeta de OneDrive</h3>
-      <p>Se abre el selector de archivos normal de tu sistema. Busca <strong>la misma carpeta de OneDrive donde ya guardas los materiales de este curso</strong> — lecturas, presentaciones, lo que sea.</p>
+      <h3>Navega hasta tu carpeta sincronizada</h3>
+      <p>Se abre el selector de archivos normal de tu sistema. Busca <strong>la misma carpeta donde ya guardas los materiales de este curso</strong> — lecturas, presentaciones, lo que sea. Da igual si esa carpeta es de OneDrive, de Drive, de Dropbox o de iCloud: lo que importa es que esté sincronizada con tu disco.</p>
     </li>
     <li class="tarjeta">
       <div class="etiquetas"><span class="tipo">Paso 5</span></div>
@@ -725,11 +756,22 @@ details[open] summary{border-bottom:1px solid var(--linea)}
   </div>
 
   <div class="oscuro-caja">
-    <strong>Por qué guardarlo en la MISMA carpeta de tus materiales.</strong> Si <code>pauta.json</code> vive dentro de la carpeta de OneDrive que ya usas para este curso, tu planeación deja de estar atada a una sola computadora. En la del salón de clases, en la de tu oficina o en cualquiera de las salas de profesores: abres <a href="/" target="_blank" rel="noopener">pauta-docente.netlify.app</a>, entras a «Archivo → Vincular archivo» → «Abrir archivo existente», y eliges ese mismo archivo dentro de tu OneDrive. Verás tu planeación completa, tal como la dejaste — sin copiar nada a mano.
+    <strong>Por qué guardarlo en la MISMA carpeta de tus materiales.</strong> Si <code>pauta.json</code> vive dentro de la carpeta sincronizada que ya usas para este curso, tu planeación deja de estar atada a una sola computadora. En la del salón de clases, en la de tu oficina o en cualquiera de las salas de profesores: abres <a href="/" target="_blank" rel="noopener">pauta-docente.netlify.app</a>, entras a «Archivo → Vincular archivo» → «Abrir archivo existente», y eliges ese mismo archivo dentro de esa carpeta. Verás tu planeación completa, tal como la dejaste — sin copiar nada a mano.
   </div>
 
   <h3>En una computadora nueva: «Abrir archivo existente»</h3>
-  <p>Es la opción de al lado. Elige el <code>.json</code> que ya vinculaste desde tu OneDrive y Pauta carga todo lo que tenías. Si dos computadoras editaron el archivo por separado, se queda con la versión más reciente.</p>
+  <p>Es la opción de al lado. Elige el <code>.json</code> que ya vinculaste desde tu carpeta sincronizada y Pauta carga todo lo que tenías. Si dos computadoras editaron el archivo por separado, se queda con la versión más reciente.</p>
+
+  <div class="oscuro-caja">
+    <strong>La carpeta tiene que estar en el disco, no solo en línea.</strong> Todas las nubes tienen un modo que deja los archivos en el servidor y baja solo los que abres, para ahorrar espacio. Si <code>pauta.json</code> cae en esa situación, Pauta no puede escribir en él. Cómo marcar esa carpeta como disponible sin conexión:
+    <ul>
+      <li><strong>OneDrive</strong> — clic derecho sobre la carpeta → <em>Conservar siempre en este dispositivo</em>.</li>
+      <li><strong>Google Drive</strong> — en Drive para escritorio, clic derecho sobre la carpeta → <em>Acceso sin conexión</em> → <em>Disponible sin conexión</em>. El modo «transmisión» por sí solo no basta.</li>
+      <li><strong>Dropbox</strong> — clic derecho sobre la carpeta → <em>Sincronización inteligente</em> → <em>Local</em>.</li>
+      <li><strong>iCloud Drive</strong> — en el Finder, clic derecho sobre la carpeta → <em>Descargar ahora</em>, y evita «Optimizar almacenamiento del Mac» para esa carpeta.</li>
+      <li><strong>Box</strong> — en Box Drive, clic derecho sobre la carpeta → <em>Make Available Offline</em>.</li>
+    </ul>
+  </div>
 
   <div class="nota-caja">
     De vez en cuando el navegador vuelve a pedir permiso sobre el archivo vinculado — es normal, una medida de seguridad del propio navegador, no un error de Pauta. Cuando pase, entra a <em>Archivo → Vincular archivo</em> y usa el botón <strong>Reconectar</strong>.
@@ -784,7 +826,7 @@ details[open] summary{border-bottom:1px solid var(--linea)}
     «Restaurar» sustituye lo que hay ahora — pero antes archiva el estado actual como una copia más, así que nunca pierdes la versión de la que partiste.
   </div>
 
-  <p>Estas copias viven en el navegador, no en OneDrive: si abres Pauta en otra computadora no las vas a encontrar ahí. Por eso son un respaldo <em>local</em>, complementario a tener el archivo vinculado — no un sustituto.</p>
+  <p>Estas copias viven en el navegador, no en tu nube: si abres Pauta en otra computadora no las vas a encontrar ahí. Por eso son un respaldo <em>local</em>, complementario a tener el archivo vinculado — no un sustituto.</p>
 </section>
 
 <!-- ============================================================ -->
@@ -804,7 +846,7 @@ details[open] summary{border-bottom:1px solid var(--linea)}
     <li class="tarjeta">
       <div class="etiquetas"><span class="tipo">Paso 2</span></div>
       <h3>Navega con las flechas del teclado</h3>
-      <p>← → para moverte entre recursos, «Abrir recurso» para abrir su liga en otra pestaña sin salir de esta pantalla.</p>
+      <p>← → para moverte entre recursos, «Abrir recurso» para abrir su liga sin salir de esta pantalla. Si encendiste la <a href="#presentacion">ventana de presentación</a>, el recurso aparece ahí y el botón te lo dice.</p>
     </li>
     <li class="tarjeta">
       <div class="etiquetas"><span class="tipo">Paso 3</span></div>
@@ -839,6 +881,78 @@ details[open] summary{border-bottom:1px solid var(--linea)}
       <button type="button" class="m-mini solido" id="btn-mc-play" style="cursor:pointer">▶ Iniciar el reloj</button>
       <span style="font-size:12px;color:var(--gris-tenue);margin-left:10px">Simulación acelerada — 1 minuto real ≈ 2 segundos aquí</span>
     </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section class="seccion" id="presentacion">
+  <div class="cabecera">
+    <div class="meta">En clase</div>
+    <h2>Clases en Zoom: la ventana de presentación</h2>
+    <p>Una sola ventana aparte para todos los recursos. Compartes esa, y nada más: tus alumnos no ven Pauta cada vez que cambias de material.</p>
+  </div>
+
+  <p><strong>El problema que resuelve.</strong> Normalmente cada recurso se abre en una pestaña nueva de la misma ventana. En Zoom eso deja dos malas opciones: compartir la ventana entera del navegador —y que el grupo vea tu Pauta, con tus tiempos y tu bitácora, cada vez que cambias— o compartir una sola pestaña, y entonces los recursos siguientes no se comparten. Lo que verían sería <em>recurso anterior → tu Pauta → recurso nuevo</em>.</p>
+
+  <p>Con la ventana de presentación encendida, todos los recursos van a una misma ventana. La compartes una vez al principio y se queda compartida toda la sesión: tú te quedas en Pauta y lo que el grupo ve cambia detrás, sin que la ventana te robe el foco.</p>
+
+  <div class="maqueta" style="padding:16px;background:var(--papel)">
+    <div class="m-zoom">
+      <div class="m-zoom-caja">
+        <div class="m-zoom-rotulo">Tu pantalla</div>
+        <div class="m-zoom-pauta">
+          <div class="m-zoom-barra"><span class="m-marca">Pauta</span></div>
+          <div class="m-zoom-cuerpo">
+            <span class="m-zoom-linea larga"></span>
+            <span class="m-zoom-linea"></span>
+            <span class="m-zoom-linea media"></span>
+            <span class="m-zoom-nota">tus tiempos, tu bitácora,<br>tus notas de clase</span>
+          </div>
+        </div>
+      </div>
+      <div class="m-zoom-flecha" aria-hidden="true">→</div>
+      <div class="m-zoom-caja">
+        <div class="m-zoom-rotulo compartida">Compartida en Zoom</div>
+        <div class="m-zoom-portada">
+          <div class="m-zoom-filete"></div>
+          <div class="m-zoom-nombre">Seminario de ejemplo</div>
+          <div class="m-zoom-titulo">Cómo está armado este panel</div>
+          <div class="m-zoom-meta">Sesión 03 · lunes, 8 de septiembre de 2026</div>
+        </div>
+      </div>
+    </div>
+    <div class="leyenda">
+      <ol>
+        <li><span class="num">1</span><div><strong>Se comparte una sola vez</strong> <span>— y se queda compartida toda la sesión.</span></div></li>
+        <li><span class="num">2</span><div><strong>La portada llena la espera</strong> <span>— puedes reservar la ventana antes de empezar sin proyectar ningún recurso.</span></div></li>
+      </ol>
+    </div>
+  </div>
+
+  <ol class="riel">
+    <li class="tarjeta">
+      <div class="etiquetas"><span class="tipo">Paso 1</span></div>
+      <h3>Enciéndela en el menú «⋯» de la sesión</h3>
+      <p>El de la derecha, junto a «Modo clase». Dice «Ventana de presentación: apagada»; al pulsarlo se enciende y abre la ventana con la portada de la sesión. La primera vez el navegador puede bloquearla: permítele las ventanas emergentes a esta página y vuelve a intentarlo.</p>
+    </li>
+    <li class="tarjeta">
+      <div class="etiquetas"><span class="tipo">Paso 2</span></div>
+      <h3>Compártela en Zoom</h3>
+      <p>En <em>Compartir pantalla</em>, elige <strong>esa ventana</strong>, no la pantalla completa ni la de Pauta. Como está mostrando la portada —nombre de la materia, sesión y fecha— puedes compartirla desde antes de empezar, sin adelantar ningún material.</p>
+    </li>
+    <li class="tarjeta">
+      <div class="etiquetas"><span class="tipo">Paso 3</span></div>
+      <h3>Da clase normal</h3>
+      <p>Cada «Abrir» lleva el recurso a esa ventana. Entre un recurso y el siguiente puedes volver a la portada: con «Mostrar la portada» del mismo menú «⋯», o con el botón <strong>Portada</strong> del modo clase.</p>
+    </li>
+  </ol>
+
+  <div class="nota-caja">
+    <strong>En el salón presencial</strong> funciona igual, pero con <em>escritorio extendido</em> en vez de duplicar pantalla: arrastra la ventana de presentación al proyector y quédate con Pauta en la tuya.
+  </div>
+
+  <div class="oscuro-caja">
+    <strong>Por qué nace apagada.</strong> Reutilizar una ventana obliga a conservar su referencia, y eso permite que la página abierta alcance la ventana de Pauta. Es un cambio real respecto de abrir cada recurso en una pestaña aislada, así que se enciende a propósito y solo mientras haga falta. Con el interruptor apagado, todo se comporta como siempre. <em>«Abrir todas las ligas» se queda con pestañas</em> en los dos casos: son varias a la vez, y en una sola ventana se pisarían unas a otras.
   </div>
 </section>
 
@@ -900,8 +1014,8 @@ details[open] summary{border-bottom:1px solid var(--linea)}
       <p>Como la anterior, pero sin ligas ni bitácoras — para compartir tu planeación sin exponer tus URLs privadas.</p>
     </div>
     <div class="item">
-      <h4>Nueva nota en Word</h4>
-      <p>Abre un Word en blanco y deja listo el formulario de recurso para pegar su liga en cuanto lo guardes.</p>
+      <h4>Nueva nota</h4>
+      <p>Abre un documento en blanco —de Word o de Google, según la suite de la materia— y deja listo el formulario de recurso para pegar su liga en cuanto lo guardes.</p>
     </div>
     <div class="item">
       <h4>Plegar la barra lateral</h4>
@@ -932,7 +1046,7 @@ details[open] summary{border-bottom:1px solid var(--linea)}
 
   <details>
     <summary>¿Pauta funciona sin internet?</summary>
-    <div class="resp"><p>Una vez cargada la página, sí. Pero si tu archivo vinculado está en OneDrive, necesitas conexión para que OneDrive sincronice esos cambios hacia tus otras computadoras.</p></div>
+    <div class="resp"><p>Una vez cargada la página, sí. Pero si tu archivo vinculado está en una carpeta sincronizada, necesitas conexión para que tu nube lleve esos cambios a tus otras computadoras.</p></div>
   </details>
 
   <details>
@@ -947,17 +1061,17 @@ details[open] summary{border-bottom:1px solid var(--linea)}
 
   <details>
     <summary>¿Puedo usar el mismo archivo desde varias computadoras?</summary>
-    <div class="resp"><p>Sí — es justo el punto de <a href="#onedrive">vincularlo dentro de tu carpeta de OneDrive</a>. En cada computadora usas <em>Archivo → Vincular archivo → Abrir archivo existente</em> y eliges ese mismo .json.</p></div>
+    <div class="resp"><p>Sí — es justo el punto de <a href="#nube">vincularlo dentro de tu carpeta sincronizada</a>. En cada computadora usas <em>Archivo → Vincular archivo → Abrir archivo existente</em> y eliges ese mismo .json.</p></div>
   </details>
 
   <details>
-    <summary>¿Mis ligas de OneDrive son privadas?</summary>
-    <div class="resp"><p>Sí, Pauta no las envía a ningún servidor. Pero los respaldos <code>.json</code> sí las incluyen, con sus claves de uso compartido — no subas ese archivo a un repositorio abierto ni lo compartas fuera de tu OneDrive institucional.</p></div>
+    <summary>¿Mis ligas de la nube son privadas?</summary>
+    <div class="resp"><p>Sí, Pauta no las envía a ningún servidor. Pero los respaldos <code>.json</code> sí las incluyen, con sus claves de uso compartido — no subas ese archivo a un repositorio abierto ni lo compartas fuera de tu nube institucional.</p></div>
   </details>
 
   <details>
     <summary>¿Por qué una liga aparece marcada como «ruta local»?</summary>
-    <div class="resp"><p>Porque empieza con <code>file://</code>: apunta al disco de una sola computadora y no abre desde el navegador en ninguna otra. Súbela a OneDrive y sustituye la liga por la que te da «Copiar vínculo».</p></div>
+    <div class="resp"><p>Porque empieza con <code>file://</code>: apunta al disco de una sola computadora y no abre desde el navegador en ninguna otra. Súbela a tu nube y sustituye la liga por la que te dé «Copiar vínculo» o «Copiar enlace».</p></div>
   </details>
 
   <details>
