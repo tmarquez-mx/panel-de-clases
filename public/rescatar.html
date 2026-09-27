@@ -87,7 +87,7 @@
     const recursos = (datos.materias || []).reduce(
       (n, m) => n + (m.sesiones || []).reduce((k, s) => k + (s.recursos?.length || 0), 0), 0);
     resumen = `Encontré ${materias} materia${materias === 1 ? "" : "s"}, ` +
-      `${sesiones} sesión${sesiones === 1 ? "" : "es"} y ${recursos} recurso${recursos === 1 ? "" : "s"}.`;
+      `${sesiones} ${sesiones === 1 ? "sesión" : "sesiones"} y ${recursos} recurso${recursos === 1 ? "" : "s"}.`;
   } catch {
     resumen = "Encontré datos guardados aquí.";
   }
