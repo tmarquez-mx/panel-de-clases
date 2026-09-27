@@ -101,9 +101,22 @@ function cerrarPresentacion() {
    Navegar la ventana
    --------------------------------------------------------- */
 
-/* Lleva la ventana de presentación a una dirección.
-   Devuelve false si el navegador bloqueó la ventana emergente. */
+/* Lleva la ventana de presentación a una dirección. Devuelve qué pasó:
+
+     "presentacion" — la ventana de siempre, navegada. Lo normal.
+     "reabierta"    — la ventana se había muerto y esta es OTRA. Importa
+                      decirlo: para Zoom una ventana nueva no es la que se
+                      estaba compartiendo, así que hay que volver a
+                      compartirla. Antes se reabría en silencio y lo único
+                      que se notaba era que Zoom pedía permiso de la nada.
+     "bloqueada"    — el navegador no dejó abrirla.
+
+   Una ventana puede morirse sin que Pauta tenga la culpa: hay páginas que
+   se cierran solas, y Chrome cierra una ventana abierta por script cuando
+   lo único que hizo fue descargar un archivo en vez de mostrarlo —lo que
+   pasa con varios tipos de archivo de la nube—. */
 function llevarAPresentacion(url) {
+  const habiaVentana = !!ventana;
   if (viva()) {
     try {
       /* Escribir location.href navega la ventana sin traerla al frente:
@@ -112,7 +125,7 @@ function llevarAPresentacion(url) {
          puede escribir entre orígenes distintos, solo no se puede leer. */
       ventana.location.href = url;
       enPortada = false;
-      return true;
+      return "presentacion";
     } catch {
       /* Referencia inservible (la ventana murió entre el closed y esto):
          se cae al window.open de abajo, que la vuelve a abrir. */
@@ -128,9 +141,9 @@ function llevarAPresentacion(url) {
     avisar(
       "El navegador bloqueó la ventana de presentación. Permite las ventanas emergentes para esta página y vuelve a intentarlo."
     );
-    return false;
+    return "bloqueada";
   }
-  return true;
+  return habiaVentana ? "reabierta" : "presentacion";
 }
 
 /* ---------------------------------------------------------
@@ -242,6 +255,10 @@ function htmlDePortada(d) {
 const INTENTOS = 90; // ~1.5 s de margen a 60 cuadros por segundo
 
 function escribirPortada(w, html, intentos = 0) {
+  /* Nunca decir «ciérrala». Cerrar la ventana es lo único que de verdad no
+     tiene arreglo en mitad de una clase: Zoom estaba compartiendo ESA
+     ventana, y al cerrarla hay que volver a compartir delante del grupo.
+     Si la portada no llega a escribirse, la ventana sigue sirviendo. */
   let doc = null;
   try {
     doc = w.document;
@@ -252,7 +269,11 @@ function escribirPortada(w, html, intentos = 0) {
 
   if (!doc) {
     if (intentos >= INTENTOS) {
-      avisar("La ventana de presentación no respondió. Ciérrala y vuelve a mostrar la portada.");
+      avisar(
+        "La portada tardó demasiado en aparecer y la ventana de presentación quedó en blanco. " +
+          "No la cierres —Zoom está compartiendo esa ventana—: vuelve a pedir la portada, o abre " +
+          "directamente el siguiente recurso."
+      );
       return;
     }
     window.requestAnimationFrame(() => escribirPortada(w, html, intentos + 1));
@@ -262,6 +283,11 @@ function escribirPortada(w, html, intentos = 0) {
   doc.open();
   doc.write(html);
   doc.close();
+  /* Hasta aquí no era verdad que hubiera portada. Marcarlo antes de
+     escribir dejaba a Pauta creyendo que la ventana mostraba la portada
+     cuando había quedado en blanco, y entonces la siguiente vez escribía
+     encima del documento equivocado. */
+  enPortada = true;
 }
 
 /**
@@ -293,7 +319,7 @@ export function mostrarPortada() {
   if (viva()) {
     try {
       ventana.location.href = "about:blank";
-      enPortada = true;
+      enPortada = false; // todavía no: lo pone escribirPortada al lograrlo
       escribirPortada(ventana, html);
       return true;
     } catch {
@@ -309,7 +335,7 @@ export function mostrarPortada() {
     return false;
   }
   ventana = w;
-  enPortada = true;
+  enPortada = false; // lo pone escribirPortada cuando de verdad la escribe
   escribirPortada(w, html);
   return true;
 }
@@ -332,7 +358,7 @@ export function abrirEnPresentacion(url) {
      obsidian:) no cargan una página: dejarían la ventana compartida en
      blanco mientras el programa abre aparte. */
   if (!esWeb(url) || !urlSegura(url)) return "";
-  return llevarAPresentacion(url) ? "presentacion" : "bloqueada";
+  return llevarAPresentacion(url);
 }
 
 /* Aquí hubo un addEventListener("pagehide", cerrarPresentacion), para no

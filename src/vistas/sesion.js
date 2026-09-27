@@ -64,6 +64,10 @@ export function abrirRecurso(url, boton) {
   // Con el modo encendido, la liga va a la ventana compartida. Si el modo
   // está apagado, o la liga no es una página web, se cae a lo de siempre.
   const enLaVentana = abrirEnPresentacion(url);
+  if (enLaVentana === "reabierta") {
+    mostrarAviso("La ventana de presentación se había cerrado sola. Esta es otra: vuelve a compartirla en Zoom.");
+    return enLaVentana;
+  }
   if (enLaVentana) return enLaVentana;
 
   /* window.open devuelve null cuando el navegador bloquea la ventana.

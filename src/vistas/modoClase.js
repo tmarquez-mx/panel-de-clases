@@ -79,6 +79,10 @@ const LO_QUE_PASO = {
   presentacion: ["Listo: el recurso ya está en la ventana de presentación.", "bien"],
   portada: ["La ventana de presentación volvió a la portada.", "bien"],
   pestana: ["Se abrió en otra pestaña, detrás de esta pantalla. Sal con Esc para verla.", "bien"],
+  reabierta: [
+    "La ventana de presentación se había cerrado sola y esta es otra: vuelve a compartirla en Zoom.",
+    "problema",
+  ],
   copiada: ["Es una ruta del disco: se copió al portapapeles.", "bien"],
   bloqueada: [
     "El navegador bloqueó la ventana. Sal con Esc y permítele las ventanas emergentes a esta página.",
