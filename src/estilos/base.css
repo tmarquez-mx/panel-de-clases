@@ -105,6 +105,16 @@ a{color:var(--rojo)}
 .btn-solido:hover{background:var(--acento-hundido)}
 .btn-solido[disabled]:hover{background:var(--acento)}
 
+/* Interruptor encendido: se distingue de un botón de acción —que se pulsa
+   y pasa— porque queda hundido y marcado mientras dure. No usa el rojo
+   sólido de «Modo clase»: dos botones rojos seguidos no dicen cuál es la
+   acción principal. */
+.btn[aria-pressed="true"]{
+  background:var(--acento-tenue);color:var(--acento);font-weight:600;
+  box-shadow:inset 0 0 0 1.5px var(--acento);
+}
+.btn[aria-pressed="true"]:hover{background:rgba(166,34,55,.18)}
+
 .btn-tinte{background:var(--acento-tenue);color:var(--acento);font-weight:600}
 .btn-tinte:hover{background:rgba(0,122,255,.18)}
 .btn-tinte[disabled]:hover{background:var(--acento-tenue)}

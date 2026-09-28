@@ -163,8 +163,12 @@
         <span class="conteo" id="conteo"></span>
         <div class="grupo-acciones">
           <button class="btn" id="btn-nuevo" title="Agregar un recurso a esta sesión">Agregar recurso</button>
+          <!-- Estaba enterrado en el menú «⋯». Preparar una clase en Zoom
+               obligaba a entrar al menú, salir a compartir y volver a
+               buscar «Modo clase»: tres viajes para empezar. -->
+          <button class="btn" id="btn-presentacion" aria-pressed="false"></button>
           <button class="btn btn-solido" id="btn-modo-clase" title="Pantalla completa, un recurso a la vez. Flechas para avanzar, Escape para salir">Modo clase</button>
-          <button class="btn-icono" id="btn-mas-acciones" aria-haspopup="menu" aria-label="Más acciones de la sesión" title="Abrir todo, ordenar por minutos, ventana de presentación y nueva nota en Word">⋯</button>
+          <button class="btn-icono" id="btn-mas-acciones" aria-haspopup="menu" aria-label="Más acciones de la sesión" title="Abrir todo, ordenar por minutos, mostrar la portada y nueva nota en Word">⋯</button>
         </div>
         <!-- Igual que arriba: viven aquí, se accionan desde el menú. -->
         <button class="btn" id="btn-abrir-todo" hidden title="Abrir en pestañas todas las ligas web de esta sesión">Abrir todo</button>

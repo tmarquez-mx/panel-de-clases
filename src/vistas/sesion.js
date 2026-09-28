@@ -23,6 +23,7 @@ import {
 const CONTROLES_DE_SESION = [
   "#btn-editar-sesion", "#btn-borrar-sesion", "#btn-duplicar-sesion", "#btn-imprimir",
   "#btn-modo-clase", "#btn-abrir-todo", "#btn-nuevo", "#btn-nota", "#btn-ordenar",
+  "#btn-presentacion",
   "#btn-mas-sesion", "#btn-mas-acciones",
 ];
 
@@ -246,6 +247,19 @@ function rotularNotaNueva() {
     : "Esta materia no tiene suite para crear archivos en blanco. Elígela al editar la materia";
 }
 
+/* El interruptor lleva el estado escrito, no el verbo: un botón que dice
+   «encender» y otro que dice «encendida» se confunden, y este se mira de
+   reojo en mitad de una clase. */
+function rotularPresentacion() {
+  const on = presentacionEncendida();
+  const boton = $("#btn-presentacion");
+  boton.textContent = on ? "Presentación: encendida" : "Presentación: apagada";
+  boton.setAttribute("aria-pressed", String(on));
+  boton.title = on
+    ? "Apagar. Los recursos volverán a abrirse en una pestaña nueva cada uno"
+    : "Encender para dar clase en Zoom o en el proyector: todos los recursos se abrirán en una misma ventana aparte, que compartes una sola vez";
+}
+
 function pintarSesion() {
   const hay = haySesion();
   for (const selector of CONTROLES_DE_SESION) $(selector).disabled = !hay;
@@ -257,6 +271,7 @@ function pintarSesion() {
     $("#proposito-sesion").textContent = voz(materia()).primerEncuentro;
     $("#conteo").textContent = "";
     $("#riel").innerHTML = `<div class="vacio">${voz(materia()).primerEncuentro}</div>`;
+    rotularPresentacion();
     return;
   }
 
@@ -273,6 +288,7 @@ function pintarSesion() {
 
   pintarFiltroDeTipos();
   rotularNotaNueva();
+  rotularPresentacion();
 
   const visibles = recursosVisibles();
   const revisados = s.recursos.filter((r) => r.estado === "listo" || r.estado === "usado").length;
@@ -347,13 +363,15 @@ function abrirTodo() {
    una ventana vacía no se sabe compartir. */
 function alternarModoPresentacion() {
   const quedo = alternarPresentacion();
-  repintar(); // el cartelito de «Abrir» dice otra cosa según el modo
+  repintar(); // el rótulo del interruptor y el cartelito de «Abrir» cambian
   if (!quedo) {
     mostrarAviso("Los recursos vuelven a abrirse en una pestaña nueva cada uno.");
     return;
   }
   if (haySesion() && mostrarPortada()) {
-    mostrarAviso("Ventana de presentación abierta con la portada. Compártela ahora en Zoom o llévala al proyector.");
+    mostrarAviso(
+      "Ventana de presentación abierta con la portada. Compártela ahora en Zoom con Compartir → Ventana (no «Pantalla»), o llévala al proyector."
+    );
   }
 }
 
@@ -418,15 +436,6 @@ export function montarVistaSesion() {
       opcionDe("#btn-ordenar", "Ordenar por minutos"),
       "---",
       {
-        etiqueta: presentacionEncendida()
-          ? "Ventana de presentación: encendida"
-          : "Ventana de presentación: apagada",
-        titulo: presentacionEncendida()
-          ? "Apagar: los recursos volverán a abrirse en una pestaña nueva cada uno"
-          : "Encender: los recursos se abrirán todos en una misma ventana aparte, para compartirla en Zoom o en el proyector",
-        accion: alternarModoPresentacion,
-      },
-      {
         etiqueta: "Mostrar la portada",
         titulo: "Llevar la ventana de presentación a la pantalla de título de esta sesión",
         desactivado: !presentacionEncendida() || !haySesion(),
@@ -447,6 +456,7 @@ export function montarVistaSesion() {
   $("#btn-borrar-sesion").addEventListener("click", () => borrarSesion(estado.sesionActiva));
   $("#btn-duplicar-sesion").addEventListener("click", () => abrirDlgDuplicar(estado.sesionActiva));
   $("#btn-modo-clase").addEventListener("click", entrarModoClase);
+  $("#btn-presentacion").addEventListener("click", alternarModoPresentacion);
   $("#btn-abrir-todo").addEventListener("click", abrirTodo);
   $("#btn-imprimir").addEventListener("click", () => window.print());
 

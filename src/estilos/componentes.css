@@ -453,6 +453,7 @@ body.lateral-plegado .plegar{background:var(--acento-tenue);color:var(--acento)}
   transition:opacity .2s;
 }
 .mc-estado[data-clase="problema"]{color:#FF9F9F}
+.mc-estado[data-clase="aviso"]{color:#FFD79A}
 .modo-clase .tecla{font-family:var(--mono);font-size:12px;color:rgba(255,255,255,.5);margin-left:auto}
 
 /* ---------- Diálogos ---------- */

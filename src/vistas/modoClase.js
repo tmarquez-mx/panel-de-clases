@@ -78,6 +78,10 @@ function pintarReloj() {
 const LO_QUE_PASO = {
   presentacion: ["Listo: el recurso ya está en la ventana de presentación.", "bien"],
   portada: ["La ventana de presentación volvió a la portada.", "bien"],
+  comparte: [
+    "La ventana de presentación tiene la portada. Compártela en Zoom con Compartir → Ventana; si compartes «Pantalla», tus alumnos verán esta pantalla negra.",
+    "aviso",
+  ],
   pestana: ["Se abrió en otra pestaña, detrás de esta pantalla. Sal con Esc para verla.", "bien"],
   reabierta: [
     "La ventana de presentación se había cerrado sola y esta es otra: vuelve a compartirla en Zoom.",
@@ -100,7 +104,8 @@ function decirQuePaso(clave) {
   caja.textContent = texto;
   caja.dataset.clase = clase;
   window.clearTimeout(borrarEstado);
-  // Un problema se queda hasta que se cambia de recurso; lo demás se va solo.
+  // Un problema, y el recordatorio de compartir, se quedan hasta que se
+  // cambia de recurso; lo demás se va solo a los pocos segundos.
   if (texto && clase === "bien") {
     borrarEstado = window.setTimeout(() => { caja.textContent = ""; }, 4000);
   }
@@ -141,6 +146,18 @@ export function entrarModoClase() {
 
   pintar();
   pintarReloj();
+
+  /* Entrar al modo clase es el momento de empezar, así que la ventana
+     compartida debe estar en la portada: se pone sola. Antes había que
+     pedirla aparte, en un menú, antes de entrar aquí —y para eso había que
+     salir de la app, compartir en Zoom y volver a buscar el botón—.
+     El recordatorio importa tanto como la portada: compartir la PANTALLA
+     en vez de la ventana hace que el grupo vea esta pantalla negra, porque
+     el modo clase está en pantalla completa y tapa todo lo demás. */
+  if (presentacionEncendida()) {
+    decirQuePaso(mostrarPortada() ? "comparte" : "bloqueada");
+  }
+
   $("#mc-siguiente").focus();
 }
 
