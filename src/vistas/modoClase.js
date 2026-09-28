@@ -138,11 +138,18 @@ export function entrarModoClase() {
   $("#envoltura").inert = true;
   document.querySelector(".barra").inert = true;
 
-  // Pantalla completa de verdad: en el proyector oculta la barra de
-  // direcciones y las pestañas. Si el navegador la niega (hace falta un
-  // gesto del usuario, y algunos equipos la bloquean), el modo clase
-  // funciona igual: solo se queda dentro de la ventana.
-  document.documentElement.requestFullscreen?.().catch(() => {});
+  /* Pantalla completa solo cuando el modo clase ES lo que se proyecta.
+     Con la ventana de presentación encendida, lo que ve el grupo es esa
+     otra ventana, y esta pantalla pasa a ser la consola privada de quien
+     da la clase. Ahí la pantalla completa solo estorba: tapa la ventana
+     compartida, y en macOS se va a su propio escritorio, así que ir a Zoom
+     a compartir y volver se vuelve un viaje entre escritorios.
+     Si el navegador la niega —hace falta un gesto del usuario, y algunos
+     equipos la bloquean—, el modo clase funciona igual dentro de la
+     ventana. */
+  if (!presentacionEncendida()) {
+    document.documentElement.requestFullscreen?.().catch(() => {});
+  }
 
   pintar();
   pintarReloj();

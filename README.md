@@ -43,9 +43,10 @@ No se instala nada y no hay cuentas. Es una página que abres en **Chrome o Edge
    planeación te sigue a cualquier computadora.
 5. **El día de la clase, entra a Modo clase.** Pantalla completa, un recurso a la vez,
    flechas para avanzar y `Esc` para salir.
-6. **Si das clase en Zoom, enciende la ventana de presentación.** Todos los recursos se
-   abren en una sola ventana aparte: compartes esa y nada más, y tus alumnos no ven
-   Pauta cada vez que cambias de recurso.
+6. **Si das clase en Zoom, enciende «Presentación»** —el botón de al lado— y entra a
+   Modo clase: la ventana aparte se abre sola con la portada de la sesión. Compartes
+   esa ventana una vez, con *Compartir → Ventana*, y tus alumnos dejan de ver Pauta
+   cada vez que cambias de recurso.
 
 No hay botón de guardar: cada cambio se guarda solo.
 
