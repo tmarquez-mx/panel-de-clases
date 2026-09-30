@@ -111,6 +111,12 @@ Además, Pauta archiva versiones por su cuenta mientras trabajas: las **últimas
 para deshacer lo reciente, más **una por día de los siete días anteriores** para volver
 más atrás. Se pueden restaurar desde *Archivo → Vincular archivo*.
 
+Las copias no pueden quedarse con todo el espacio del navegador (unos cinco millones de
+caracteres por sitio, y cada copia es el panel entero). Están limitadas a la mitad, y si
+aun así el guardado principal no cupiera, Pauta suelta copias antes que dejar de guardar
+lo que estás escribiendo, y lo avisa. Con una planeación muy grande, lo más seguro es
+vincular un archivo.
+
 ---
 
 ## Instalación

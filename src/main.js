@@ -245,12 +245,13 @@ function pintarCopias() {
   const copias = leerCopias();
   if (!copias.length) {
     return `<h4 class="alm-titulo">Copias de seguridad</h4>
-      <p class="pista">Todavía no hay ninguna. El panel archiva por su cuenta las últimas tres versiones:
-      una al abrir y una antes de cada operación que sustituye todo.</p>`;
+      <p class="pista">Todavía no hay ninguna. El panel archiva por su cuenta una al abrir, una antes de cada
+      operación que sustituye todo y otra cada pocos minutos mientras trabajas; conserva las últimas seis y una
+      por día de la última semana.</p>`;
   }
 
   return `<h4 class="alm-titulo">Copias de seguridad</h4>
-    <p class="pista">Las últimas ${copias.length === 1 ? "versión archivada" : `${copias.length} versiones archivadas`}
+    <p class="pista">${copias.length === 1 ? "La única versión archivada" : `Las últimas ${copias.length} versiones archivadas`}
     por el panel. Restaurar sustituye lo que hay ahora, y antes archiva el estado actual.</p>
     <ul class="alm-copias">
       ${copias

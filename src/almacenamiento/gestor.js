@@ -69,6 +69,12 @@ export function crearGestor({ alCambiarEstado = () => {} } = {}) {
   let ultimosDatos = null;
   let problemaLocal = "";
 
+  /* Cuántas copias de seguridad hubo que soltar para poder guardar, en lo que
+     va de la sesión. El aviso no se apaga en el siguiente guardado: quien
+     tiene datos muy grandes debe saber que tiene menos copias de las
+     habituales mientras dure, no enterarse el día que necesite una. */
+  let copiasSoltadas = 0;
+
   /* Sincronía con el archivo. `base` es null mientras no se sepa; `conflicto`
      guarda lo que el archivo trae ahora, para mostrarlo y para archivarlo
      antes de sobrescribirlo; `confiarEnDisco` deja que UNA escritura pase sin
@@ -130,14 +136,19 @@ export function crearGestor({ alCambiarEstado = () => {} } = {}) {
     let hayCopiaLocal = false;
     if (local.disponible()) {
       try {
-        local.escribir(sellados);
+        // No es un fallo si suelta copias: el guardado salió bien.
+        copiasSoltadas += local.escribirConEspacio(sellados);
         hayCopiaLocal = true;
       } catch (error) {
         problemaLocal =
           error?.name === "QuotaExceededError"
-            ? "El almacenamiento del navegador está lleno."
+            ? "El almacenamiento del navegador está lleno, incluso sin copias de seguridad, y lo último que hiciste no se pudo guardar aquí. Usa «Guardar respaldo» o vincula un archivo para no perderlo."
             : "El navegador no dejó guardar la copia local.";
       }
+    }
+    // Se compone después de escribir, con la cuenta ya al día.
+    if (hayCopiaLocal && copiasSoltadas) {
+      problemaLocal = `El almacenamiento del navegador está casi lleno: para poder guardar se han soltado ${copiasSoltadas} copia${copiasSoltadas === 1 ? "" : "s"} de seguridad antigua${copiasSoltadas === 1 ? "" : "s"}, así que hay menos de las habituales.`;
     }
 
     // Mientras el archivo esté desconectado no se reintenta en cada tecla:
@@ -251,7 +262,7 @@ export function crearGestor({ alCambiarEstado = () => {} } = {}) {
   function guardarAlSalir() {
     if (!temporizador || !ultimosDatos || !local.disponible()) return;
     try {
-      local.escribir(sellar(ultimosDatos));
+      local.escribirConEspacio(sellar(ultimosDatos));
     } catch {
       /* si no se pudo, no hay nada más que intentar */
     }
