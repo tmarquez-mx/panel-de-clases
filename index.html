@@ -510,6 +510,26 @@
   </form>
 </dialog>
 
+<!-- ---------- Diálogo: el archivo cambió en otra computadora ---------- -->
+<dialog id="dlg-conflicto" aria-labelledby="con-titulo-dlg">
+  <form method="dialog">
+    <div class="dlg-cuerpo">
+      <h3 id="con-titulo-dlg">El archivo cambió en otra computadora</h3>
+      <div id="con-cuerpo"></div>
+    </div>
+    <div class="dlg-pie">
+      <button type="button" class="btn" id="btn-con-despues" data-cerrar
+        title="Cerrar sin decidir. El archivo no se toca y sigues guardando solo en este navegador, hasta que elijas. Se puede resolver después desde el indicador de guardado">Decidir después</button>
+      <div class="derecha">
+        <button type="button" class="btn" id="btn-con-archivo"
+          title="Cargar lo que guardó la otra computadora. Lo que hay en esta pestaña se guarda antes como copia de seguridad">Usar la versión del archivo</button>
+        <button type="button" class="btn btn-solido" id="btn-con-mia"
+          title="Escribir lo de esta pestaña en el archivo. La versión que hay ahora en el archivo se guarda antes como copia de seguridad">Guardar la mía encima</button>
+      </div>
+    </div>
+  </form>
+</dialog>
+
 <!-- Aviso de lo que acaba de pasar, con la acción para revertirlo -->
 <div class="aviso-flotante" id="aviso-flotante" role="status" aria-live="polite" hidden></div>
 

@@ -99,6 +99,14 @@ estándar del navegador y escribe en un archivo normal del disco; quien lo sincr
 la aplicación de escritorio de tu nube. Funciona igual con OneDrive, Google Drive,
 Dropbox o iCloud, siempre que la carpeta esté **disponible sin conexión**.
 
+**Pauta no pisa lo que escribió otra computadora.** Antes de escribir en el archivo
+comprueba que sigue siendo la versión que este navegador conoce. Si otra computadora lo
+cambió mientras tenías Pauta abierta, se detiene y pregunta cuál versión conservar; la
+otra queda como copia de seguridad. Lo mismo al reconectar el archivo tras perder el
+permiso: lo escrito sin permiso se conserva. Las versiones se reconocen por igualdad de
+sello y nunca por cuál es «más reciente», así que no importa que los relojes de las
+computadoras no coincidan.
+
 Además, Pauta archiva versiones por su cuenta mientras trabajas: las **últimas seis**
 para deshacer lo reciente, más **una por día de los siete días anteriores** para volver
 más atrás. Se pueden restaurar desde *Archivo → Vincular archivo*.

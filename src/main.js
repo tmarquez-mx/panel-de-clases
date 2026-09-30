@@ -30,7 +30,14 @@ import { exportarPlantilla, exportarRespaldo } from "./exportacion/respaldo.js";
    respaldo: se rechaza antes de intentar leerlo, para no colgar el navegador. */
 const LIMITE_DE_ARCHIVO = 10 * 1024 * 1024;
 
-const gestor = crearGestor({ alCambiarEstado: pintarIndicador });
+const gestor = crearGestor({
+  alCambiarEstado: (e) => {
+    pintarIndicador(e);
+    // Un conflicto se abre solo la primera vez que se detecta; después queda
+    // el indicador, para no interrumpir cada vez que se guarda.
+    if (e.abrirDialogo) abrirConflicto();
+  },
+});
 
 /* ========================= Indicador de guardado ========================= */
 
@@ -52,7 +59,8 @@ function pintarIndicador({ modo, situacion, hora, detalle, necesitaReconectar, n
      el signo del indicador, para quien no distingue los matices de rojo. */
   let breve;
   let signo = "guardado";
-  if (situacion === "guardando") { breve = "Guardando…"; signo = "trabajando"; }
+  if (situacion === "conflicto") { breve = "Otra computadora cambió el archivo"; signo = "error"; }
+  else if (situacion === "guardando") { breve = "Guardando…"; signo = "trabajando"; }
   else if (situacion === "pendiente") { breve = "Cambios sin guardar"; signo = "pendiente"; }
   else if (situacion === "error") { breve = "No se pudo guardar"; signo = "error"; }
   else if (situacion === "sin-guardar" || modo === "memoria") { breve = "Sin guardado automático"; signo = "error"; }
@@ -62,7 +70,8 @@ function pintarIndicador({ modo, situacion, hora, detalle, necesitaReconectar, n
   if (necesitaReconectar) { breve = "Falta permiso del archivo"; signo = "pendiente"; }
 
   let largo;
-  if (situacion === "error") largo = detalle || "No se pudo guardar.";
+  if (situacion === "conflicto") largo = detalle;
+  else if (situacion === "error") largo = detalle || "No se pudo guardar.";
   else if (hora) largo = `Guardado a las ${horaCorta(hora)} ${modo === "archivo" ? `en ${nombreArchivo}` : TEXTO_DE_MODO[modo]}.`;
   else largo = `Se guardará ${TEXTO_DE_MODO[modo]}.`;
 
@@ -218,6 +227,8 @@ function pintarDialogoAlmacen() {
        </ul>`;
 
   $("#alm-cuerpo").innerHTML = `
+    ${gestor.estado().hayConflicto ? `<div class="alm-modo">Otra computadora cambió el archivo y todavía no has decidido qué versión se queda. Mientras tanto no se escribe nada en él.
+      <button type="button" class="mini" data-resolver-conflicto title="Ver qué cambió y elegir qué versión se queda">Resolver ahora</button></div>` : ""}
     <div class="alm-modo">${explicacion[modo] || explicacion.navegador}</div>
     ${necesitaReconectar ? `<div class="alm-modo">El archivo vinculado necesita tu permiso otra vez. Presiona <strong>Reconectar</strong>; si el archivo cambió de lugar, usa «Abrir archivo existente».</div>` : ""}
     ${disponible}
@@ -277,6 +288,11 @@ function restaurarCopia(indice) {
 
 function montarDialogoAlmacen() {
   $("#alm-cuerpo").addEventListener("click", (e) => {
+    if (e.target.closest("[data-resolver-conflicto]")) {
+      $("#dlg-almacen").close("cerrar");
+      abrirConflicto();
+      return;
+    }
     const boton = e.target.closest("[data-restaurar]");
     if (boton) restaurarCopia(Number(boton.dataset.restaurar));
   });
@@ -345,7 +361,7 @@ function montarDialogoAlmacen() {
 
   $("#btn-alm-reconectar").addEventListener("click", async () => {
     try {
-      const contenido = await gestor.reconectar((crudo) => migrar(crudo));
+      const contenido = await gestor.reconectar((crudo) => migrar(crudo), estado.datos);
       if (contenido) cargarEnElPanel(contenido);
       $("#dlg-almacen").close("cerrar");
     } catch (error) {
@@ -364,6 +380,61 @@ function montarDialogoAlmacen() {
   });
 }
 
+/* ========================= El archivo cambió en otra computadora ========================= */
+
+function abrirConflicto() {
+  const dlg = $("#dlg-conflicto");
+  const d = gestor.detalleDeConflicto();
+  if (!d || dlg.open) return;
+
+  const cuando = d.cuando ? ` (a las ${horaCorta(d.cuando)})` : "";
+  const cuanto = `${d.materias} materia${d.materias === 1 ? "" : "s"} y ${d.sesiones} ${d.sesiones === 1 ? "sesión" : "sesiones"}`;
+  $("#con-cuerpo").innerHTML = `
+    <p>Mientras tenías Pauta abierta, <strong>otra computadora, u otra pestaña, guardó cambios</strong> en
+      <em>${esc(d.nombreArchivo || "el archivo vinculado")}</em>${esc(cuando)}. La versión del archivo trae ${esc(cuanto)}.</p>
+    <p>Para no pisarlos, <strong>no se ha escrito nada en el archivo</strong>. Lo que hiciste en esta pestaña está a salvo
+      en este navegador. Elige qué versión se queda:</p>
+    <ul class="alm-lista">
+      <li><strong>Usar la versión del archivo</strong>: cargas lo que guardó la otra computadora. Lo de esta pestaña se archiva antes como copia de seguridad.</li>
+      <li><strong>Guardar la mía encima</strong>: el archivo queda con lo de esta pestaña. La versión que hay ahora en el archivo se archiva antes como copia de seguridad.</li>
+    </ul>
+    <p class="pista">En los dos casos la otra versión queda en «Copias de seguridad», dentro de «Vincular archivo».</p>`;
+  dlg.showModal();
+}
+
+function montarConflicto() {
+  $("#btn-con-archivo").addEventListener("click", () => {
+    const enDisco = gestor.contenidoEnConflicto();
+    if (!enDisco) return $("#dlg-conflicto").close("cerrar");
+    try {
+      migrar(enDisco); // se valida antes de tocar nada: si no sirve, el conflicto sigue abierto
+    } catch (error) {
+      avisar(
+        error instanceof ErrorDeDatos
+          ? `La versión del archivo no se puede cargar: ${error.message}`
+          : "La versión del archivo no se puede cargar."
+      );
+      return;
+    }
+    archivarCopia(estado.datos, "antes de cargar la versión del archivo");
+    cargarEnElPanel(gestor.usarArchivo(), { guardar: true });
+    $("#dlg-conflicto").close("cerrar");
+    mostrarAviso("Se cargó la versión del archivo. Lo que tenías en esta pestaña quedó guardado como copia, en «Vincular archivo».");
+  });
+
+  $("#btn-con-mia").addEventListener("click", async () => {
+    const enDisco = gestor.contenidoEnConflicto();
+    // Primero se archiva lo que se va a sobrescribir; si no cupiera, no se sigue.
+    if (enDisco && !archivarCopia(enDisco, "versión del archivo antes de sobrescribirla")) {
+      const hayCopiaIgual = leerCopias().some((c) => JSON.stringify(c.datos) === JSON.stringify(enDisco));
+      if (!hayCopiaIgual && !confirmar("No se pudo guardar una copia de la versión del archivo, así que se perderá al sobrescribirlo. ¿Continuar de todos modos?")) return;
+    }
+    await gestor.guardarLaMia(estado.datos);
+    $("#dlg-conflicto").close("cerrar");
+    mostrarAviso("Se guardó tu versión en el archivo. La que había quedó guardada como copia, en «Vincular archivo».");
+  });
+}
+
 /* ========================= Arranque ========================= */
 
 async function arrancar() {
@@ -379,6 +450,7 @@ async function arrancar() {
   montarImportacion();
   montarExportaciones();
   montarDialogoAlmacen();
+  montarConflicto();
 
   registrarPersistencia((datos) => gestor.programar(datos));
 
@@ -395,6 +467,7 @@ async function arrancar() {
     cargarEnElPanel(inicio.datos || DATOS_DE_EJEMPLO);
     // Copia de seguridad del estado con el que se abrió, si había algo guardado.
     if (inicio.datos) archivarCopia(estado.datos, "al abrir el panel");
+    if (inicio.hayConflicto) abrirConflicto();
   } catch (error) {
     cargarEnElPanel(DATOS_DE_EJEMPLO);
     avisar(

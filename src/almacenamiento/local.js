@@ -48,6 +48,52 @@ export function borrar() {
 }
 
 /* ---------------------------------------------------------
+   Última versión en que el archivo vinculado y este navegador coincidieron.
+
+   Es lo que permite saber QUIÉN cambió algo. Con solo dos versiones, la del
+   archivo y la del navegador, no se puede distinguir «la otra computadora
+   guardó» de «yo escribí sin conexión»: las dos se ven como «distinta». Con
+   una tercera, la de la última vez que coincidieron, sí: si el archivo se
+   apartó de ella cambió afuera, y si el navegador se apartó cambió aquí.
+
+   Se guarda aparte y no dentro de los datos porque es del vínculo con un
+   archivo, no de la planeación: no debe viajar en un respaldo ni en la
+   plantilla de un curso.
+
+   Devuelve null cuando no hay nada guardado. El cero es un valor válido:
+   significa «el archivo estaba vacío».
+   --------------------------------------------------------- */
+
+const CLAVE_BASE = "panel-de-clases:sello-base";
+
+export function leerBase() {
+  try {
+    const crudo = window.localStorage.getItem(CLAVE_BASE);
+    if (crudo === null) return null;
+    const n = Number(crudo);
+    return Number.isFinite(n) ? n : null;
+  } catch {
+    return null;
+  }
+}
+
+export function escribirBase(sello) {
+  try {
+    window.localStorage.setItem(CLAVE_BASE, String(sello));
+  } catch {
+    /* sin espacio: se pierde la referencia y el gestor cae a comparar sellos */
+  }
+}
+
+export function borrarBase() {
+  try {
+    window.localStorage.removeItem(CLAVE_BASE);
+  } catch {
+    /* nada que hacer */
+  }
+}
+
+/* ---------------------------------------------------------
    Copias de seguridad rotativas.
 
    Sirven para volver atrás: se importó el respaldo equivocado, se borró algo

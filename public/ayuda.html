@@ -760,7 +760,7 @@ details[open] summary{border-bottom:1px solid var(--linea)}
   </div>
 
   <h3>En una computadora nueva: «Abrir archivo existente»</h3>
-  <p>Es la opción de al lado. Elige el <code>.json</code> que ya vinculaste desde tu carpeta sincronizada y Pauta carga todo lo que tenías. Si dos computadoras editaron el archivo por separado, se queda con la versión más reciente.</p>
+  <p>Es la opción de al lado. Elige el <code>.json</code> que ya vinculaste desde tu carpeta sincronizada y Pauta carga todo lo que tenías.</p>
 
   <div class="oscuro-caja">
     <strong>La carpeta tiene que estar en el disco, no solo en línea.</strong> Todas las nubes tienen un modo que deja los archivos en el servidor y baja solo los que abres, para ahorrar espacio. Si <code>pauta.json</code> cae en esa situación, Pauta no puede escribir en él. Cómo marcar esa carpeta como disponible sin conexión:
@@ -774,8 +774,17 @@ details[open] summary{border-bottom:1px solid var(--linea)}
   </div>
 
   <div class="nota-caja">
-    De vez en cuando el navegador vuelve a pedir permiso sobre el archivo vinculado — es normal, una medida de seguridad del propio navegador, no un error de Pauta. Cuando pase, entra a <em>Archivo → Vincular archivo</em> y usa el botón <strong>Reconectar</strong>.
+    De vez en cuando el navegador vuelve a pedir permiso sobre el archivo vinculado — es normal, una medida de seguridad del propio navegador, no un error de Pauta. Cuando pase, entra a <em>Archivo → Vincular archivo</em> y usa el botón <strong>Reconectar</strong>. <strong>Lo que hayas escrito mientras tanto no se pierde:</strong> sigue guardándose en el navegador, y al reconectar Pauta lo escribe en el archivo.
   </div>
+
+  <h3>Si otra computadora cambia el archivo mientras tienes Pauta abierta</h3>
+  <p>Pasa, por ejemplo, cuando dejas Pauta abierta en casa, trabajas en la oficina y al día siguiente vuelves a la pestaña de casa. Pauta <strong>no escribe encima</strong> de lo que guardó la otra computadora: se detiene, avisa con un cuadro y el indicador de guardado se pone en rojo («Otra computadora cambió el archivo»). Tus cambios siguen a salvo en el navegador y el archivo no se toca hasta que decidas:</p>
+  <ul>
+    <li><strong>Usar la versión del archivo</strong> — cargas lo que guardó la otra computadora. Lo que tenías en esta pestaña se archiva antes como copia de seguridad.</li>
+    <li><strong>Guardar la mía encima</strong> — el archivo queda con lo de esta pestaña. La versión que había se archiva antes como copia de seguridad.</li>
+    <li><strong>Decidir después</strong> — no pasa nada con el archivo; puedes resolverlo más tarde desde el indicador de guardado.</li>
+  </ul>
+  <p>Sea cual sea tu elección, la otra versión queda en <a href="#respaldos">Copias de seguridad</a>, así que nada se pierde. Para que Pauta pueda comparar versiones no hace falta que los relojes de las computadoras coincidan.</p>
 </section>
 
 <!-- ============================================================ -->
