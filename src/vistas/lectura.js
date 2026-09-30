@@ -84,22 +84,46 @@ let focoPrevio = null;
 
 /**
  * Da formato al texto guardado sin ejecutar nada de lo que traiga.
- * Todo se escapa primero; solo después se reconocen párrafos, viñetas y
- * direcciones. Así una descripción con etiquetas HTML se lee como texto,
- * que es lo que es.
+ * Se reconocen párrafos, viñetas y direcciones, y TODO lo que sale al HTML
+ * pasa por esc() exactamente una vez. Así una descripción con etiquetas HTML
+ * se lee como texto, que es lo que es.
+ *
+ * El orden importa. Antes se escapaba todo primero y las direcciones se
+ * buscaban después, sobre el texto ya escapado, y al ponerlas en el enlace se
+ * escapaban otra vez: cada «&» de una dirección pasaba a «&amp;amp;». El
+ * navegador deshace un solo nivel, así que la liga apuntaba a «?x=1&amp;y=2»
+ * y el segundo parámetro llegaba corrupto (se perdía, por ejemplo, el
+ * minuto de un video de YouTube). Ahora las direcciones se buscan en el texto
+ * original y cada trozo se escapa una sola vez, sea liga o texto.
  */
 export function formatearTexto(crudo) {
   const texto = String(crudo || "").trim();
   if (!texto) return "";
 
-  const enlazar = (seguro) =>
-    seguro.replace(/(https?:\/\/[^\s<]+)/g, (liga) => {
+  /* Recibe texto SIN escapar y devuelve HTML. Una dirección termina donde
+     empieza un espacio, un «<» o «>» o unas comillas: son los signos que la
+     rodean al pegarla («<https://…>», «"https://…"») y nunca forman parte de
+     ella. Los puntos y comas del final tampoco. */
+  const enlazar = (crudo) => {
+    let html = "";
+    let desde = 0;
+    for (const coincidencia of crudo.matchAll(/https?:\/\/[^\s<>"]+/g)) {
+      const liga = coincidencia[0];
       const limpia = liga.replace(/[.,;:)]+$/, "");
       const cola = liga.slice(limpia.length);
-      if (!urlSegura(limpia)) return esc(limpia) + esc(cola);
-      // El nombre visible es la procedencia, no la dirección entera.
-      return `<a href="${esc(limpia)}" target="_blank" rel="noopener noreferrer" title="${esc(limpia)}">${esc(procedencia(limpia) || limpia)}</a>${esc(cola)}`;
-    });
+
+      html += esc(crudo.slice(desde, coincidencia.index));
+      if (urlSegura(limpia)) {
+        // El nombre visible es la procedencia, no la dirección entera.
+        html += `<a href="${esc(limpia)}" target="_blank" rel="noopener noreferrer" title="${esc(limpia)}">${esc(procedencia(limpia) || limpia)}</a>`;
+      } else {
+        html += esc(limpia);
+      }
+      html += esc(cola);
+      desde = coincidencia.index + liga.length;
+    }
+    return html + esc(crudo.slice(desde));
+  };
 
   const bloques = texto.split(/\n{2,}/);
   return bloques
@@ -108,11 +132,11 @@ export function formatearTexto(crudo) {
       const sonViñetas = lineas.every((l) => /^\s*[-*•]\s+/.test(l));
       if (sonViñetas) {
         const puntos = lineas
-          .map((l) => `<li>${enlazar(esc(l.replace(/^\s*[-*•]\s+/, "")))}</li>`)
+          .map((l) => `<li>${enlazar(l.replace(/^\s*[-*•]\s+/, ""))}</li>`)
           .join("");
         return `<ul>${puntos}</ul>`;
       }
-      return `<p>${enlazar(esc(bloque)).replace(/\n/g, "<br>")}</p>`;
+      return `<p>${enlazar(bloque).replace(/\n/g, "<br>")}</p>`;
     })
     .join("");
 }
