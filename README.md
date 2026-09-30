@@ -223,7 +223,8 @@ anteriores: los campos que falten se completan con valores por omisión.
   conservar su referencia, y eso permite que la página abierta alcance `window.opener`.
   Por eso nace apagada y se enciende a propósito: con el interruptor apagado, cada
   recurso se abre como siempre, en una pestaña con `noopener,noreferrer`.
-- **Deshacer llega hasta la última eliminación**, no más atrás.
+- **Deshacer llega hasta la última eliminación**, no más atrás. Devuelve solo lo que se
+  quitó, en su lugar, sin tocar lo escrito después.
 - **La búsqueda abarca la sesión abierta**, no el curso entero. El filtro de tipos sí
   ofrece los tipos de toda la materia.
 - **No hay pruebas automáticas.** Todo se verifica a mano.
@@ -244,7 +245,7 @@ public/
 src/
   main.js                   Arranque: monta las vistas y conecta el guardado
   estado.js                 Qué materia y qué sesión están activas; avisa a las vistas
-  historial.js              Deshacer la última eliminación
+  historial.js              Deshacer una eliminación: repone solo lo quitado
   datos/
     modelo.js               Estructura, migración de respaldos y operaciones
     vocabulario.js          Curso, taller o ponencia: solo las palabras

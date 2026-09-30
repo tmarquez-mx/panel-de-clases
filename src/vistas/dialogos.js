@@ -14,7 +14,7 @@ import {
 import { mostrarAviso } from "./aviso.js";
 import { voz } from "../datos/vocabulario.js";
 import { suiteDe, comoCopiarEn, rotuloDeCuaderno } from "../datos/nubes.js";
-import { recordarParaDeshacer, deshacer } from "../historial.js";
+import { prepararDeshacer, posicionEn, materiaSigue, mostrar } from "../historial.js";
 
 /* Índices de lo que se está editando. null = se está creando algo nuevo. */
 let recursoEnEdicion = null;
@@ -187,7 +187,6 @@ function guardarMovimiento() {
   const destino = m?.sesiones[iDestino];
   if (!r || !destino || destino === origen) return;
 
-  recordarParaDeshacer();
   origen.recursos.splice(recursoAMover, 1);
   insertarPorMomento(destino, r);
   recursoAMover = null;
@@ -257,14 +256,20 @@ export function borrarSesion(indice) {
   const n = s.recursos.length;
   const cola = n ? ` y sus ${n} recurso${n === 1 ? "" : "s"}` : "";
   if (!confirmar(`¿Eliminar la sesión "${s.titulo}"${cola}?`)) return;
-  recordarParaDeshacer();
+
   m.sesiones.splice(indice, 1);
   irASesion(indiceVigente(m));
+  const deshacerEsto = prepararDeshacer(() => {
+    if (!materiaSigue(m)) return false;
+    m.sesiones.splice(posicionEn(m.sesiones, indice), 0, s);
+    ordenarSesiones(m); // por si entre tanto se cambió alguna fecha
+    mostrar(m, s);
+  });
   actualizar();
   mostrarAviso(`Se eliminó la sesión «${s.titulo}».`, {
     etiqueta: "Deshacer",
-    titulo: "Devolver la sesión con todos sus recursos",
-    accion: deshacer,
+    titulo: "Devolver la sesión con todos sus recursos. No toca nada de lo que hayas escrito después",
+    accion: deshacerEsto,
   });
 }
 
@@ -379,14 +384,18 @@ function borrarMateria() {
   const cola = sesiones ? ` con sus ${sesiones} ${sesiones === 1 ? "sesión" : "sesiones"} y ${recursos} recurso${recursos === 1 ? "" : "s"}` : "";
   if (!confirmar(`¿Eliminar la materia "${m.nombre}"${cola}?`)) return;
 
-  recordarParaDeshacer();
   estado.datos.materias.splice(indice, 1);
   irAMateria(indice < estado.materiaActiva ? estado.materiaActiva - 1 : estado.materiaActiva);
+  const deshacerEsto = prepararDeshacer(() => {
+    if (materiaSigue(m)) return false; // ya está de vuelta: no se repone dos veces
+    estado.datos.materias.splice(posicionEn(estado.datos.materias, indice), 0, m);
+    mostrar(m);
+  });
   actualizar();
   mostrarAviso(`Se eliminó la materia «${m.nombre}».`, {
     etiqueta: "Deshacer",
-    titulo: "Devolver la materia con todas sus sesiones",
-    accion: deshacer,
+    titulo: "Devolver la materia con todas sus sesiones. No toca nada de lo que hayas escrito después",
+    accion: deshacerEsto,
   });
 }
 

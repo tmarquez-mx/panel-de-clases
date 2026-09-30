@@ -11,7 +11,7 @@ import {
 import { abrirDlgRecurso, abrirDlgSesion, abrirDlgDuplicar, abrirDlgMover, borrarSesion } from "./dialogos.js";
 import { entrarModoClase } from "./modoClase.js";
 import { mostrarAviso } from "./aviso.js";
-import { recordarParaDeshacer, deshacer } from "../historial.js";
+import { prepararDeshacer, posicionEn, sesionSigue, mostrar } from "../historial.js";
 import { abrirMenu, cerrarMenu } from "./menu.js";
 import { voz } from "../datos/vocabulario.js";
 import { nombreDeNube, suiteDe } from "../datos/nubes.js";
@@ -220,17 +220,25 @@ function moverRecurso(i, paso) {
 }
 
 function quitarRecurso(i) {
-  const recursos = sesion()?.recursos;
-  const r = recursos?.[i];
+  const m = materia();
+  const s = sesion();
+  const r = s?.recursos?.[i];
   if (!r) return;
   if (!confirmar(`¿Quitar "${r.titulo}" de esta sesión?`)) return;
-  recordarParaDeshacer();
-  recursos.splice(i, 1);
+
+  s.recursos.splice(i, 1);
+  // Deshacer devuelve este recurso a su sitio y nada más: lo que se escriba
+  // mientras el aviso sigue a la vista no se toca.
+  const deshacerEsto = prepararDeshacer(() => {
+    if (!sesionSigue(m, s)) return false;
+    s.recursos.splice(posicionEn(s.recursos, i), 0, r);
+    mostrar(m, s);
+  });
   actualizar();
   mostrarAviso(`Se quitó «${r.titulo}» de esta sesión.`, {
     etiqueta: "Deshacer",
-    titulo: "Devolver el recurso a su lugar",
-    accion: deshacer,
+    titulo: "Devolver el recurso a su lugar. No toca nada de lo que hayas escrito después",
+    accion: deshacerEsto,
   });
 }
 
