@@ -8,6 +8,7 @@
      "tipos": ["podcast"],            // tipos propios, además de los de base
      "materias": [{
        id, clase, nombre, clave, carpeta, cuaderno,   // clase: curso | taller | ponencia
+       ofimatica,                     // opcional: microsoft | google | ninguna
        sesiones: [{
          num, fecha, titulo, proposito, bitacora,
          recursos: [{ titulo, tipo, momento, url, nota, estado }]
@@ -22,6 +23,7 @@
 
 import { aFecha } from "../util/fechas.js";
 import { CLASES } from "./vocabulario.js";
+import { SUITES } from "./nubes.js";
 
 export const VERSION_DATOS = 2;
 
@@ -92,6 +94,16 @@ function normalizarMateria(entrada, posicion) {
   // Los respaldos anteriores no traen «clase»: todo lo que existía era un
   // curso, así que ese es el valor por omisión y nada se pierde al migrar.
   const clase = CLASES.includes(texto(m.clase).trim()) ? texto(m.clase).trim() : "curso";
+
+  /* La suite de ofimática es opcional, y ausente significa algo: que se
+     deduzca de la carpeta vinculada. Por eso solo se conserva si es una de
+     las tres válidas, y si no lo es simplemente no se escribe, en vez de
+     inventar un valor. Este campo se perdía al recargar porque migrar()
+     copia campo por campo y nadie se lo enseñó: todo lo que la interfaz
+     escribe en una materia tiene que aparecer aquí, o no sobrevive a la
+     siguiente carga. Object.hasOwn y no «in»: «constructor» está en cualquier
+     objeto y no es una suite. */
+  const ofimatica = texto(m.ofimatica).trim();
   const materia = {
     id: texto(m.id).trim() || identificador(),
     clase,
@@ -99,6 +111,7 @@ function normalizarMateria(entrada, posicion) {
     clave: texto(m.clave).trim(),
     carpeta: texto(m.carpeta).trim(),
     cuaderno: texto(m.cuaderno).trim(),
+    ...(Object.hasOwn(SUITES, ofimatica) ? { ofimatica } : {}),
     sesiones: soloObjetos(m.sesiones).map(normalizarSesion),
   };
   ordenarSesiones(materia);
