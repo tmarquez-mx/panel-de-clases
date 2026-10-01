@@ -18,6 +18,7 @@ import { nombreDeNube, suiteDe } from "../datos/nubes.js";
 import { abrirLectura, formatearTexto } from "./lectura.js";
 import {
   abrirEnPresentacion, presentacionEncendida, alternarPresentacion, mostrarPortada,
+  modoPresentacion, queDecir,
 } from "./presentacion.js";
 
 const CONTROLES_DE_SESION = [

@@ -448,6 +448,19 @@ body.lateral-plegado .plegar{background:var(--acento-tenue);color:var(--acento)}
 .modo-clase .btn:focus-visible{outline:2px solid var(--blanco);outline-offset:3px}
 .modo-clase .btn[disabled]{opacity:.4}
 .modo-clase .btn[disabled]:hover{background:rgba(255,255,255,.16)}
+/* Las dos opciones de «Duplicar materia»: tarjetas de radio. */
+.opciones-copia{border:0;margin:0 0 6px;padding:0;min-width:0}
+.opcion-copia{
+  display:grid;grid-template-columns:auto 1fr;column-gap:10px;row-gap:3px;align-items:start;
+  border:1px solid var(--linea);border-radius:var(--r-control);padding:11px 14px;margin:0 0 9px;cursor:pointer;
+}
+.opcion-copia:hover{border-color:rgba(60,60,67,.3)}
+.opcion-copia:has(input:checked){border-color:var(--acento);background:var(--seleccion)}
+.opcion-copia input{grid-row:1 / span 2;margin:3px 0 0;accent-color:var(--acento)}
+.opcion-copia strong{font-size:.94rem}
+.opcion-copia .pista{margin:0;grid-column:2}
+.opcional{color:var(--gris-tenue);font-weight:400}
+.pista-aparte{margin:2px 0 16px}
 .mc-estado{
   margin:14px 0 0;min-height:1.2em;font-size:13px;color:rgba(255,255,255,.72);
   transition:opacity .2s;

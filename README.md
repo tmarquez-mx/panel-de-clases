@@ -116,7 +116,15 @@ Pauta no se queda vacía: abre la copia del navegador y avisa.
 
 Además, Pauta archiva versiones por su cuenta mientras trabajas: las **últimas seis**
 para deshacer lo reciente, más **una por día de los siete días anteriores** para volver
-más atrás. Se pueden restaurar desde *Archivo → Vincular archivo*.
+más atrás. Se restauran desde *Mis datos → Versiones anteriores*.
+
+Todo lo que tiene que ver con los datos vive en un solo lugar, el botón **Mis datos**, que
+dice además si todo está guardado. Ahí hay tres bloques: *dónde se guardan* (con la única
+acción que tiene sentido en cada situación: guardar en un archivo, reconectar o cambiar),
+*llevarlos a otra parte* (*Descargar mis datos* y *Cargar datos de un archivo*) y
+*versiones anteriores*, plegadas salvo cuando algo salió mal. Lo que se hace con **una
+materia** —editarla, duplicarla, descargarla como texto— está en el menú **⋯** de cada
+materia.
 
 Las copias no pueden quedarse con todo el espacio del navegador (unos cinco millones de
 caracteres por sitio, y cada copia es el panel entero). Están limitadas a la mitad, y si
@@ -178,7 +186,7 @@ llave publicada.
 - Pauta no abre ligas con esquemas peligrosos (`javascript:`, `data:`): si un respaldo
   ajeno trae una, la muestra como texto y avisa.
 
-### Formato del respaldo
+### Formato de los datos
 
 *Guardar respaldo* descarga un `.json` con esta estructura:
 
@@ -240,8 +248,9 @@ anteriores: los campos que falten se completan con valores por omisión.
 - **«Abrir todo» y el bloqueador de ventanas emergentes**: la primera vez el navegador
   bloqueará las pestañas; hay que permitirlas para esa página. Lo mismo la primera vez
   que se enciende la ventana de presentación.
-- **La ventana de presentación suelta `noopener`.** Reutilizar una ventana exige
-  conservar su referencia, y eso permite que la página abierta alcance `window.opener`.
+- **La presentación conserva el vínculo con lo que abre.** Reutilizar una pestaña o una
+  ventana exige conservar su referencia, y eso permite que la página abierta alcance
+  `window.opener` (cortarlo con `w.opener = null` impide navegarla después; se probó).
   Por eso nace apagada y se enciende a propósito: con el interruptor apagado, cada
   recurso se abre como siempre, en una pestaña con `noopener,noreferrer`.
 - **Deshacer llega hasta la última eliminación**, no más atrás. Devuelve solo lo que se

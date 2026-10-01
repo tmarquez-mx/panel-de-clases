@@ -9,7 +9,8 @@ import "./estilos/impresion.css";
 
 import { $, esc, avisar, confirmar } from "./util/dom.js";
 import { fechaHoraCorta, horaCorta } from "./util/fechas.js";
-import { migrar, ErrorDeDatos } from "./datos/modelo.js";
+import { migrar, ErrorDeDatos, copiaDeMateria, ordenarSesiones, identificador } from "./datos/modelo.js";
+import { voz } from "./datos/vocabulario.js";
 import { DATOS_DE_EJEMPLO } from "./datos/ejemplo.js";
 import { crearGestor } from "./almacenamiento/gestor.js";
 import { archivarCopia, leerCopias, leerDanado, borrarDanado } from "./almacenamiento/local.js";
@@ -17,7 +18,7 @@ import { estado, materia, irAMateria, registrarPersistencia, repintar, actualiza
 import { montarLateral } from "./vistas/lateral.js";
 import { montarVistaSesion } from "./vistas/sesion.js";
 import { montarVistaSemestre } from "./vistas/semestre.js";
-import { montarModoClase } from "./vistas/modoClase.js";
+import { montarModoClase, retomarClaseTrasRecarga } from "./vistas/modoClase.js";
 import { montarDialogos } from "./vistas/dialogos.js";
 import { montarAviso, mostrarAviso } from "./vistas/aviso.js";
 import { abrirMenu } from "./vistas/menu.js";
@@ -60,7 +61,8 @@ function pintarIndicador({ modo, situacion, hora, detalle, necesitaReconectar, n
      el signo del indicador, para quien no distingue los matices de rojo. */
   let breve;
   let signo = "guardado";
-  if (situacion === "conflicto") { breve = "Otra computadora cambió el archivo"; signo = "error"; }
+  if (situacion === "abriendo") { breve = "Abriendo tu archivo…"; signo = "trabajando"; }
+  else if (situacion === "conflicto") { breve = "Otra computadora cambió el archivo"; signo = "error"; }
   else if (situacion === "guardando") { breve = "Guardando…"; signo = "trabajando"; }
   else if (situacion === "pendiente") { breve = "Cambios sin guardar"; signo = "pendiente"; }
   else if (situacion === "error") { breve = "No se pudo guardar"; signo = "error"; }
@@ -151,7 +153,7 @@ function montarImportacion() {
     if (!archivo) return;
 
     if (archivo.size > LIMITE_DE_ARCHIVO) {
-      avisar("Ese archivo es demasiado grande para ser un respaldo del panel.");
+      avisar("Ese archivo es demasiado grande para ser de Pauta.");
       return;
     }
 
@@ -162,7 +164,7 @@ function montarImportacion() {
       try {
         crudos = JSON.parse(String(lector.result));
       } catch {
-        avisar("El archivo no es JSON válido. Debe ser un respaldo generado por «Guardar respaldo».");
+        avisar("El archivo no es JSON válido. Debe ser un .json descargado o guardado desde Pauta.");
         return;
       }
       try {
@@ -177,7 +179,7 @@ function montarImportacion() {
         avisar(
           error instanceof ErrorDeDatos
             ? error.message
-            : "El archivo no tiene la estructura del panel. Debe ser un respaldo generado por «Guardar respaldo»."
+            : "El archivo no tiene la estructura de Pauta. Debe ser un .json descargado o guardado desde Pauta."
         );
       }
     };
@@ -188,8 +190,6 @@ function montarImportacion() {
 /* ========================= Exportaciones ========================= */
 
 function montarExportaciones() {
-  $("#btn-json").addEventListener("click", () => exportarRespaldo(estado.datos));
-
   $("#btn-md").addEventListener("click", () => {
     const m = materia();
     if (m) exportarMarkdown(m);
@@ -203,9 +203,16 @@ function montarExportaciones() {
   });
 }
 
-/* ========================= Diálogo de almacenamiento ========================= */
+/* ========================= Mis datos =========================
 
-function pintarDialogoAlmacen() {
+   Un solo lugar para todo lo que tiene que ver con los datos, con tres
+   preguntas en orden: dónde se guardan, cómo llevarlos a otra parte y cómo
+   volver atrás. Antes esto estaba repartido entre el menú «Archivo» y este
+   cuadro, con cinco botones al pie y tres palabras —respaldo, copia de
+   seguridad, archivo vinculado— que sonaban a lo mismo. Ahora cada bloque
+   ofrece solo la acción que tiene sentido en la situación del momento. */
+
+function bloqueDondeSeGuardan() {
   const { modo, soportaArchivo, nombreArchivo, necesitaReconectar } = gestor.estado();
 
   const explicacion = {
@@ -480,9 +487,13 @@ async function arrancar() {
     const aSalvo = gestor.lecturaInvalida(inicio?.datos ?? null);
     const copias = leerCopias().length;
     avisar(
-      `Lo guardado no se pudo leer, así que se abrieron los datos de ejemplo. Nada se ha sobrescrito todavía: importa tu último respaldo antes de hacer cambios.\n\n${
-        error instanceof ErrorDeDatos ? error.message : "El archivo guardado está dañado."
-      }`
+      "Lo guardado no se pudo leer, así que se abrieron los datos de ejemplo. " +
+        (aSalvo ? "Lo que no se pudo leer se conservó aparte, sin tocarlo, y puedes descargarlo desde «Mis datos». " : "") +
+        (gestor.estado().necesitaReconectar ? "No se escribirá nada en tu archivo hasta que lo reconectes o elijas otro. " : "") +
+        (copias
+          ? `Hay ${copias} ${copias === 1 ? "versión anterior" : "versiones anteriores"}: restaura la más reciente en «Mis datos» antes de hacer cambios.`
+          : "Si tienes tus datos descargados, cárgalos en «Mis datos» antes de hacer cambios.") +
+        `\n\n${error instanceof ErrorDeDatos ? error.message : "El archivo guardado está dañado."}`
     );
   }
 
@@ -495,7 +506,7 @@ async function arrancar() {
 /** Última red: si el arranque falla del todo, al menos se dice en voz alta. */
 function arrancarConRed() {
   arrancar().catch(() => {
-    avisar("El panel no pudo arrancar. Vuelve a cargar la página; si sigue igual, abre un respaldo con «Importar respaldo».");
+    avisar("Pauta no pudo arrancar. Vuelve a cargar la página; si sigue igual, carga tus datos desde «Mis datos» → Cargar datos de un archivo.");
   });
 }
 

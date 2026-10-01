@@ -510,6 +510,81 @@
   </form>
 </dialog>
 
+<!-- ---------- Diálogo: duplicar materia ---------- -->
+<dialog id="dlg-plantilla" aria-labelledby="pl-titulo-dlg">
+  <form method="dialog">
+    <div class="dlg-cuerpo">
+      <h3 id="pl-titulo-dlg">Duplicar materia</h3>
+      <p class="sub" id="pl-sub"></p>
+
+      <fieldset class="opciones-copia">
+        <legend class="oculto-visual">Para qué la quieres</legend>
+        <label class="opcion-copia" title="Conserva tus recursos con sus ligas, la carpeta y el cuaderno del curso. Sirve para volver a dar el mismo curso con los mismos materiales">
+          <input type="radio" name="pl-modo" value="semestre" checked>
+          <strong>Copia para otro semestre</strong>
+          <span class="pista">Conserva tus recursos <em>con sus ligas</em>, la carpeta y el cuaderno del curso. Para volver a dar el mismo curso con los mismos materiales.</span>
+        </label>
+        <label class="opcion-copia" title="Quita todas las ligas, también las escritas dentro de las notas, y deja solo el esqueleto. Sirve para empezar otro curso o un taller, o para compartirla sin filtrar tus direcciones">
+          <input type="radio" name="pl-modo" value="estructura">
+          <strong>Estructura para otro curso o taller</strong>
+          <span class="pista">Quita <em>todas</em> las ligas —también las escritas dentro de las notas, que quedan como «[liga quitada]»— y deja el esqueleto: sesiones, propósitos, títulos, tipos y notas de uso. Para empezar algo nuevo, o para compartirla sin filtrar tus direcciones.</span>
+        </label>
+      </fieldset>
+      <p class="pista pista-aparte">En las dos, las bitácoras se quedan fuera y todos los recursos vuelven a «pendiente».</p>
+
+      <div class="campo">
+        <label for="pl-nombre" id="lbl-pl-nombre">Nombre</label>
+        <input id="pl-nombre" required title="El nombre que llevará la copia. Cámbialo si es para otro curso o para un taller">
+      </div>
+      <div class="dos">
+        <div class="campo">
+          <label for="pl-clave" id="lbl-pl-clave">Nivel y periodo</label>
+          <input id="pl-clave" title="El dato que acompaña al nombre. Para otro semestre, cambia aquí el periodo">
+        </div>
+        <div class="campo">
+          <label for="pl-clase">Qué es</label>
+          <select id="pl-clase" title="Cambia las palabras del panel: sesiones para un curso, bloques para un taller, presentaciones para una ponencia">
+            <option value="curso">Un curso</option>
+            <option value="taller">Un taller</option>
+            <option value="ponencia">Una ponencia</option>
+          </select>
+        </div>
+      </div>
+      <div class="campo">
+        <label for="pl-fecha">Fecha de la primera sesión <span class="opcional">(opcional)</span></label>
+        <input id="pl-fecha" type="date" title="Mueve todas las fechas para que la primera sesión caiga este día, conservando los intervalos entre ellas. Si la dejas vacía, las fechas se conservan tal cual">
+        <p class="pista">Mueve todas las fechas conservando los intervalos. Vacía, se conservan las actuales.</p>
+      </div>
+    </div>
+    <div class="dlg-pie">
+      <button type="button" class="btn" data-cerrar title="Cerrar sin copiar nada">Cancelar</button>
+      <div class="derecha">
+        <button type="button" class="btn" id="btn-pl-descargar" title="Descargar la copia como archivo .json, para guardarla o pasársela a alguien. Al importarla en otro panel se puede agregar junto a lo que haya ahí">Descargar archivo</button>
+        <button type="button" class="btn btn-solido" id="btn-pl-agregar" title="Agregar la copia a tu panel, junto a tus otras materias. No toca nada de lo que ya tienes">Agregar a mi panel</button>
+      </div>
+    </div>
+  </form>
+</dialog>
+
+<!-- ---------- Diálogo: importar un archivo con una sola materia ---------- -->
+<dialog id="dlg-importar" aria-labelledby="imp-titulo-dlg">
+  <form method="dialog">
+    <div class="dlg-cuerpo">
+      <h3 id="imp-titulo-dlg">El archivo trae una sola materia</h3>
+      <div id="imp-cuerpo"></div>
+    </div>
+    <div class="dlg-pie">
+      <button type="button" class="btn" data-cerrar title="Cerrar sin importar nada. Tu panel queda como está">Cancelar</button>
+      <div class="derecha">
+        <button type="button" class="btn peligro" id="btn-imp-sustituir"
+          title="Quitar todo lo que hay ahora en el panel y dejar solo lo del archivo. Lo de ahora se guarda antes como versión anterior">Sustituir todo</button>
+        <button type="button" class="btn btn-solido" id="btn-imp-agregar"
+          title="Agregar la materia del archivo junto a tus otras materias. No toca nada de lo que ya tienes">Agregar como materia nueva</button>
+      </div>
+    </div>
+  </form>
+</dialog>
+
 <!-- ---------- Diálogo: el archivo cambió en otra computadora ---------- -->
 <dialog id="dlg-conflicto" aria-labelledby="con-titulo-dlg">
   <form method="dialog">
