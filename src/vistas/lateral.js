@@ -9,6 +9,25 @@ import { voz, rotuloDeLaLista } from "../datos/vocabulario.js";
 import { rotuloDeCuaderno } from "../datos/nubes.js";
 import { abrirDlgMateria, abrirDlgSesion } from "./dialogos.js";
 import { abrirRevision } from "./revision.js";
+import { abrirMenu } from "./menu.js";
+
+/* Lo que se hace CON una materia vive en su propio menú: editarla,
+   duplicarla y descargarla como texto. Antes las dos últimas estaban en
+   «Archivo», revueltas con lo que se hace con los datos. Duplicar y
+   descargar actúan sobre la materia abierta, así que primero se abre. */
+function menuDeMateria(boton, i) {
+  const ir = () => {
+    if (estado.materiaActiva !== i) {
+      irAMateria(i);
+      repintar();
+    }
+  };
+  abrirMenu(boton, [
+    { etiqueta: "Editar…", titulo: "Cambiar nombre, periodo, tipo, carpeta y cuaderno, o eliminarla", accion: () => abrirDlgMateria(i) },
+    { etiqueta: "Duplicar…", titulo: $("#btn-plantilla").title, accion: () => { ir(); $("#btn-plantilla").click(); } },
+    { etiqueta: "Descargar como texto (.md)", titulo: $("#btn-md").title, accion: () => { ir(); $("#btn-md").click(); } },
+  ]);
+}
 
 function pintarMaterias() {
   // El rótulo sigue a lo que hay: «Materias» si todo son cursos, «Talleres»
@@ -19,7 +38,7 @@ function pintarMaterias() {
       (m, i) => `
     <div class="fila materia" data-activo="${i === estado.materiaActiva}">
       <button class="principalbtn" data-ir="${i}" title="Abrir ${esc(voz(m).etiqueta.toLowerCase())}">${esc(m.nombre)}${m.clase && m.clase !== "curso" ? `<span class="clase">${esc(voz(m).etiqueta)}</span>` : ""}<small>${esc(m.clave || "")}</small></button>
-      <button class="lapiz" data-editar="${i}" title="Editar nombre, periodo, carpeta y cuaderno" aria-label="Editar ${esc(voz(m).etiqueta.toLowerCase())} ${esc(m.nombre)}">editar</button>
+      <button class="lapiz" data-opciones="${i}" aria-haspopup="menu" title="Editar, duplicar o descargar como texto" aria-label="Opciones de ${esc(voz(m).etiqueta.toLowerCase())} ${esc(m.nombre)}">⋯</button>
     </div>`
     )
     .join("");
@@ -106,9 +125,9 @@ function pintarSesiones() {
 
 export function montarLateral() {
   $("#lista-materias").addEventListener("click", (e) => {
-    const editar = e.target.closest("[data-editar]");
-    if (editar) {
-      abrirDlgMateria(Number(editar.dataset.editar));
+    const opciones = e.target.closest("[data-opciones]");
+    if (opciones) {
+      menuDeMateria(opciones, Number(opciones.dataset.opciones));
       return;
     }
     const ir = e.target.closest("[data-ir]");

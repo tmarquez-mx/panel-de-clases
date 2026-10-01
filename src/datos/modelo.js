@@ -131,12 +131,12 @@ export function migrar(entrada) {
     throw new ErrorDeDatos('El archivo no tiene la lista "materias". No son datos de Pauta.');
   }
   if (entrada.materias.length === 0) {
-    throw new ErrorDeDatos("El respaldo no tiene ninguna materia. No se cargó nada para no borrar lo que ya tienes.");
+    throw new ErrorDeDatos("El archivo no tiene ninguna materia. No se cargó nada para no borrar lo que ya tienes.");
   }
 
   const materias = soloObjetos(entrada.materias).map(normalizarMateria);
   if (!materias.length) {
-    throw new ErrorDeDatos("Ninguna materia del respaldo se pudo leer: el archivo está dañado.");
+    throw new ErrorDeDatos("Ninguna materia del archivo se pudo leer: está dañado.");
   }
 
   // Tipos propios: los declarados en el respaldo más los que aparezcan en los

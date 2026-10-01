@@ -39,8 +39,8 @@ No se instala nada y no hay cuentas. Es una página que abres en **Chrome o Edge
    vigente.
 3. **Cuelga los recursos** de cada sesión: una liga, una lectura, una actividad, una
    nota. Si le pones el minuto (`0:15–0:40`), se acomodan solos en ese orden.
-4. **Vincula un archivo** dentro de tu carpeta de la nube. Desde ese momento tu
-   planeación te sigue a cualquier computadora.
+4. **Guarda en un archivo** de tu carpeta de la nube: botón **Mis datos** → *Guardar en un
+   archivo…*. Desde ese momento tu planeación te sigue a cualquier computadora.
 5. **El día de la clase, entra a Modo clase.** Pantalla completa, un recurso a la vez,
    flechas para avanzar y `Esc` para salir.
 6. **Si das clase en Zoom, enciende «Presentación»** —el botón de al lado— y entra a
@@ -92,11 +92,11 @@ pulsarlo se abre el detalle.
 
 | Modo | Qué significa |
 |---|---|
-| **Archivo vinculado** | Hay un `.json` tuyo en el disco y Pauta escribe ahí cada cambio, además de dejar copia en el navegador. Es el modo recomendado. |
+| **En tu archivo** | Hay un `.json` tuyo en el disco y Pauta escribe ahí cada cambio, además de dejar copia en el navegador. Es el modo recomendado. |
 | **Navegador** | Todo se guarda en este navegador y esta computadora. No viaja a ningún servidor, pero tampoco a tu otra máquina. |
-| **Memoria** | El navegador bloqueó el almacenamiento. Pauta avisa; hay que exportar un respaldo antes de cerrar. |
+| **Memoria** | El navegador bloqueó el almacenamiento. Pauta avisa; hay que usar *Descargar mis datos* antes de cerrar. |
 
-**El archivo vinculado no depende de ninguna nube en particular.** Pauta usa la API
+**Guardar en un archivo no depende de ninguna nube en particular.** Pauta usa la API
 estándar del navegador y escribe en un archivo normal del disco; quien lo sincroniza es
 la aplicación de escritorio de tu nube. Funciona igual con OneDrive, Google Drive,
 Dropbox o iCloud, siempre que la carpeta esté **disponible sin conexión**.
@@ -104,7 +104,7 @@ Dropbox o iCloud, siempre que la carpeta esté **disponible sin conexión**.
 **Pauta no pisa lo que escribió otra computadora.** Antes de escribir en el archivo
 comprueba que sigue siendo la versión que este navegador conoce. Si otra computadora lo
 cambió mientras tenías Pauta abierta, se detiene y pregunta cuál versión conservar; la
-otra queda como copia de seguridad. Lo mismo al reconectar el archivo tras perder el
+otra queda entre las versiones anteriores. Lo mismo al reconectar el archivo tras perder el
 permiso: lo escrito sin permiso se conserva. Las versiones se reconocen por igualdad de
 sello y nunca por cuál es «más reciente», así que no importa que los relojes de las
 computadoras no coincidan.
@@ -173,24 +173,33 @@ líneas, escrito dentro de `vite.config.js`, en lugar de agregar otra dependenci
 ## Datos y privacidad
 
 Pauta no manda nada a ningún servidor, no tiene analítica y no pide cuentas. Lo que
-escribes vive en tu navegador y, si lo vinculas, en tu archivo.
+escribes vive en tu navegador y, si guardas en un archivo, en tu archivo.
 
-**Cuidado con los respaldos.** Las ligas de OneDrive, Drive, Dropbox o SharePoint llevan claves
-de uso compartido y apuntan a una cuenta institucional: un respaldo publicado es una
+**Cuidado con los `.json`.** Las ligas de OneDrive, Drive, Dropbox o SharePoint llevan claves
+de uso compartido y apuntan a una cuenta institucional: un `.json` publicado es una
 llave publicada.
 
 - El `.gitignore` excluye cualquier `.json` de datos, `datos-locales/` y `respaldos/`.
 - Los datos de ejemplo del repositorio son ficticios y no tienen ninguna liga real.
-- No subas tu respaldo a un repositorio abierto. Para compartir la estructura de un
-  curso está **Plantilla del curso**, que exporta la materia **sin ligas y sin
-  bitácoras**: quedan las sesiones, fechas, títulos, propósitos, tipos, momentos y las
-  notas de uso, para que quien la reciba cuelgue sus propios archivos.
+- No subas tu archivo ni lo que descargues a un repositorio abierto. Para copiar un curso
+  está **Duplicar materia** (menú ⋯ de la materia), con dos opciones según para qué la quieras:
+  - **Copia para otro semestre**: conserva los recursos **con sus ligas**, la carpeta y el
+    cuaderno del curso, para volver a dar el mismo curso con los mismos materiales.
+  - **Estructura para otro curso o taller**: quita **todas** las ligas, también las escritas
+    dentro de títulos, propósitos y notas (quedan como «[liga quitada]»), y deja solo el
+    esqueleto. Es la que sirve para compartir sin filtrar tus direcciones.
+
+  En las dos las bitácoras se quedan fuera y los recursos vuelven a «pendiente». Se puede
+  poner otro nombre, otro periodo y otro tipo (curso, taller o ponencia), y mover todas las
+  fechas a partir de una nueva primera sesión conservando los intervalos. El resultado se
+  puede **agregar al propio panel**, junto a las demás materias, o descargar como archivo,
+  que al importarlo en otro panel también se puede agregar.
 - Pauta no abre ligas con esquemas peligrosos (`javascript:`, `data:`): si un respaldo
   ajeno trae una, la muestra como texto y avisa.
 
 ### Formato de los datos
 
-*Guardar respaldo* descarga un `.json` con esta estructura:
+*Descargar mis datos* crea un `.json` con esta estructura (la misma que tu archivo):
 
 ```json
 {
@@ -257,7 +266,14 @@ anteriores: los campos que falten se completan con valores por omisión.
   ventana exige conservar su referencia, y eso permite que la página abierta alcance
   `window.opener` (cortarlo con `w.opener = null` impide navegarla después; se probó).
   Por eso nace apagada y se enciende a propósito: con el interruptor apagado, cada
-  recurso se abre como siempre, en una pestaña con `noopener,noreferrer`.
+  recurso se abre en una pestaña a la que se le corta `opener` en el acto.
+- **Sin ventanita flotante, algunos sitios desconectan la ventana de presentación.**
+  En Safari y Firefox los recursos van a una ventana aparte, y YouTube, Google Drive,
+  Classroom, Dropbox, iCloud, Canva, Padlet y Mentimeter mandan
+  `Cross-Origin-Opener-Policy`: el navegador la separa de Pauta y el recurso siguiente
+  tiene que abrir otra, que hay que volver a compartir. Pauta lo detecta y lo avisa en
+  el momento. En Chrome y Edge no pasa: con la ventanita flotante (*Document
+  Picture-in-Picture*) cada recurso es una pestaña de la misma ventana compartida.
 - **Deshacer llega hasta la última eliminación**, no más atrás. Devuelve solo lo que se
   quitó, en su lugar, sin tocar lo escrito después.
 - **La búsqueda abarca la sesión abierta**, no el curso entero. El filtro de tipos sí
@@ -288,7 +304,7 @@ src/
     ejemplo.js              Materias ficticias, sin ligas reales
   almacenamiento/
     gestor.js               Decide dónde se guarda y en qué modo está
-    local.js                localStorage y copias de seguridad por tramos
+    local.js                localStorage y versiones anteriores por tramos
     archivo.js              File System Access API
     manijas.js              Recuerda tu archivo (IndexedDB)
   vistas/
@@ -321,7 +337,7 @@ qué otras vistas existen.
 - Ningún control aparece solo al pasar el cursor.
 - **Cada control lleva su cartelito**: al pasar el cursor, cualquier botón, campo o
   menú dice qué hace. Los que cambian de comportamiento lo dicen —«Abrir» anuncia si
-  va a una pestaña nueva o a la ventana de presentación—.
+  va a una pestaña nueva o a la presentación—.
 - El estado nunca se comunica solo con color: cambia también la palabra o la forma.
 - Los tamaños de lectura se ajustan con **A− A A+** sin descuadrar la interfaz.
 - En modo clase, el resto de la página queda fuera del recorrido del teclado y del

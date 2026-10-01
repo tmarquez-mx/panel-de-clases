@@ -364,8 +364,8 @@ details[open] summary{border-bottom:1px solid var(--linea)}
   <div class="grupo">
     <p class="rotulo">Guardar</p>
     <a href="#como-guarda">Cómo se guarda tu trabajo</a>
-    <a href="#nube">Vincular con tu nube</a>
-    <a href="#respaldos">Copias de seguridad</a>
+    <a href="#nube">Guardar en tu nube</a>
+    <a href="#respaldos">Versiones anteriores</a>
   </div>
   <div class="grupo">
     <p class="rotulo">En clase</p>
@@ -483,7 +483,7 @@ details[open] summary{border-bottom:1px solid var(--linea)}
     </div>
     <div class="leyenda">
       <ol>
-        <li><span class="num">1</span><div><strong>Archivo</strong> <span>— vincular tu archivo, importar y guardar respaldos, exportar. A su izquierda, el indicador de guardado: púlsalo y te dice dónde y a qué hora se guardó.</span></div></li>
+        <li><span class="num">1</span><div><strong>Mis datos</strong> <span>— dice si todo está guardado. Púlsalo para ver dónde se guardan, descargarlos, cargarlos en otra computadora o volver a una versión anterior.</span></div></li>
         <li><span class="num">2</span><div><strong>Materias</strong> <span>— tus cursos, talleres y ponencias, en la columna izquierda.</span></div></li>
         <li><span class="num">3</span><div><strong>Sesiones</strong> <span>— cada clase de esa materia. Abajo, las herramientas del curso.</span></div></li>
       </ol>
@@ -672,24 +672,24 @@ details[open] summary{border-bottom:1px solid var(--linea)}
       <p>Al abrir Pauta sin hacer nada más, cada cambio se guarda en este navegador y esta computadora. No viaja a ningún servidor — y tampoco a tu otra computadora.</p>
     </div>
     <div class="item" style="border-color:var(--rojo)">
-      <h4 style="color:var(--rojo)">Archivo vinculado <span style="color:var(--gris-tenue);font-weight:400">(recomendado)</span></h4>
-      <p>Vinculas un archivo <code>.json</code> propio y Pauta escribe ahí cada cambio, además de dejar una copia en el navegador. Es la base de la sección de tu nube, más abajo.</p>
+      <h4 style="color:var(--rojo)">En tu archivo <span style="color:var(--gris-tenue);font-weight:400">(recomendado)</span></h4>
+      <p>En <em>Mis datos → Guardar en un archivo…</em> eliges un <code>.json</code> propio y Pauta escribe ahí cada cambio, además de dejar una copia en el navegador. Es la base de la sección de tu nube, más abajo.</p>
     </div>
     <div class="item">
       <h4>Sin guardado <span style="color:var(--gris-tenue);font-weight:400">(poco común)</span></h4>
-      <p>Solo ocurre si el navegador bloquea el almacenamiento local. Pauta te avisa; en ese caso, usa <em>Guardar respaldo</em> antes de cerrar la pestaña.</p>
+      <p>Solo ocurre si el navegador bloquea el almacenamiento local. Pauta te avisa; en ese caso, entra a <em>Mis datos</em> y usa <em>Descargar mis datos</em> antes de cerrar la pestaña.</p>
     </div>
   </div>
 
-  <p>El estado actual siempre se ve en la pastilla junto a los botones, arriba a la derecha:</p>
+  <p>El estado actual siempre se ve en <strong>Mis datos</strong>, arriba a la derecha:</p>
   <div class="maqueta" style="max-width:420px">
     <div style="background:var(--rojo);padding:10px 14px">
-      <span style="font-size:12px;display:inline-flex;align-items:center;gap:8px;background:rgba(118,118,128,.12);padding:6px 13px;border-radius:999px;color:var(--gris-tenue)"><span style="width:9px;height:9px;border-radius:50%;background:#248A3D;display:inline-block"></span>Guardado en pauta.json</span>
+      <span style="font-size:12px;display:inline-flex;align-items:center;gap:8px;background:rgba(118,118,128,.12);padding:6px 13px;border-radius:999px;color:var(--gris-tenue)"><span style="width:9px;height:9px;border-radius:50%;background:#248A3D;display:inline-block"></span><strong style="color:var(--negro)">Mis datos</strong>&nbsp;· Guardado en pauta.json</span>
     </div>
   </div>
 
   <div class="nota-caja">
-    Con «Guardar respaldo» descargas todo Pauta como <code>.json</code>, y con «Importar respaldo» lo cargas en otra computadora. Es la forma de pasar tus datos si no puedes vincular un archivo — pero hacerlo a mano cada vez es justo lo que <a href="#nube">vincular con tu nube</a> evita.
+    En <em>Mis datos</em>, «Descargar mis datos» crea un <code>.json</code> con todas tus materias, y «Cargar datos de un archivo» lo abre en otra computadora. Sirve si no puedes guardar en un archivo de tu nube — pero hacerlo a mano cada vez es justo lo que <a href="#nube">guardar en tu nube</a> evita.
   </div>
 </section>
 
@@ -697,7 +697,7 @@ details[open] summary{border-bottom:1px solid var(--linea)}
 <section class="seccion" id="nube">
   <div class="cabecera">
     <div class="meta">Guardar · recomendado</div>
-    <h2>Vincular tu archivo con tu nube</h2>
+    <h2>Guardar en un archivo de tu nube</h2>
     <p>Esto es lo único que necesitas configurar una vez. Después, Pauta guarda solo, y tu planeación te sigue a cualquier computadora donde tengas esa carpeta.</p>
     <p>Sirve <strong>cualquier nube que sincronice una carpeta con tu disco</strong>: OneDrive, Google Drive, Dropbox, iCloud Drive, Box. Pauta no habla con ninguna de ellas —escribe un archivo normal en tu computadora, con la API estándar del navegador— y es la aplicación de escritorio de tu nube la que lo sube. Por eso funciona igual en todas y no hay nada que conectar ni ninguna cuenta que dar.</p>
   </div>
@@ -710,13 +710,13 @@ details[open] summary{border-bottom:1px solid var(--linea)}
     </li>
     <li class="tarjeta">
       <div class="etiquetas"><span class="tipo">Paso 2</span></div>
-      <h3>Abre «Archivo» y elige «Vincular archivo…»</h3>
-      <p>«Archivo» es el botón de la barra de arriba. Dentro están también «Importar respaldo», «Guardar respaldo» y las exportaciones.</p>
+      <h3>Pulsa «Mis datos»</h3>
+      <p>Es el botón de arriba a la derecha que dice si todo está guardado. Abre un cuadro con tres partes: dónde se guardan, llevarlos a otra parte y versiones anteriores.</p>
     </li>
     <li class="tarjeta">
       <div class="etiquetas"><span class="tipo">Paso 3</span></div>
-      <h3>Elige «Vincular archivo nuevo»</h3>
-      <p>Se abre una ventana titulada «Dónde se guardan tus datos», con varias opciones — esta es la que empieza a escribir en un archivo tuyo.</p>
+      <h3>Elige «Guardar en un archivo…»</h3>
+      <p>Es el botón rojo de «Dónde se guardan». A partir de ahí, Pauta escribe cada cambio en un archivo tuyo.</p>
     </li>
     <li class="tarjeta">
       <div class="etiquetas"><span class="tipo">Paso 4</span></div>
@@ -736,11 +736,12 @@ details[open] summary{border-bottom:1px solid var(--linea)}
       <div class="m-dialogo-fondo">
         <div class="m-dialogo">
           <div class="m-dlg-cuerpo">
-            <h4>Dónde se guardan tus datos</h4>
-            <p class="m-sub" style="margin-bottom:10px">Ahora mismo Pauta guarda en este navegador.</p>
-            <div class="m-dlg-opcion marcada" style="display:flex;align-items:center;justify-content:flex-start"><span class="badge">1</span>Vincular archivo nuevo</div>
-            <div class="m-dlg-opcion">Abrir archivo existente</div>
-            <div class="m-dlg-opcion">Desvincular</div>
+            <h4>Mis datos</h4>
+            <p class="m-sub" style="margin-bottom:10px">Dónde se guardan: solo en este navegador, en esta computadora.</p>
+            <div class="m-dlg-opcion marcada" style="display:flex;align-items:center;justify-content:flex-start"><span class="badge">1</span>Guardar en un archivo…</div>
+            <div class="m-dlg-opcion">Ya tengo un archivo: abrirlo…</div>
+            <div class="m-dlg-opcion">Descargar mis datos · Cargar datos de un archivo…</div>
+            <div class="m-dlg-opcion">› Versiones anteriores</div>
           </div>
           <div class="m-dlg-pie">
             <span class="m-mini">Cerrar</span>
@@ -750,17 +751,17 @@ details[open] summary{border-bottom:1px solid var(--linea)}
     </div>
     <div class="leyenda">
       <ol>
-        <li><span class="num">1</span><div><strong>Vincular archivo nuevo</strong> <span>— crea el .json y empieza a escribir en él desde ahora.</span></div></li>
+        <li><span class="num">1</span><div><strong>Guardar en un archivo…</strong> <span>— crea el .json y empieza a escribir en él desde ahora.</span></div></li>
       </ol>
     </div>
   </div>
 
   <div class="oscuro-caja">
-    <strong>Por qué guardarlo en la MISMA carpeta de tus materiales.</strong> Si <code>pauta.json</code> vive dentro de la carpeta sincronizada que ya usas para este curso, tu planeación deja de estar atada a una sola computadora. En la del salón de clases, en la de tu oficina o en cualquiera de las salas de profesores: abres <a href="/" target="_blank" rel="noopener">pauta-docente.netlify.app</a>, entras a «Archivo → Vincular archivo» → «Abrir archivo existente», y eliges ese mismo archivo dentro de esa carpeta. Verás tu planeación completa, tal como la dejaste — sin copiar nada a mano.
+    <strong>Por qué guardarlo en la MISMA carpeta de tus materiales.</strong> Si <code>pauta.json</code> vive dentro de la carpeta sincronizada que ya usas para este curso, tu planeación deja de estar atada a una sola computadora. En la del salón de clases, en la de tu oficina o en cualquiera de las salas de profesores: abres <a href="/" target="_blank" rel="noopener">pauta-docente.netlify.app</a>, entras a «Mis datos» → «Ya tengo un archivo: abrirlo…», y eliges ese mismo archivo dentro de esa carpeta. Verás tu planeación completa, tal como la dejaste — sin copiar nada a mano.
   </div>
 
-  <h3>En una computadora nueva: «Abrir archivo existente»</h3>
-  <p>Es la opción de al lado. Elige el <code>.json</code> que ya vinculaste desde tu carpeta sincronizada y Pauta carga todo lo que tenías.</p>
+  <h3>En una computadora nueva: «Ya tengo un archivo: abrirlo…»</h3>
+  <p>Es la opción de al lado. Elige el <code>.json</code> que ya usas, dentro de tu carpeta sincronizada, y Pauta carga todo lo que tenías. Si más adelante quieres usar otro archivo, o dejar de usar uno, en <em>Mis datos</em> está «Cambiar…».</p>
 
   <div class="oscuro-caja">
     <strong>La carpeta tiene que estar en el disco, no solo en línea.</strong> Todas las nubes tienen un modo que deja los archivos en el servidor y baja solo los que abres, para ahorrar espacio. Si <code>pauta.json</code> cae en esa situación, Pauta no puede escribir en él. Cómo marcar esa carpeta como disponible sin conexión:
@@ -774,28 +775,28 @@ details[open] summary{border-bottom:1px solid var(--linea)}
   </div>
 
   <div class="nota-caja">
-    De vez en cuando el navegador vuelve a pedir permiso sobre el archivo vinculado — es normal, una medida de seguridad del propio navegador, no un error de Pauta. Cuando pase, entra a <em>Archivo → Vincular archivo</em> y usa el botón <strong>Reconectar</strong>. <strong>Lo que hayas escrito mientras tanto no se pierde:</strong> sigue guardándose en el navegador, y al reconectar Pauta lo escribe en el archivo.
+    De vez en cuando el navegador vuelve a pedir permiso sobre tu archivo — es normal, una medida de seguridad del propio navegador, no un error de Pauta. Cuando pase, entra a <em>Mis datos</em> y usa el botón <strong>Reconectar</strong>. <strong>Lo que hayas escrito mientras tanto no se pierde:</strong> sigue guardándose en el navegador, y al reconectar Pauta lo escribe en el archivo.
   </div>
 
   <h3>Si otra computadora cambia el archivo mientras tienes Pauta abierta</h3>
   <p>Pasa, por ejemplo, cuando dejas Pauta abierta en casa, trabajas en la oficina y al día siguiente vuelves a la pestaña de casa. Pauta <strong>no escribe encima</strong> de lo que guardó la otra computadora: se detiene, avisa con un cuadro y el indicador de guardado se pone en rojo («Otra computadora cambió el archivo»). Tus cambios siguen a salvo en el navegador y el archivo no se toca hasta que decidas:</p>
   <ul>
-    <li><strong>Usar la versión del archivo</strong> — cargas lo que guardó la otra computadora. Lo que tenías en esta pestaña se archiva antes como copia de seguridad.</li>
-    <li><strong>Guardar la mía encima</strong> — el archivo queda con lo de esta pestaña. La versión que había se archiva antes como copia de seguridad.</li>
+    <li><strong>Usar la versión del archivo</strong> — cargas lo que guardó la otra computadora. Lo que tenías en esta pestaña se guarda antes como versión anterior.</li>
+    <li><strong>Guardar la mía encima</strong> — el archivo queda con lo de esta pestaña. La versión que había se guarda antes como versión anterior.</li>
     <li><strong>Decidir después</strong> — no pasa nada con el archivo; puedes resolverlo más tarde desde el indicador de guardado.</li>
   </ul>
-  <p>Sea cual sea tu elección, la otra versión queda en <a href="#respaldos">Copias de seguridad</a>, así que nada se pierde. Para que Pauta pueda comparar versiones no hace falta que los relojes de las computadoras coincidan.</p>
+  <p>Sea cual sea tu elección, la otra versión queda en las <a href="#respaldos">versiones anteriores</a>, así que nada se pierde. Para que Pauta pueda comparar versiones no hace falta que los relojes de las computadoras coincidan.</p>
 </section>
 
 <!-- ============================================================ -->
 <section class="seccion" id="respaldos">
   <div class="cabecera">
     <div class="meta">Guardar</div>
-    <h2>Copias de seguridad</h2>
-    <p>Además de tu archivo, Pauta archiva versiones por su cuenta, para que puedas volver atrás si borraste algo sin darte cuenta o importaste el respaldo equivocado.</p>
+    <h2>Versiones anteriores</h2>
+    <p>Además de tu archivo, Pauta guarda versiones por su cuenta, para que puedas volver atrás si borraste algo sin darte cuenta o cargaste el archivo equivocado.</p>
   </div>
 
-  <p>El reparto importa más que el número. Guardar una copia con cada dato que capturas suena a más seguridad y es lo contrario: en diez minutos las ranuras quedarían ocupadas por tres versiones casi idénticas de hace un rato, y el estado de ayer —el único al que querrías volver— se habría perdido. Por eso se conservan en dos tramos:</p>
+  <p>El reparto importa más que el número. Guardar una versión con cada dato que capturas suena a más seguridad y es lo contrario: en diez minutos las ranuras quedarían ocupadas por tres versiones casi idénticas de hace un rato, y el estado de ayer —el único al que querrías volver— se habría perdido. Por eso se conservan en dos tramos:</p>
 
   <div class="grid">
     <div class="item">
@@ -809,14 +810,14 @@ details[open] summary{border-bottom:1px solid var(--linea)}
   </div>
 
   <div class="nota-caja">
-    <strong>Si tu planeación es muy grande</strong>, cada copia ocupa lo que ocupa todo el panel, y el navegador solo deja unos cinco millones de caracteres por sitio. Pauta no deja que las copias se queden con ese espacio: guarda menos —primero suelta las recientes de más, después los días más viejos— para que <em>lo que escribes ahora</em> siempre quepa. Si aun así tuvo que soltar copias, el indicador de guardado te lo dice. Para una planeación así de grande lo más seguro es <a href="#nube">vincular un archivo</a>, que no tiene ese límite.
+    <strong>Si tu planeación es muy grande</strong>, cada versión ocupa lo que ocupa todo el panel, y el navegador solo deja unos cinco millones de caracteres por sitio. Pauta no deja que las versiones se queden con ese espacio: guarda menos —primero suelta las recientes de más, después los días más viejos— para que <em>lo que escribes ahora</em> siempre quepa. Si aun así tuvo que soltar versiones, <em>Mis datos</em> te lo dice. Para una planeación así de grande lo más seguro es <a href="#nube">guardar en un archivo</a>, que no tiene ese límite.
   </div>
 
-  <p>Antes de cualquier operación que sustituya todo —abrir otro archivo, importar un respaldo, restaurar una copia— se archiva siempre, sin esperar. Las copias aparecen al final de la ventana «Dónde se guardan tus datos»:</p>
+  <p>Antes de cualquier operación que sustituya todo —abrir otro archivo, cargar datos de un archivo, restaurar una versión— se guarda siempre una, sin esperar. Están al final de <em>Mis datos</em>, plegadas en «Versiones anteriores»; se despliegan solas cuando algo salió mal:</p>
 
   <div class="maqueta" style="max-width:480px">
     <div style="padding:14px 16px">
-      <h4 style="font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:var(--gris-tenue);margin-bottom:6px">Copias de seguridad</h4>
+      <h4 style="font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:var(--gris-tenue);margin-bottom:6px">Versiones anteriores</h4>
       <div class="m-copia nueva">
         <span class="m-cuando">Hoy, 10:32</span>
         <span class="m-que">mientras trabajabas · 2 materias, 5 sesiones</span>
@@ -824,7 +825,7 @@ details[open] summary{border-bottom:1px solid var(--linea)}
       </div>
       <div class="m-copia">
         <span class="m-cuando">Ayer, 18:10</span>
-        <span class="m-que">antes de importar un respaldo · 2 materias, 5 sesiones</span>
+        <span class="m-que">antes de cargar datos de un archivo · 2 materias, 5 sesiones</span>
         <span class="m-mini">Restaurar</span>
       </div>
       <div class="m-copia">
@@ -836,10 +837,10 @@ details[open] summary{border-bottom:1px solid var(--linea)}
   </div>
 
   <div class="nota-caja">
-    «Restaurar» sustituye lo que hay ahora — pero antes archiva el estado actual como una copia más, así que nunca pierdes la versión de la que partiste.
+    «Restaurar» sustituye lo que hay ahora — pero antes guarda el estado actual como una versión más, así que nunca pierdes la versión de la que partiste.
   </div>
 
-  <p>Estas copias viven en el navegador, no en tu nube: si abres Pauta en otra computadora no las vas a encontrar ahí. Por eso son un respaldo <em>local</em>, complementario a tener el archivo vinculado — no un sustituto.</p>
+  <p>Estas versiones viven en el navegador, no en tu nube: si abres Pauta en otra computadora no las vas a encontrar ahí. Son una red <em>local</em>, complementaria a guardar en un archivo — no un sustituto.</p>
 </section>
 
 <!-- ============================================================ -->
@@ -1051,12 +1052,12 @@ details[open] summary{border-bottom:1px solid var(--linea)}
       <p>Imprime la sesión activa como guion de papel, sin botones ni interfaz.</p>
     </div>
     <div class="item">
-      <h4>Exportar a Markdown</h4>
-      <p>Descarga la materia activa en texto plano: sesiones, recursos, ligas, notas y bitácoras.</p>
+      <h4>Descargar como texto (.md)</h4>
+      <p>En el menú <strong>⋯</strong> de cada materia, en la columna izquierda. Descarga la materia en texto: sesiones, recursos, ligas, notas y bitácoras. Se abre con cualquier editor.</p>
     </div>
     <div class="item">
-      <h4>Plantilla del curso</h4>
-      <p>Como la anterior, pero sin ligas ni bitácoras — para compartir tu planeación sin exponer tus URLs privadas.</p>
+      <h4>Duplicar materia</h4>
+      <p>En el menú <strong>⋯</strong> de cada materia. Hace una copia de ella, con dos opciones. <strong>Copia para otro semestre</strong> conserva tus recursos <em>con sus ligas</em>, la carpeta y el cuaderno: para volver a dar el mismo curso. <strong>Estructura para otro curso o taller</strong> quita <em>todas</em> las ligas, también las escritas dentro de las notas, y deja solo el esqueleto: para empezar algo nuevo o compartirla sin exponer tus direcciones. En las dos las bitácoras se quedan fuera y los recursos vuelven a «pendiente». Puedes cambiar el nombre, el periodo y el tipo, y mover las fechas a una nueva primera sesión. La copia se <strong>agrega a tu panel</strong> junto a tus otras materias, o se descarga como archivo. Al cargar un archivo que trae una sola materia (<em>Mis datos → Cargar datos de un archivo</em>), Pauta pregunta si <em>agregarla como materia nueva</em> o <em>sustituir todo</em>; uno con varias materias siempre sustituye todo, previa confirmación.</p>
     </div>
     <div class="item">
       <h4>Nueva nota</h4>
@@ -1093,27 +1094,42 @@ details[open] summary{border-bottom:1px solid var(--linea)}
 
   <details>
     <summary>¿Pauta funciona sin internet?</summary>
-    <div class="resp"><p>Una vez cargada la página, sí. Pero si tu archivo vinculado está en una carpeta sincronizada, necesitas conexión para que tu nube lleve esos cambios a tus otras computadoras.</p></div>
+    <div class="resp"><p>Una vez cargada la página, sí. Pero si tu archivo está en una carpeta sincronizada, necesitas conexión para que tu nube lleve esos cambios a tus otras computadoras.</p></div>
+  </details>
+
+  <details>
+    <summary>¿Qué significa «No se pudo escribir en tu archivo porque está en uso»?</summary>
+    <div class="resp"><p>Otro programa tenía el archivo abierto justo cuando Pauta quiso escribir en él —suele ser la aplicación de tu nube, sincronizándolo—. Pauta espera unos segundos y lo vuelve a intentar sola; casi siempre basta y no ves nada. Si el aviso aparece, tus cambios <strong>están a salvo en el navegador</strong> y Pauta lo reintenta en el siguiente cambio. No hace falta reconectar: eso solo es cuando el aviso habla del <em>permiso</em> o de que el archivo <em>ya no está donde estaba</em>.</p></div>
+  </details>
+
+  <details>
+    <summary>Pauta abrió con datos de ejemplo y dijo que lo guardado estaba dañado. ¿Perdí mi planeación?</summary>
+    <div class="resp"><p>Probablemente no. Cuando Pauta no puede leer lo que había guardado en el navegador, <strong>lo conserva aparte, sin tocarlo</strong>, antes de dejarte trabajar con los datos de ejemplo. Entra a <em>Mis datos</em>: ahí aparece <em>«Se conservó aparte una versión que no se pudo leer»</em>, con un botón para descargarla, y las <a href="#respaldos">versiones anteriores</a> ya desplegadas: restaura la más reciente. Si tienes tus datos descargados, cárgalos con <em>Cargar datos de un archivo</em>.</p></div>
+  </details>
+
+  <details>
+    <summary>Pauta tarda en abrir mi archivo</summary>
+    <div class="resp"><p>Si el archivo está «solo en línea», la aplicación de tu nube tiene que descargarlo primero. Pauta espera unos segundos con el indicador en «Abriendo tu archivo…»; si no llega, abre la copia de este navegador y te lo dice. Cuando el archivo esté disponible entra a <em>Mis datos</em> y usa <strong>Reconectar</strong>: lo que hayas escrito mientras tanto se guarda en el archivo, no se pierde. Para que no vuelva a pasar, marca la carpeta como <a href="#nube">disponible sin conexión</a>.</p></div>
   </details>
 
   <details>
     <summary>¿Por qué me vuelve a pedir permiso sobre el archivo?</summary>
-    <div class="resp"><p>Es el propio navegador, no Pauta: por seguridad, Chrome y Edge piden confirmar el acceso cada cierto tiempo. Se resuelve con el botón <strong>Reconectar</strong> dentro de <em>Archivo → Vincular archivo</em>.</p></div>
+    <div class="resp"><p>Es el propio navegador, no Pauta: por seguridad, Chrome y Edge piden confirmar el acceso cada cierto tiempo. Se resuelve con el botón <strong>Reconectar</strong> dentro de <em>Mis datos</em>.</p></div>
   </details>
 
   <details>
-    <summary>Cerré la pestaña sin vincular archivo. ¿Perdí mi planeación?</summary>
-    <div class="resp"><p>No: si estabas en modo «navegador», tus datos siguen guardados en este navegador y esta computadora. Ábrelo de nuevo en el mismo Chrome o Edge y ahí van a estar. Si no aparecen, revisa las <a href="#respaldos">copias de seguridad</a>.</p></div>
+    <summary>Cerré la pestaña sin guardar en un archivo. ¿Perdí mi planeación?</summary>
+    <div class="resp"><p>No: si estabas en modo «navegador», tus datos siguen guardados en este navegador y esta computadora. Ábrelo de nuevo en el mismo Chrome o Edge y ahí van a estar. Si no aparecen, revisa las <a href="#respaldos">versiones anteriores</a>.</p></div>
   </details>
 
   <details>
     <summary>¿Puedo usar el mismo archivo desde varias computadoras?</summary>
-    <div class="resp"><p>Sí — es justo el punto de <a href="#nube">vincularlo dentro de tu carpeta sincronizada</a>. En cada computadora usas <em>Archivo → Vincular archivo → Abrir archivo existente</em> y eliges ese mismo .json.</p></div>
+    <div class="resp"><p>Sí — es justo el punto de <a href="#nube">guardarlo dentro de tu carpeta sincronizada</a>. En cada computadora usas <em>Mis datos → Ya tengo un archivo: abrirlo…</em> y eliges ese mismo .json.</p></div>
   </details>
 
   <details>
     <summary>¿Mis ligas de la nube son privadas?</summary>
-    <div class="resp"><p>Sí, Pauta no las envía a ningún servidor. Pero los respaldos <code>.json</code> sí las incluyen, con sus claves de uso compartido — no subas ese archivo a un repositorio abierto ni lo compartas fuera de tu nube institucional.</p></div>
+    <div class="resp"><p>Sí, Pauta no las envía a ningún servidor. Pero los <code>.json</code> —tu archivo y lo que descargues— sí las incluyen, con sus claves de uso compartido — no subas ese archivo a un repositorio abierto ni lo compartas fuera de tu nube institucional.</p></div>
   </details>
 
   <details>
@@ -1125,7 +1141,7 @@ details[open] summary{border-bottom:1px solid var(--linea)}
     <summary>Antes se llamaba «Pauta» y estaba en otra dirección. ¿Perdí algo?</summary>
     <div class="resp">
       <p>No. La dirección anterior reenvía sola a esta, así que las ligas viejas siguen funcionando.</p>
-      <p>Lo único que no viaja es lo guardado «en este navegador»: ese almacenamiento está atado a la dirección, y esta es nueva. Si usabas Pauta sin archivo vinculado, tu planeación sigue intacta en la dirección anterior: ábrela, usa <em>Archivo → Guardar respaldo</em> y luego <em>Archivo → Importar respaldo</em> aquí. Si tenías archivo vinculado, no tienes que hacer nada.</p>
+      <p>Lo único que no viaja es lo guardado «en este navegador»: ese almacenamiento está atado a la dirección, y esta es nueva. Si usabas Pauta sin guardar en un archivo, tu planeación sigue intacta en la dirección anterior: ábrela, usa <em>Descargar mis datos</em> y luego, aquí, <em>Mis datos → Cargar datos de un archivo</em>. Si guardabas en un archivo, no tienes que hacer nada.</p>
     </div>
   </details>
 

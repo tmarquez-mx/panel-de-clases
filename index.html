@@ -66,10 +66,11 @@
 <path d="M0 0 C0.825 0.165 0.825 0.165 5 1 C4.34 2.32 3.68 3.64 3 5 C2.01 4.67 1.02 4.34 0 4 C0 2.68 0 1.36 0 0 Z " fill="#262626" transform="translate(842,266)"/>
 </svg>
   <div class="der">
+    <!-- «Mis datos»: el único lugar para todo lo que tiene que ver con tus
+         datos —dónde se guardan, llevarlos a otra computadora, volver a una
+         versión anterior—. Muestra además si están guardados. -->
     <button class="chip-guardado" id="estado-guardado" aria-haspopup="dialog"
-      title="Ver dónde y cuándo se guardó"></button>
-    <button class="btn" id="btn-archivo" aria-haspopup="menu"
-      title="Vincular archivo, importar y guardar respaldos, exportar">Archivo</button>
+      title="Mis datos: dónde se guardan, descargarlos, cargarlos y volver a una versión anterior"></button>
     <div class="escala-texto" role="group" aria-label="Tamaño del texto">
       <button class="btn-icono" id="btn-texto-menos" title="Reducir el tamaño del texto" aria-label="Reducir el tamaño del texto">A<span class="menos">−</span></button>
       <button class="btn-icono" id="btn-texto-reset" title="Volver al tamaño normal" aria-label="Volver al tamaño normal del texto">A</button>
@@ -77,13 +78,10 @@
     </div>
     <a class="btn" href="/ayuda" target="_blank" rel="noopener" title="Abrir la guía de uso, con ejemplos paso a paso">Ayuda</a>
 
-    <!-- Siguen en el documento, accionados desde el menú «Archivo»: así
-         conservan sus manejadores, sus nombres y sus confirmaciones. -->
-    <button class="btn" id="btn-vincular" hidden title="Elegir un archivo .json del disco donde el panel escriba cada cambio, y ver dónde se está guardando">Vincular archivo</button>
-    <button class="btn" id="btn-importar" hidden title="Cargar un respaldo .json. Sustituye todo lo que hay ahora en el panel, previa confirmación">Importar respaldo</button>
-    <button class="btn" id="btn-json" hidden title="Descargar todo el panel como archivo .json, con todas las materias">Guardar respaldo</button>
-    <button class="btn" id="btn-md" hidden title="Descargar la materia activa en texto: sesiones, recursos, ligas, notas y bitácoras">Exportar a Markdown</button>
-    <button class="btn" id="btn-plantilla" hidden title="Descargar la materia activa sin ligas ni bitácoras, para compartirla sin filtrar tus URLs">Plantilla del curso</button>
+    <!-- Siguen en el documento, accionados desde el menú «⋯» de cada
+         materia: así conservan sus manejadores, nombres y confirmaciones. -->
+    <button class="btn" id="btn-md" hidden title="Descargar esta materia como texto (.md): sesiones, recursos, ligas, notas y bitácoras. Se abre con cualquier editor">Descargar como texto (.md)</button>
+    <button class="btn" id="btn-plantilla" hidden title="Hacer una copia de esta materia: con sus recursos y ligas, para darla otro semestre, o solo su estructura, sin ligas, para otro curso o un taller">Duplicar materia…</button>
   </div>
 </header>
 
@@ -189,7 +187,7 @@
           <textarea id="txt-bitacora" placeholder="Qué funcionó, qué quedó pendiente, con qué empezar la próxima vez."
             title="Notas de después de la clase. Se guardan solas mientras escribes"></textarea>
           <p class="solo-impresion" id="bitacora-impresa"></p>
-          <p class="pie-bit">Se guarda dentro del respaldo del panel (no en tu nube) y sale en la exportación a Markdown.</p>
+          <p class="pie-bit">Se guarda con el resto de tus datos y sale al descargar la materia como texto.</p>
         </div>
       </details>
     </section>
@@ -502,22 +500,13 @@
 <dialog id="dlg-almacen" aria-labelledby="alm-titulo-dlg">
   <form method="dialog">
     <div class="dlg-cuerpo">
-      <h3 id="alm-titulo-dlg">Dónde se guardan tus datos</h3>
+      <h3 id="alm-titulo-dlg">Mis datos</h3>
       <div id="alm-cuerpo"></div>
-
-      <details class="alm-ayuda" id="alm-ayuda">
-        <summary title="Desplegar la explicación de dónde quedan los datos y cómo volver a una copia anterior">Guardado y respaldos</summary>
-        <div class="alm-ayuda-cuerpo" id="alm-ayuda-cuerpo"></div>
-        <p class="alm-ayuda-liga"><a href="/ayuda#como-guarda" target="_blank" rel="noopener"
-          title="Abrir la guía de Pauta en otra pestaña, en la sección de guardado">Ver la guía completa sobre guardado ↗</a></p>
-      </details>
+      <p class="alm-ayuda-liga"><a href="/ayuda#como-guarda" target="_blank" rel="noopener"
+        title="Abrir la guía de Pauta en otra pestaña, en la sección de guardado">Cómo funciona el guardado ↗</a></p>
     </div>
     <div class="dlg-pie">
-      <button type="button" class="btn" id="btn-alm-reconectar" title="Volver a pedir permiso sobre el archivo vinculado y seguir escribiendo en él">Reconectar</button>
-      <button type="button" class="btn" id="btn-alm-nuevo" title="Crear un .json nuevo y escribir ahí cada cambio, de aquí en adelante">Vincular archivo nuevo</button>
-      <button type="button" class="btn" id="btn-alm-existente" title="Abrir un .json que ya tengas y seguir escribiendo en él">Abrir archivo existente</button>
       <div class="derecha">
-        <button type="button" class="btn peligro" id="btn-alm-desvincular" title="Dejar de escribir en el archivo. Los datos siguen en este navegador">Desvincular</button>
         <button class="btn btn-solido" value="cerrar" title="Cerrar esta ventana">Cerrar</button>
       </div>
     </div>
@@ -613,7 +602,7 @@
         <button type="button" class="btn" id="btn-con-archivo"
           title="Cargar lo que guardó la otra computadora. Lo que hay en esta pestaña se guarda antes como versión anterior">Usar la versión del archivo</button>
         <button type="button" class="btn btn-solido" id="btn-con-mia"
-          title="Escribir lo de esta pestaña en el archivo. La versión que hay ahora en el archivo se guarda antes como copia de seguridad">Guardar la mía encima</button>
+          title="Escribir lo de esta pestaña en el archivo. La versión que hay ahora en el archivo se guarda antes como versión anterior">Guardar la mía encima</button>
       </div>
     </div>
   </form>

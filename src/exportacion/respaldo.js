@@ -1,4 +1,4 @@
-/* Respaldo completo en JSON y plantilla de curso para compartir. */
+/* «Descargar mis datos» (todo, en JSON) y la descarga de «Duplicar materia». */
 
 import { descargar, nombreLimpio } from "./descargar.js";
 import { VERSION_DATOS, copiaDeMateria } from "../datos/modelo.js";

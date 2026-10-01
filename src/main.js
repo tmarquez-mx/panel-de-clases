@@ -79,7 +79,7 @@ function pintarIndicador({ modo, situacion, hora, detalle, necesitaReconectar, n
   else largo = `Se guardará ${TEXTO_DE_MODO[modo]}.`;
 
   const pendientes = [];
-  if (necesitaReconectar) pendientes.push("el archivo vinculado necesita permiso");
+  if (necesitaReconectar) pendientes.push("tu archivo necesita permiso");
   if (detalle && situacion !== "error") pendientes.push(detalle);
   if (pendientes.length) largo += ` Pendiente: ${pendientes.join(" · ")}.`;
 
@@ -93,43 +93,19 @@ function pintarIndicador({ modo, situacion, hora, detalle, necesitaReconectar, n
   const firma = `${modo}|${nombreArchivo}`;
   if (firma !== pieVigente) {
     pieVigente = firma;
-    pintarPie(modo, nombreArchivo);
+    pintarPie(modo);
   }
 }
 
-function pintarPie(modo, nombreArchivo) {
-  const donde = {
-    archivo: `<p><strong>Cómo guarda tu trabajo.</strong> Cada cambio se escribe solo en el archivo
-      <em>${esc(nombreArchivo)}</em> y, además, queda una copia en este navegador. Si el archivo está en una
-      carpeta sincronizada —OneDrive, Google Drive, Dropbox, iCloud: la que uses—, el respaldo viaja solo a
-      tus otras computadoras.</p>`,
-    navegador: `<p><strong>Cómo guarda tu trabajo.</strong> Cada cambio se guarda solo en este navegador y en
-      esta computadora. No viaja a ningún servidor. Para pasar tus datos a la computadora del salón usa
-      <em>Guardar respaldo</em> aquí e <em>Importar respaldo</em> allá; en Chrome o Edge también puedes usar
-      <em>Vincular archivo</em> y dejar el respaldo en tu carpeta sincronizada.</p>`,
-    memoria: `<p><strong>Atención: aquí no se guarda nada.</strong> Este navegador no permite almacenamiento
-      local, así que todo lo que escribas se pierde al cerrar la pestaña. Usa <em>Guardar respaldo</em> antes de
-      salir e <em>Importar respaldo</em> al volver.</p>`,
-  };
-
-  /* Estas explicaciones vivían repetidas al pie de cada sesión, donde se
-     leían una vez y después solo ocupaban sitio. Ahora están en «Guardado y
-     respaldos», dentro del diálogo que abre el indicador de guardado, y en
-     la guía. Al pie solo se queda lo que es un problema concreto y ahora. */
-  $("#alm-ayuda-cuerpo").innerHTML = `
-    ${donde[modo] || donde.navegador}
-    <p><strong>Para que funcione en cualquier computadora,</strong> usa ligas de tu nube en lugar de rutas del
-    disco. Las rutas locales (<span class="ruta" style="display:inline">file://</span>) no abren con un clic desde
-    el navegador. El botón <em>Revisar enlaces</em> las encuentra todas antes de la clase.</p>
-    <p><strong>La carpeta tiene que estar en el disco, no solo en línea.</strong> Drive en modo transmisión,
-    la sincronización inteligente de Dropbox y «Optimizar almacenamiento» en iCloud pueden dejar el archivo
-    fuera de la computadora, y entonces Pauta no puede escribir en él. Marca esa carpeta como disponible sin
-    conexión.</p>
-    <p><strong>Tus ligas son privadas.</strong> Los respaldos incluyen las ligas de tu nube, que llevan claves de
-    uso compartido. No los subas a un repositorio abierto.</p>`;
-
-  // El aviso al pie solo aparece cuando hay algo que resolver.
-  $("#pie-pagina").innerHTML = modo === "memoria" ? donde.memoria : "";
+function pintarPie(modo) {
+  /* Las explicaciones de cómo se guarda viven en la guía, enlazada desde
+     «Mis datos». Al pie solo se queda lo que es un problema concreto y ahora. */
+  $("#pie-pagina").innerHTML =
+    modo === "memoria"
+      ? `<p><strong>Atención: aquí no se guarda nada.</strong> Este navegador no permite almacenamiento
+          local, así que todo lo que escribas se pierde al cerrar la pestaña. Antes de salir, abre
+          <em>Mis datos</em> y usa <em>Descargar mis datos</em>; al volver, <em>Cargar datos de un archivo</em>.</p>`
+      : "";
   $("#pie-pagina").hidden = modo !== "memoria";
 }
 
@@ -144,8 +120,81 @@ function cargarEnElPanel(datosCrudos, { guardar = false } = {}) {
 
 /* ========================= Importar respaldo ========================= */
 
+/* Un archivo con una sola materia casi nunca es un respaldo de todo el panel:
+   es una «Copia para otro semestre», una «Estructura» o la materia que pasó
+   una colega. Sustituirlo todo con ella dejaba a la usuaria solo con esa
+   materia, así que en ese caso se pregunta. Con dos o más materias el archivo
+   es un respaldo completo y se sigue confirmando como antes. */
+
+let importacionPendiente = null; // { crudos, previo } hasta que se elige en el diálogo
+
+const cuentaDeSesiones = (n) => `${n} ${n === 1 ? "sesión" : "sesiones"}`;
+
+/** «2 sesiones», «2 bloques» o «2 presentaciones», según lo que sea la materia. */
+function cuentaDeEncuentros(m) {
+  const v = voz(m);
+  const n = m.sesiones.length;
+  return `${n} ${(n === 1 ? v.encuentro : v.encuentros).toLowerCase()}`;
+}
+
+function sustituirTodoCon(crudos) {
+  archivarCopia(estado.datos, "antes de cargar datos de un archivo");
+  cargarEnElPanel(crudos, { guardar: true });
+  mostrarAviso("Se cargaron los datos del archivo. Lo que había antes quedó en «Mis datos», entre las versiones anteriores.");
+}
+
+function agregarMateriaImportada(previo) {
+  const nueva = previo.materias[0];
+  // Si el archivo salió de este mismo panel, su id ya existe: se le da uno propio.
+  if (estado.datos.materias.some((m) => m.id === nueva.id)) nueva.id = identificador();
+  // Sus tipos propios se suman a los del panel, para que no se pierdan al editar.
+  estado.datos.tipos = [...new Set([...(estado.datos.tipos || []), ...previo.tipos])].sort();
+  estado.datos.materias.push(nueva);
+  irAMateria(estado.datos.materias.length - 1);
+  actualizar();
+  mostrarAviso(
+    `Se agregó «${nueva.nombre}» a tu panel, con ${cuentaDeEncuentros(nueva)}. ` +
+      "Tus otras materias siguen igual. Si no la querías, elimínala desde su menú ⋯ → Editar."
+  );
+}
+
+function abrirDlgImportar(crudos, previo) {
+  const m = previo.materias[0];
+  const recursos = m.sesiones.reduce((n, s) => n + s.recursos.length, 0);
+  const tuyas = estado.datos?.materias?.length || 0;
+  importacionPendiente = { crudos, previo };
+  $("#imp-cuerpo").innerHTML = `
+    <p class="sub">${esc(voz(m).etiqueta)} «${esc(m.nombre)}»${m.clave ? ` · ${esc(m.clave)}` : ""} · ${esc(cuentaDeEncuentros(m))} y ${recursos} recurso${recursos === 1 ? "" : "s"}</p>
+    <p>Tu panel tiene ahora ${tuyas} materia${tuyas === 1 ? "" : "s"}. Elige qué hacer con la del archivo:</p>
+    <ul class="alm-lista">
+      <li><strong>Agregar como materia nueva</strong>: queda junto a tus otras materias. No se toca nada de lo que ya tienes.</li>
+      <li><strong>Sustituir todo</strong>: el panel queda solo con esta materia. Lo que hay ahora se guarda antes entre las versiones anteriores, en «Mis datos».</li>
+    </ul>`;
+  $("#dlg-importar").showModal();
+}
+
+/** Lo que espera respuesta, una sola vez: un doble clic no agrega dos copias. */
+function tomarImportacion() {
+  const pendiente = importacionPendiente;
+  importacionPendiente = null;
+  $("#dlg-importar").close("cerrar");
+  return pendiente;
+}
+
+function montarDlgImportar() {
+  $("#btn-imp-agregar").addEventListener("click", () => {
+    const pendiente = tomarImportacion();
+    if (pendiente) agregarMateriaImportada(pendiente.previo);
+  });
+
+  $("#btn-imp-sustituir").addEventListener("click", () => {
+    const pendiente = tomarImportacion();
+    if (pendiente) sustituirTodoCon(pendiente.crudos);
+  });
+}
+
 function montarImportacion() {
-  $("#btn-importar").addEventListener("click", () => $("#archivo-json").click());
+  montarDlgImportar();
 
   $("#archivo-json").addEventListener("change", (e) => {
     const archivo = e.target.files?.[0];
@@ -170,11 +219,10 @@ function montarImportacion() {
       try {
         const previo = migrar(crudos); // valida antes de tocar nada de lo que ya hay
         const materias = previo.materias.length;
+        if (materias === 1) return abrirDlgImportar(crudos, previo);
         const sesiones = previo.materias.reduce((n, m) => n + m.sesiones.length, 0);
-        if (!confirmar(`El respaldo trae ${materias} materia${materias === 1 ? "" : "s"} y ${sesiones} ${sesiones === 1 ? "sesión" : "sesiones"}. Sustituirá todo lo que hay ahora en el panel. ¿Continuar?`)) return;
-        archivarCopia(estado.datos, "antes de importar un respaldo");
-        cargarEnElPanel(crudos, { guardar: true });
-        mostrarAviso("Se cargó el respaldo. Lo que había antes quedó guardado como copia, en «Vincular archivo».");
+        if (!confirmar(`El archivo trae ${materias} materias y ${cuentaDeSesiones(sesiones)}. Sustituirá todo lo que hay ahora en el panel. ¿Continuar?`)) return;
+        sustituirTodoCon(crudos);
       } catch (error) {
         avisar(
           error instanceof ErrorDeDatos
@@ -195,7 +243,64 @@ function montarExportaciones() {
     if (m) exportarMarkdown(m);
   });
 
-  $("#btn-plantilla").addEventListener("click", () => {
+  $("#btn-plantilla").addEventListener("click", abrirDlgPlantilla);
+}
+
+/* ========================= Duplicar materia ========================= */
+
+/* Copiar una materia sirve a dos usos opuestos —volver a dar el curso con los
+   mismos recursos, o empezar otro curso o un taller con el esqueleto—, así que
+   se elige aquí, con la materia delante. «Agregar a mi panel» ahorra el rodeo de
+   descargar el archivo e importarlo, que además pregunta si agregar o sustituir. */
+
+const modoElegido = () => document.querySelector('input[name="pl-modo"]:checked')?.value || "semestre";
+
+/** Las etiquetas siguen a lo que se está eligiendo: curso, taller o ponencia. */
+function rotularDlgPlantilla() {
+  const v = voz({ clase: $("#pl-clase").value });
+  $("#lbl-pl-nombre").textContent = v.campoNombre;
+  $("#lbl-pl-clave").textContent = v.campoClave;
+  $("#pl-clave").placeholder = v.ejemploClave;
+}
+
+function abrirDlgPlantilla() {
+  const m = materia();
+  if (!m) return;
+  const recursos = m.sesiones.reduce((n, s) => n + s.recursos.length, 0);
+  $("#pl-sub").textContent = `«${m.nombre}» · ${cuentaDeEncuentros(m)} y ${recursos} recurso${recursos === 1 ? "" : "s"}`;
+  document.querySelector('input[name="pl-modo"][value="semestre"]').checked = true;
+  $("#pl-nombre").value = m.nombre;
+  $("#pl-clave").value = m.clave || "";
+  $("#pl-clase").value = m.clase || "curso";
+  $("#pl-fecha").value = "";
+  rotularDlgPlantilla();
+  $("#dlg-plantilla").showModal();
+  $("#pl-nombre").focus();
+}
+
+/** Lo que la usuaria eligió en el diálogo, o null si falta el nombre. */
+function opcionesDePlantilla() {
+  const nombre = $("#pl-nombre").value.trim();
+  if (!nombre) {
+    $("#pl-nombre").focus();
+    return null;
+  }
+  return {
+    modo: modoElegido(),
+    nombre,
+    clave: $("#pl-clave").value.trim(),
+    clase: $("#pl-clase").value,
+    primeraFecha: $("#pl-fecha").value,
+  };
+}
+
+function montarPlantilla() {
+  $("#pl-clase").addEventListener("change", rotularDlgPlantilla);
+  // Sin un botón de envío, Enter no cierra el diálogo ni pierde lo escrito.
+  $("#dlg-plantilla form").addEventListener("submit", (e) => e.preventDefault());
+
+  $("#btn-pl-descargar").addEventListener("click", () => {
+    const opciones = opcionesDePlantilla();
     const m = materia();
     if (!opciones || !m) return;
     exportarPlantilla(m, opciones);
@@ -241,37 +346,43 @@ function bloqueDondeSeGuardan() {
   const boton = (accion, texto, titulo, clase = "btn") =>
     `<button type="button" class="${clase}" data-alm="${accion}" title="${esc(titulo)}">${esc(texto)}</button>`;
 
-  const explicacion = {
-    archivo: `Ahora mismo el panel escribe en <strong>${esc(nombreArchivo)}</strong>, y deja además una copia en este navegador.`,
-    navegador: "Ahora mismo el panel guarda en <strong>este navegador</strong>: los datos sobreviven a cerrar la ventana, pero viven solo en esta computadora.",
-    memoria: "Ahora mismo el panel <strong>no puede guardar nada</strong>. Exporta un respaldo antes de cerrar la pestaña.",
-  };
+  let texto;
+  let botones = "";
+  if (necesitaReconectar) {
+    texto = `Se guardan en <strong>${esc(nombreArchivo || "tu archivo")}</strong>, pero el navegador necesita tu
+      permiso otra vez para seguir escribiendo en él. Mientras tanto, todo queda a salvo en este navegador.`;
+    botones =
+      boton("reconectar", "Reconectar", "Volver a dar permiso sobre el archivo y seguir escribiendo en él", "btn btn-solido") +
+      boton("existente", "Abrir otro archivo…", "Si el archivo cambió de lugar, elígelo otra vez");
+  } else if (modo === "archivo") {
+    texto = `En el archivo <strong>${esc(nombreArchivo)}</strong>. Si está en tu carpeta de OneDrive, Drive, Dropbox
+      o iCloud, te sigue a tus otras computadoras. Además queda una copia en este navegador.`;
+    botones = `<details class="alm-cambiar">
+        <summary title="Usar otro archivo, crear uno nuevo o dejar de guardar en un archivo">Cambiar…</summary>
+        <div class="alm-botones">
+          ${boton("existente", "Abrir otro archivo…", "Abrir un .json que ya tengas y guardar ahí de aquí en adelante")}
+          ${boton("nuevo", "Crear un archivo nuevo…", "Crear un .json nuevo con lo que hay ahora y guardar ahí de aquí en adelante")}
+          ${boton("desvincular", "Dejar de usar el archivo", "Dejar de escribir en el archivo. Tus datos siguen en este navegador", "btn peligro")}
+        </div>
+      </details>`;
+  } else if (modo === "memoria") {
+    texto = `<strong>En ningún lado:</strong> este navegador no deja guardar nada y todo se pierde al cerrar la
+      pestaña. Antes de salir, usa <em>Descargar mis datos</em>.`;
+  } else if (soportaArchivo) {
+    texto = `Solo en <strong>este navegador</strong>, en esta computadora. Guárdalos en un archivo dentro de tu
+      carpeta de OneDrive, Drive, Dropbox o iCloud y te seguirán a cualquier computadora.`;
+    botones =
+      boton("nuevo", "Guardar en un archivo…", "Crear un .json en la carpeta que elijas y guardar ahí cada cambio, de aquí en adelante", "btn btn-solido") +
+      boton("existente", "Ya tengo un archivo: abrirlo…", "Abrir el .json que ya usas en otra computadora y seguir guardando en él");
+  } else {
+    texto = `Solo en <strong>este navegador</strong>, en esta computadora. Guardar en un archivo de tu nube solo se
+      puede en Chrome y Edge (y no abriendo Pauta con doble clic desde el disco). Aquí, para llevar tus datos a
+      otra computadora, descárgalos y cárgalos allá.`;
+  }
 
-  const disponible = soportaArchivo
-    ? `<ul class="alm-lista">
-         <li>Vincular un archivo <code>.json</code> deja tus datos en un archivo que tú controlas.</li>
-         <li>Si lo pones en una carpeta sincronizada —OneDrive, Drive, Dropbox, iCloud—, el mismo respaldo llega a tus otras computadoras.</li>
-         <li>El navegador te pedirá permiso otra vez cada cierto tiempo. Es normal: se reconecta desde aquí.</li>
-       </ul>`
-    : `<ul class="alm-lista">
-         <li>Este navegador no tiene la API de acceso a archivos: hoy solo está en Chrome y en Edge, y no funciona
-             al abrir el panel con doble clic desde el disco.</li>
-         <li>Aquí el guardado automático usa el almacenamiento del navegador. Para mover los datos, usa
-             <em>Guardar respaldo</em> e <em>Importar respaldo</em>.</li>
-       </ul>`;
-
-  $("#alm-cuerpo").innerHTML = `
-    ${gestor.estado().hayConflicto ? `<div class="alm-modo">Otra computadora cambió el archivo y todavía no has decidido qué versión se queda. Mientras tanto no se escribe nada en él.
-      <button type="button" class="mini" data-resolver-conflicto title="Ver qué cambió y elegir qué versión se queda">Resolver ahora</button></div>` : ""}
-    <div class="alm-modo">${explicacion[modo] || explicacion.navegador}</div>
-    ${necesitaReconectar ? `<div class="alm-modo">El archivo vinculado necesita tu permiso otra vez. Presiona <strong>Reconectar</strong>; si el archivo cambió de lugar, usa «Abrir archivo existente».</div>` : ""}
-    ${disponible}
-    ${pintarCopias()}`;
-
-  $("#btn-alm-reconectar").hidden = !necesitaReconectar;
-  $("#btn-alm-nuevo").disabled = !soportaArchivo;
-  $("#btn-alm-existente").disabled = !soportaArchivo;
-  $("#btn-alm-desvincular").hidden = modo !== "archivo" && !necesitaReconectar;
+  return `<h4 class="alm-titulo">Dónde se guardan</h4>
+    <p class="alm-texto">${texto}</p>
+    ${botones ? `<div class="alm-botones">${botones}</div>` : ""}`;
 }
 
 function bloqueLlevar() {
@@ -297,12 +408,36 @@ function bloqueVersiones(abierto) {
           const sesiones = (copia.datos?.materias || []).reduce((n, m) => n + (m.sesiones?.length || 0), 0);
           return `<li>
             <span class="cuando">${esc(fechaHoraCorta(copia.fecha))}</span>
-            <span class="que">${esc(copia.motivo || "copia")} · ${materias} materia${materias === 1 ? "" : "s"}, ${sesiones} ${sesiones === 1 ? "sesión" : "sesiones"}</span>
-            <button type="button" class="mini" data-restaurar="${i}" title="Volver a esta versión del panel">Restaurar</button>
+            <span class="que">${esc(copia.motivo || "versión")} · ${materias} materia${materias === 1 ? "" : "s"}, ${sesiones} ${sesiones === 1 ? "sesión" : "sesiones"}</span>
+            <button type="button" class="mini" data-restaurar="${i}" title="Volver a esta versión de tus datos">Restaurar</button>
           </li>`;
         })
         .join("")}
-    </ul>`;
+      </ul>`
+    : `<p class="pista">Todavía no hay ninguna.</p>`;
+
+  return `<details class="alm-versiones"${abierto ? " open" : ""}>
+      <summary title="Ver las versiones que Pauta guarda sola, por si necesitas volver atrás">Versiones anteriores (${copias.length})</summary>
+      <p class="pista">Pauta las guarda sola en este navegador: al abrir, antes de cualquier cambio que sustituya todo y
+        cada pocos minutos mientras trabajas. Conserva las seis más recientes y una por día de la última semana.</p>
+      ${lista}
+    </details>`;
+}
+
+function pintarDialogoAlmacen() {
+  const danado = leerDanado();
+  const problemas =
+    (danado
+      ? `<div class="alm-modo">Se conservó aparte una versión que no se pudo leer (${Math.max(1, Math.round(danado.length / 1024))} KB). No se usa para nada; está por si alguien puede recuperar algo de ahí. Si buscas tus datos, mira las versiones anteriores.
+      <button type="button" class="mini" data-bajar-danado title="Descargar lo que no se pudo leer, como archivo de texto">Descargar</button>
+      <button type="button" class="mini" data-descartar-danado title="Borrar de este navegador lo que no se pudo leer. No se puede deshacer">Descartar</button></div>`
+      : "") +
+    (gestor.estado().hayConflicto
+      ? `<div class="alm-modo">Otra computadora cambió el archivo y todavía no has decidido qué versión se queda. Mientras tanto no se escribe nada en él.
+      <button type="button" class="mini" data-resolver-conflicto title="Ver qué cambió y elegir qué versión se queda">Resolver ahora</button></div>`
+      : "");
+
+  $("#alm-cuerpo").innerHTML = problemas + bloqueDondeSeGuardan() + bloqueLlevar() + bloqueVersiones(!!danado);
 }
 
 function restaurarCopia(indice) {
@@ -314,69 +449,29 @@ function restaurarCopia(indice) {
     archivarCopia(estado.datos, "antes de restaurar una versión");
     cargarEnElPanel(copia.datos, { guardar: true });
     $("#dlg-almacen").close("cerrar");
-    mostrarAviso(`Se restauró la versión guardada el ${fechaHoraCorta(copia.fecha)}`);
+    mostrarAviso(`Se restauró la versión del ${fechaHoraCorta(copia.fecha)}.`);
   } catch (error) {
     avisar(
       error instanceof ErrorDeDatos
-        ? `Esa copia está dañada y no se pudo restaurar: ${error.message}`
-        : "Esa copia está dañada y no se pudo restaurar."
+        ? `Esa versión está dañada y no se pudo restaurar: ${error.message}`
+        : "Esa versión está dañada y no se pudo restaurar."
     );
   }
 }
 
-function montarDialogoAlmacen() {
-  $("#alm-cuerpo").addEventListener("click", (e) => {
-    if (e.target.closest("[data-resolver-conflicto]")) {
-      $("#dlg-almacen").close("cerrar");
-      abrirConflicto();
-      return;
-    }
-    const boton = e.target.closest("[data-restaurar]");
-    if (boton) restaurarCopia(Number(boton.dataset.restaurar));
-  });
-
-  const abrirAlmacen = () => {
-    pintarDialogoAlmacen();
-    $("#dlg-almacen").showModal();
-  };
-  $("#btn-vincular").addEventListener("click", abrirAlmacen);
-  // El indicador de guardado es la puerta al detalle: dónde se guarda,
-  // a qué hora y qué copias de seguridad hay.
-  $("#estado-guardado").addEventListener("click", abrirAlmacen);
-
-  /* Menú «Archivo». Los botones siguen en el documento, ocultos: el menú
-     los acciona, así que conservan nombre, título y confirmaciones. */
-  const opcionDe = (selector, etiqueta) => {
-    const boton = $(selector);
-    return {
-      etiqueta,
-      titulo: boton?.title || "",
-      desactivado: !boton || boton.disabled,
-      accion: () => boton?.click(),
-    };
-  };
-  $("#btn-archivo").addEventListener("click", (e) =>
-    abrirMenu(e.currentTarget, [
-      opcionDe("#btn-vincular", "Vincular archivo…"),
-      "---",
-      opcionDe("#btn-importar", "Importar respaldo…"),
-      opcionDe("#btn-json", "Guardar respaldo"),
-      "---",
-      opcionDe("#btn-md", "Exportar a Markdown"),
-      opcionDe("#btn-plantilla", "Plantilla del curso"),
-    ])
-  );
-
-  $("#btn-alm-nuevo").addEventListener("click", async () => {
+/* Lo que hace cada botón de «Mis datos». Los botones se repintan según la
+   situación, así que se escuchan desde el cuadro y no uno por uno. */
+const ACCIONES_DE_DATOS = {
+  async nuevo() {
     try {
       const listo = await gestor.vincularNuevo(estado.datos, "panel-de-clases.json");
       if (listo) $("#dlg-almacen").close("cerrar");
     } catch {
-      avisar("No se pudo vincular el archivo.");
+      avisar("No se pudo crear el archivo.");
     }
-  });
+  },
 
-  $("#btn-alm-existente").addEventListener("click", async () => {
+  async existente() {
     try {
       const contenido = await gestor.abrirExistente((crudo) => migrar(crudo));
       if (contenido === null) return; // canceló
@@ -384,7 +479,7 @@ function montarDialogoAlmacen() {
         archivarCopia(estado.datos, "antes de abrir otro archivo");
         cargarEnElPanel(contenido, { guardar: true });
       } else {
-        // Archivo vacío: se vincula y se escribe en él lo que ya hay en el panel.
+        // Archivo vacío: se usa y se escribe en él lo que ya hay en el panel.
         await gestor.guardarAhora(estado.datos);
       }
       $("#dlg-almacen").close("cerrar");
@@ -392,12 +487,12 @@ function montarDialogoAlmacen() {
       avisar(
         error instanceof ErrorDeDatos
           ? error.message
-          : "No se pudo abrir ese archivo. Debe ser un respaldo del panel en formato JSON."
+          : "No se pudo abrir ese archivo. Debe ser un .json guardado o descargado desde Pauta."
       );
     }
-  });
+  },
 
-  $("#btn-alm-reconectar").addEventListener("click", async () => {
+  async reconectar() {
     try {
       const contenido = await gestor.reconectar((crudo) => migrar(crudo), estado.datos);
       if (contenido) cargarEnElPanel(contenido);
@@ -405,16 +500,60 @@ function montarDialogoAlmacen() {
     } catch (error) {
       avisar(
         error instanceof ErrorDeDatos
-          ? `El archivo vinculado ya no es un respaldo válido: ${error.message}`
-          : "No se pudo reconectar el archivo. Elígelo otra vez con «Abrir archivo existente»."
+          ? `El archivo ya no tiene datos de Pauta válidos: ${error.message}`
+          : "No se pudo reconectar el archivo. Elígelo otra vez con «Abrir otro archivo»."
       );
     }
-  });
+  },
 
-  $("#btn-alm-desvincular").addEventListener("click", async () => {
-    if (!confirmar("El panel dejará de escribir en el archivo y seguirá guardando solo en este navegador. ¿Continuar?")) return;
+  async desvincular() {
+    if (!confirmar("Pauta dejará de escribir en el archivo y seguirá guardando solo en este navegador. ¿Continuar?")) return;
     await gestor.desvincular();
     $("#dlg-almacen").close("cerrar");
+  },
+
+  descargar() {
+    exportarRespaldo(estado.datos);
+  },
+
+  cargar() {
+    $("#dlg-almacen").close("cerrar");
+    $("#archivo-json").click();
+  },
+};
+
+function montarDialogoAlmacen() {
+  $("#alm-cuerpo").addEventListener("click", (e) => {
+    const accion = e.target.closest("[data-alm]")?.dataset.alm;
+    if (accion) {
+      ACCIONES_DE_DATOS[accion]?.();
+      return;
+    }
+    if (e.target.closest("[data-resolver-conflicto]")) {
+      $("#dlg-almacen").close("cerrar");
+      abrirConflicto();
+      return;
+    }
+    if (e.target.closest("[data-bajar-danado]")) {
+      const texto = leerDanado();
+      if (texto) descargar("panel-de-clases-danado.txt", texto, "text/plain;charset=utf-8");
+      return;
+    }
+    if (e.target.closest("[data-descartar-danado]")) {
+      if (!confirmar("Se borrará de este navegador lo que no se pudo leer. No se puede deshacer. ¿Continuar?")) return;
+      borrarDanado();
+      pintarDialogoAlmacen();
+      return;
+    }
+    const boton = e.target.closest("[data-restaurar]");
+    if (boton) restaurarCopia(Number(boton.dataset.restaurar));
+  });
+
+  // El indicador de guardado es la puerta: dice si todo está guardado y,
+  // al pulsarlo, todo lo demás.
+  $("#estado-guardado").addEventListener("click", () => {
+    pintarDialogoAlmacen();
+    $("#dlg-almacen").showModal();
   });
 }
 
@@ -429,14 +568,14 @@ function abrirConflicto() {
   const cuanto = `${d.materias} materia${d.materias === 1 ? "" : "s"} y ${d.sesiones} ${d.sesiones === 1 ? "sesión" : "sesiones"}`;
   $("#con-cuerpo").innerHTML = `
     <p>Mientras tenías Pauta abierta, <strong>otra computadora, u otra pestaña, guardó cambios</strong> en
-      <em>${esc(d.nombreArchivo || "el archivo vinculado")}</em>${esc(cuando)}. La versión del archivo trae ${esc(cuanto)}.</p>
+      <em>${esc(d.nombreArchivo || "tu archivo")}</em>${esc(cuando)}. La versión del archivo trae ${esc(cuanto)}.</p>
     <p>Para no pisarlos, <strong>no se ha escrito nada en el archivo</strong>. Lo que hiciste en esta pestaña está a salvo
       en este navegador. Elige qué versión se queda:</p>
     <ul class="alm-lista">
-      <li><strong>Usar la versión del archivo</strong>: cargas lo que guardó la otra computadora. Lo de esta pestaña se archiva antes como copia de seguridad.</li>
-      <li><strong>Guardar la mía encima</strong>: el archivo queda con lo de esta pestaña. La versión que hay ahora en el archivo se archiva antes como copia de seguridad.</li>
+      <li><strong>Usar la versión del archivo</strong>: cargas lo que guardó la otra computadora. Lo de esta pestaña se guarda antes como versión anterior.</li>
+      <li><strong>Guardar la mía encima</strong>: el archivo queda con lo de esta pestaña. La versión que hay ahora en el archivo se guarda antes como versión anterior.</li>
     </ul>
-    <p class="pista">En los dos casos la otra versión queda en «Copias de seguridad», dentro de «Vincular archivo».</p>`;
+    <p class="pista">En los dos casos la otra versión queda en «Mis datos», entre las versiones anteriores.</p>`;
   dlg.showModal();
 }
 
@@ -457,7 +596,7 @@ function montarConflicto() {
     archivarCopia(estado.datos, "antes de cargar la versión del archivo");
     cargarEnElPanel(gestor.usarArchivo(), { guardar: true });
     $("#dlg-conflicto").close("cerrar");
-    mostrarAviso("Se cargó la versión del archivo. Lo que tenías en esta pestaña quedó guardado como copia, en «Vincular archivo».");
+    mostrarAviso("Se cargó la versión del archivo. Lo que tenías en esta pestaña quedó en «Mis datos», entre las versiones anteriores.");
   });
 
   $("#btn-con-mia").addEventListener("click", async () => {
@@ -469,7 +608,7 @@ function montarConflicto() {
     }
     await gestor.guardarLaMia(estado.datos);
     $("#dlg-conflicto").close("cerrar");
-    mostrarAviso("Se guardó tu versión en el archivo. La que había quedó guardada como copia, en «Vincular archivo».");
+    mostrarAviso("Se guardó tu versión en el archivo. La que había quedó en «Mis datos», entre las versiones anteriores.");
   });
 }
 
@@ -489,6 +628,7 @@ async function arrancar() {
   montarExportaciones();
   montarDialogoAlmacen();
   montarConflicto();
+  montarPlantilla();
 
   registrarPersistencia((datos) => gestor.programar(datos));
 
@@ -507,6 +647,7 @@ async function arrancar() {
     // Copia de seguridad del estado con el que se abrió, si había algo guardado.
     if (inicio.datos) archivarCopia(estado.datos, "al abrir el panel");
     if (inicio.hayConflicto) abrirConflicto();
+    retomarClaseTrasRecarga();
   } catch (error) {
     cargarEnElPanel(DATOS_DE_EJEMPLO);
     /* Antes este aviso decía «nada se ha sobrescrito todavía», y el primer
