@@ -245,17 +245,31 @@
   <p class="nota" id="mc-nota"></p>
   <span class="ruta" id="mc-ruta"></span>
   <div class="pie">
+    <!-- Lo que ven los alumnos, para no tener que ir a Zoom a comprobarlo. -->
+    <p class="mc-en-pantalla" id="mc-en-pantalla" hidden></p>
     <button class="btn" id="mc-anterior" title="Recurso anterior (flecha izquierda)">Anterior</button>
-    <button class="btn" id="mc-abrir" title="Abrir este recurso en otra pestaña, sin salir del modo clase">Abrir recurso</button>
-    <button class="btn" id="mc-portada" hidden title="Llevar la ventana de presentación de vuelta a la portada de la sesión">Portada</button>
+    <button class="btn" id="mc-abrir" title="Abrir este recurso en otra pestaña, sin salir del modo clase (A)">Abrir recurso</button>
+    <button class="btn" id="mc-portada" hidden title="Volver a mostrar la portada de la sesión a tus alumnos (P)">Portada</button>
     <button class="btn" id="mc-siguiente" title="Recurso siguiente (flecha derecha)">Siguiente</button>
-    <button class="btn" id="mc-salir" title="Salir del modo clase (Escape)">Salir</button>
+    <button class="btn" id="mc-salir" title="Salir del modo clase (Esc)">Salir</button>
       <!-- Qué pasó al abrir. En pantalla completa no se ve nada de lo que
            ocurre fuera, así que hay que decirlo aquí dentro. -->
       <p class="mc-estado" id="mc-estado" role="status" aria-live="polite"></p>
-    <span class="tecla">← → para navegar · Esc para salir</span>
+    <span class="tecla" id="mc-teclas">← → recursos · A abrir · Esc salir</span>
   </div>
 </section>
+
+<!-- Escenario: lo que ve el grupo en esta pestaña mientras los controles
+     están en la ventanita flotante. Ver src/vistas/presentacion.js. -->
+<div class="escenario" id="escenario" hidden>
+  <!-- sandbox sin permisos: la portada solo se mira, no ejecuta nada. -->
+  <iframe id="escenario-portada" title="Portada de la sesión" tabindex="-1" sandbox></iframe>
+  <div class="escenario-control" id="escenario-control" hidden>
+    <p id="escenario-aviso"></p>
+    <button class="btn" id="btn-escenario-reanudar" title="Volver a abrir los controles flotantes, en el recurso donde ibas y con el reloj de la clase">Reanudar la clase</button>
+    <button class="btn btn-solido" id="btn-escenario-volver" title="Quitar la portada y volver al panel. Si sigues compartiendo esta ventana en Zoom, tus alumnos verán el panel">Volver al panel</button>
+  </div>
+</div>
 
 <!-- ---------- Diálogo: recurso ---------- -->
 <dialog id="dlg-recurso" aria-labelledby="rec-titulo-dlg">
@@ -328,7 +342,7 @@
       </div>
       <div class="campo">
         <label for="s-titulo">Título de la sesión</label>
-        <input id="s-titulo" required title="El tema de la sesión. Es lo que se ve grande arriba y lo que aparece en la portada de la ventana de presentación">
+        <input id="s-titulo" required title="El tema de la sesión. Es lo que se ve grande arriba y lo que aparece en la portada de la presentación">
       </div>
       <div class="campo">
         <label for="s-proposito">Propósito</label>
@@ -416,7 +430,7 @@
       </div>
       <div class="campo">
         <label for="m-nombre" id="lbl-m-nombre">Nombre de la materia</label>
-        <input id="m-nombre" required title="El nombre con que aparece en la lista de la izquierda y en la portada de la ventana de presentación">
+        <input id="m-nombre" required title="El nombre con que aparece en la lista de la izquierda y en la portada de la presentación">
       </div>
       <div class="campo">
         <label for="m-clave" id="lbl-m-clave">Nivel y periodo</label>
@@ -597,7 +611,7 @@
         title="Cerrar sin decidir. El archivo no se toca y sigues guardando solo en este navegador, hasta que elijas. Se puede resolver después desde el indicador de guardado">Decidir después</button>
       <div class="derecha">
         <button type="button" class="btn" id="btn-con-archivo"
-          title="Cargar lo que guardó la otra computadora. Lo que hay en esta pestaña se guarda antes como copia de seguridad">Usar la versión del archivo</button>
+          title="Cargar lo que guardó la otra computadora. Lo que hay en esta pestaña se guarda antes como versión anterior">Usar la versión del archivo</button>
         <button type="button" class="btn btn-solido" id="btn-con-mia"
           title="Escribir lo de esta pestaña en el archivo. La versión que hay ahora en el archivo se guarda antes como copia de seguridad">Guardar la mía encima</button>
       </div>

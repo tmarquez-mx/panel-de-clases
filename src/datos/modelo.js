@@ -125,10 +125,10 @@ function normalizarMateria(entrada, posicion) {
  */
 export function migrar(entrada) {
   if (!entrada || typeof entrada !== "object" || Array.isArray(entrada)) {
-    throw new ErrorDeDatos("El archivo no contiene un respaldo del panel: se esperaba un objeto JSON.");
+    throw new ErrorDeDatos("El archivo no tiene datos de Pauta: se esperaba un objeto JSON.");
   }
   if (!Array.isArray(entrada.materias)) {
-    throw new ErrorDeDatos('El archivo no tiene la lista "materias". No es un respaldo del panel.');
+    throw new ErrorDeDatos('El archivo no tiene la lista "materias". No son datos de Pauta.');
   }
   if (entrada.materias.length === 0) {
     throw new ErrorDeDatos("El respaldo no tiene ninguna materia. No se cargó nada para no borrar lo que ya tienes.");

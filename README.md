@@ -44,9 +44,11 @@ No se instala nada y no hay cuentas. Es una página que abres en **Chrome o Edge
 5. **El día de la clase, entra a Modo clase.** Pantalla completa, un recurso a la vez,
    flechas para avanzar y `Esc` para salir.
 6. **Si das clase en Zoom, enciende «Presentación»** —el botón de al lado— y entra a
-   Modo clase: la ventana aparte se abre sola con la portada de la sesión. Compartes
-   esa ventana una vez, con *Compartir → Ventana*, y tus alumnos dejan de ver Pauta
-   cada vez que cambias de recurso.
+   Modo clase. En Chrome o Edge los controles pasan a una ventanita flotante que solo
+   ves tú, y la pestaña de Pauta muestra la portada de la sesión; cada recurso se abre
+   en una pestaña de esa misma ventana. La compartes una vez, con *Compartir →
+   Ventana*, y no vuelves a Zoom en toda la clase. `→` avanza, `A` muestra, `P` vuelve
+   a la portada.
 
 No hay botón de guardar: cada cambio se guarda solo.
 
@@ -130,7 +132,7 @@ Las copias no pueden quedarse con todo el espacio del navegador (unos cinco mill
 caracteres por sitio, y cada copia es el panel entero). Están limitadas a la mitad, y si
 aun así el guardado principal no cupiera, Pauta suelta copias antes que dejar de guardar
 lo que estás escribiendo, y lo avisa. Con una planeación muy grande, lo más seguro es
-vincular un archivo.
+guardar en un archivo.
 
 ---
 
@@ -228,8 +230,11 @@ interfaz. Los respaldos anteriores, que no la traen, entran como `curso`.
 aparecen en «¿No existe todavía? Crear». Si falta, Pauta la deduce de la carpeta
 vinculada.
 
-*Importar respaldo* valida la estructura antes de tocar nada, dice cuántas materias y
-sesiones trae y pide confirmación, porque sustituye todo. Acepta respaldos de versiones
+*Cargar datos de un archivo* valida la estructura antes de tocar nada. Si el archivo trae
+varias materias son tus datos completos: dice cuántas materias y sesiones trae y pide
+confirmación, porque sustituye todo. Si trae **una sola** materia (una copia, una
+estructura, la materia de una colega) pregunta: *Agregar como materia nueva*, junto a las
+demás, o *Sustituir todo*. Sustituir guarda antes lo que había como versión anterior. Acepta archivos de versiones
 anteriores: los campos que falten se completan con valores por omisión.
 
 ---
@@ -285,20 +290,20 @@ src/
     gestor.js               Decide dónde se guarda y en qué modo está
     local.js                localStorage y copias de seguridad por tramos
     archivo.js              File System Access API
-    manijas.js              Recuerda el archivo vinculado (IndexedDB)
+    manijas.js              Recuerda tu archivo (IndexedDB)
   vistas/
     lateral.js              Materias, enlaces del curso, sesiones y plegado
     sesion.js               Cabecera, controles, riel de recursos y bitácora
     semestre.js             Todas las sesiones de un vistazo
-    modoClase.js            Pantalla completa, un recurso a la vez, con reloj
-    presentacion.js         Ventana aparte para compartir en Zoom, con su portada
+    modoClase.js            Un recurso a la vez, con reloj; en Zoom, en ventanita flotante
+    presentacion.js         Lo que ven los alumnos: escenario y pestañas, o ventana aparte
     lectura.js              Tamaño del texto y vista de lectura
     menu.js                 Menús «⋯», accesibles y con teclado
     dialogos.js             Formularios de recurso, sesión, duplicar, mover y materia
     revision.js             Revisión de la forma de las ligas
     aviso.js                Aviso flotante con la acción para revertir
     mudanza.js              Aviso de cambio de dirección (temporal)
-  exportacion/              Markdown, respaldo completo, plantilla y descarga
+  exportacion/              Texto (.md), «Descargar mis datos», «Duplicar materia» y descarga
   util/                     Fechas, ligas, portapapeles y atajos del DOM
   estilos/                  base, componentes e impresión
 ```

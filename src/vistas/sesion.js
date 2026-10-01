@@ -51,34 +51,38 @@ function opcionDe(selector, etiqueta, extra = {}) {
  *
  *  Es el único punto por el que se abre un recurso —la tarjeta y el modo
  *  clase pasan los dos por aquí—, así que también es el único lugar donde
- *  hay que preguntar por la ventana de presentación. */
+ *  hay que preguntar por la presentación. Devuelve qué pasó, como clave de
+ *  queDecir(), y no avisa por su cuenta: quien llama sabe dónde decirlo —en
+ *  un aviso, o en la ventanita de controles, donde un alert() congelaría la
+ *  clase y saldría encima de lo que ve el grupo—. */
 export function abrirRecurso(url, boton) {
   if (!url) return "sin-liga";
   if (esLocal(url)) {
     copiar(url, boton, "Liga copiada");
     return "copiada";
   }
-  if (!urlSegura(url)) {
-    avisar("Esa liga no tiene una forma que el panel pueda abrir. Revísala con «Revisar enlaces».");
-    return "invalida";
-  }
+  if (!urlSegura(url)) return "invalida";
 
-  // Con el modo encendido, la liga va a la ventana compartida. Si el modo
+  // Con el modo encendido, la liga va a lo que ven los alumnos. Si el modo
   // está apagado, o la liga no es una página web, se cae a lo de siempre.
-  const enLaVentana = abrirEnPresentacion(url);
-  if (enLaVentana === "reabierta") {
-    mostrarAviso("La ventana de presentación se había cerrado sola. Esta es otra: vuelve a compartirla en Zoom.");
-    return enLaVentana;
-  }
-  if (enLaVentana) return enLaVentana;
+  const enPresentacion = abrirEnPresentacion(url);
+  if (enPresentacion) return enPresentacion;
 
-  /* window.open devuelve null cuando el navegador bloquea la ventana.
-     Antes se ignoraba, y eso era una falla muda: la liga no se abría y el
-     panel no decía nada, así que el botón parecía descompuesto. Peor en
-     modo clase, donde la pantalla completa tapa cualquier pestaña nueva y
-     ni siquiera se ve la que sí se abrió. */
-  const pestana = window.open(url, "_blank", "noopener,noreferrer");
-  return pestana ? "pestana" : "bloqueada";
+  /* window.open devuelve null cuando el navegador bloquea la ventana, y
+     hay que decirlo: en modo clase la pantalla completa tapa la pestaña
+     nueva y una apertura muda parece un botón descompuesto. Pero con
+     «noopener» devuelve null SIEMPRE, abra o no —así lo manda la norma—, y
+     el modo clase anunciaba «bloqueada» en cada recurso que sí se abría.
+     Por eso se abre sin él y se corta el vínculo en el acto: la página
+     todavía no ha empezado a cargar y nunca llega a ver a Pauta. */
+  const pestana = window.open(url, "_blank");
+  if (!pestana) return "bloqueada";
+  try {
+    pestana.opener = null;
+  } catch {
+    /* no debería pasar con una pestaña recién creada */
+  }
+  return esWeb(url) ? "pestana" : "programa";
 }
 
 function recursosVisibles() {
@@ -118,7 +122,9 @@ const LARGO_PLEGADO = 320;
 function tituloDeAbrir(url, local) {
   if (local) return "Copiar la ruta: el navegador no abre archivos del disco";
   if (presentacionEncendida() && esWeb(url) && urlSegura(url)) {
-    return "Mostrar este recurso en la ventana de presentación, la que estás compartiendo";
+    return modoPresentacion() === "pestanas"
+      ? "Mostrar este recurso en la pestaña de presentación de esta ventana. Se reutiliza siempre la misma"
+      : "Mostrar este recurso en la ventana de presentación, la que estás compartiendo";
   }
   return "Abrir este recurso en otra pestaña";
 }
@@ -266,7 +272,9 @@ function rotularPresentacion() {
   boton.setAttribute("aria-pressed", String(on));
   boton.title = on
     ? "Apagar. Los recursos volverán a abrirse en una pestaña nueva cada uno"
-    : "Encender para dar clase en Zoom o en el proyector: todos los recursos se abrirán en una misma ventana aparte, que compartes una sola vez";
+    : modoPresentacion() === "pestanas"
+      ? "Encender para dar clase en Zoom o en el proyector: en el modo clase, los controles pasan a una ventanita flotante y esta ventana muestra la portada y los recursos. La compartes una sola vez"
+      : "Encender para dar clase en Zoom o en el proyector: todos los recursos se abrirán en una misma ventana aparte, que compartes una sola vez";
 }
 
 function pintarSesion() {
@@ -326,9 +334,11 @@ function accionEnTarjeta(e) {
   if (!r) return;
 
   switch (boton.dataset.acc) {
-    case "abrir":
-      abrirRecurso(r.url, boton);
+    case "abrir": {
+      const [texto, clase] = queDecir(abrirRecurso(r.url, boton));
+      if (clase === "problema") mostrarAviso(texto);
       break;
+    }
     case "estado":
       r.estado = siguienteEstado(r.estado);
       focoPendiente = { i, acc: "estado" }; // el punto sigue bajo el dedo
@@ -367,9 +377,10 @@ function abrirTodo() {
   for (const r of web) window.open(r.url, "_blank", "noopener,noreferrer");
 }
 
-/* El interruptor de la ventana de presentación. Al encenderlo abre la
-   portada en el acto: es el momento en que hay que compartirla en Zoom, y
-   una ventana vacía no se sabe compartir. */
+/* El interruptor de la presentación. Con la ventana aparte, al encenderlo
+   abre la portada en el acto: es el momento de compartirla en Zoom, y una
+   ventana vacía no se sabe compartir. Con pestañas no abre nada: el
+   escenario aparece al entrar al modo clase, en esta misma pestaña. */
 function alternarModoPresentacion() {
   const quedo = alternarPresentacion();
   repintar(); // el rótulo del interruptor y el cartelito de «Abrir» cambian
@@ -377,11 +388,19 @@ function alternarModoPresentacion() {
     mostrarAviso("Los recursos vuelven a abrirse en una pestaña nueva cada uno.");
     return;
   }
-  if (haySesion() && mostrarPortada()) {
+  if (modoPresentacion() === "pestanas") {
     mostrarAviso(
-      "Ventana de presentación abierta con la portada. Compártela ahora en Zoom con Compartir → Ventana (no «Pantalla»), o llévala al proyector."
+      "Listo. Al entrar al modo clase, los controles pasan a una ventanita flotante que solo ves tú y esta pestaña muestra la portada: comparte en Zoom esta ventana del navegador. Si tiene otras pestañas, tus alumnos verán sus títulos."
     );
+    return;
   }
+  if (!haySesion()) return;
+  const paso = mostrarPortada();
+  mostrarAviso(
+    paso === "portada"
+      ? "Ventana de presentación abierta con la portada. Compártela ahora en Zoom con Compartir → Ventana (no «Pantalla»), o llévala al proyector."
+      : queDecir(paso)[0]
+  );
 }
 
 export function montarVistaSesion() {
@@ -447,11 +466,16 @@ export function montarVistaSesion() {
       {
         etiqueta: "Mostrar la portada",
         titulo: "Llevar la ventana de presentación a la pantalla de título de esta sesión",
-        desactivado: !presentacionEncendida() || !haySesion(),
-        razon: presentacionEncendida()
-          ? "No hay ninguna sesión abierta"
-          : "Primero enciende la ventana de presentación",
-        accion: mostrarPortada,
+        desactivado: !presentacionEncendida() || !haySesion() || modoPresentacion() === "pestanas",
+        razon: !presentacionEncendida()
+          ? "Primero enciende la presentación"
+          : modoPresentacion() === "pestanas"
+            ? "La portada aparece sola al entrar al modo clase, en esta misma pestaña"
+            : "No hay ninguna sesión abierta",
+        accion: () => {
+          const paso = mostrarPortada();
+          if (paso !== "portada") mostrarAviso(queDecir(paso)[0]);
+        },
       },
       "---",
       opcionDe("#btn-nota", $("#btn-nota").textContent, {

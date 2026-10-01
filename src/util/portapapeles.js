@@ -4,20 +4,24 @@
 
 import { avisar } from "./dom.js";
 
-/** Copia texto y confirma en el propio botón. */
+/** Copia texto y confirma en el propio botón.
+ *  Se usa el portapapeles de la ventana donde está el botón: en el modo
+ *  clase puede ser la ventanita flotante, y el navegador solo deja escribir
+ *  en el portapapeles a la ventana que tiene el foco. */
 export function copiar(texto, boton, mensaje = "Copiada") {
+  const vista = boton?.ownerDocument?.defaultView || window;
   const original = boton?.textContent;
   const listo = () => {
     if (!boton) return;
     boton.textContent = mensaje;
-    window.setTimeout(() => {
+    vista.setTimeout(() => {
       boton.textContent = original;
     }, 1400);
   };
-  const respaldo = () => window.prompt("Copia la liga:", texto);
+  const respaldo = () => vista.prompt("Copia la liga:", texto);
 
-  if (navigator.clipboard?.writeText) {
-    navigator.clipboard.writeText(texto).then(listo, respaldo);
+  if (vista.navigator.clipboard?.writeText) {
+    vista.navigator.clipboard.writeText(texto).then(listo, respaldo);
   } else {
     respaldo();
   }

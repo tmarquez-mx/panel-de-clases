@@ -21,7 +21,6 @@ import { montarVistaSemestre } from "./vistas/semestre.js";
 import { montarModoClase, retomarClaseTrasRecarga } from "./vistas/modoClase.js";
 import { montarDialogos } from "./vistas/dialogos.js";
 import { montarAviso, mostrarAviso } from "./vistas/aviso.js";
-import { abrirMenu } from "./vistas/menu.js";
 import { montarEscalaDeTexto, montarLectura } from "./vistas/lectura.js";
 import { montarMudanza } from "./vistas/mudanza.js";
 import { exportarMarkdown } from "./exportacion/markdown.js";
@@ -44,7 +43,7 @@ const gestor = crearGestor({
 /* ========================= Indicador de guardado ========================= */
 
 const TEXTO_DE_MODO = {
-  archivo: "en el archivo vinculado",
+  archivo: "en tu archivo",
   navegador: "en este navegador",
   memoria: "sin guardado automático",
 };
@@ -73,7 +72,8 @@ function pintarIndicador({ modo, situacion, hora, detalle, necesitaReconectar, n
   if (necesitaReconectar) { breve = "Falta permiso del archivo"; signo = "pendiente"; }
 
   let largo;
-  if (situacion === "conflicto") largo = detalle;
+  if (situacion === "abriendo") largo = "Leyendo tu archivo. Si tarda, quizá la nube lo está descargando.";
+  else if (situacion === "conflicto") largo = detalle;
   else if (situacion === "error") largo = detalle || "No se pudo guardar.";
   else if (hora) largo = `Guardado a las ${horaCorta(hora)} ${modo === "archivo" ? `en ${nombreArchivo}` : TEXTO_DE_MODO[modo]}.`;
   else largo = `Se guardará ${TEXTO_DE_MODO[modo]}.`;
@@ -84,9 +84,9 @@ function pintarIndicador({ modo, situacion, hora, detalle, necesitaReconectar, n
   if (pendientes.length) largo += ` Pendiente: ${pendientes.join(" · ")}.`;
 
   caja.dataset.situacion = signo;
-  caja.innerHTML = `<span class="punto"></span><span class="rot">${esc(breve)}</span>`;
-  caja.title = `${largo} Pulsa para ver dónde se guarda y las copias de seguridad.`;
-  caja.setAttribute("aria-label", `${breve}. ${largo} Pulsa para ver dónde se guarda.`);
+  caja.innerHTML = `<span class="punto"></span><span class="rot"><strong>Mis datos</strong> · ${esc(breve)}</span>`;
+  caja.title = `${largo} Pulsa para ver dónde se guardan, descargarlos, cargarlos o volver a una versión anterior.`;
+  caja.setAttribute("aria-label", `Mis datos. ${breve}. ${largo}`);
 
   // El pie solo se rehace cuando cambia el modo: si no, cada tecla de la bitácora
   // reescribiría ese bloque y rompería cualquier selección de texto.
@@ -197,9 +197,33 @@ function montarExportaciones() {
 
   $("#btn-plantilla").addEventListener("click", () => {
     const m = materia();
-    if (!m) return;
-    if (!confirmar(`Se exportará "${m.nombre}" sin ligas y sin bitácoras, para compartirla. ¿Continuar?`)) return;
-    exportarPlantilla(m);
+    if (!opciones || !m) return;
+    exportarPlantilla(m, opciones);
+    $("#dlg-plantilla").close("cerrar");
+    mostrarAviso(
+      opciones.modo === "estructura"
+        ? "Se descargó la estructura, sin ninguna liga. Al cargarla en otro Pauta se puede agregar junto a lo que haya ahí."
+        : "Se descargó la copia, con tus recursos y sus ligas. Al cargarla en otro Pauta se puede agregar junto a lo que haya ahí."
+    );
+  });
+
+  $("#btn-pl-agregar").addEventListener("click", () => {
+    const opciones = opcionesDePlantilla();
+    const m = materia();
+    if (!opciones || !m) return;
+
+    const copia = copiaDeMateria(m, opciones);
+    ordenarSesiones(copia);
+    estado.datos.materias.push(copia);
+    irAMateria(estado.datos.materias.length - 1);
+    actualizar();
+    $("#dlg-plantilla").close("cerrar");
+
+    mostrarAviso(
+      `Se agregó «${copia.nombre}» a tu panel, con ${cuentaDeEncuentros(copia)}` +
+        (opciones.modo === "estructura" ? " y sin ligas." : " y sus recursos.") +
+        " Si no la querías, elimínala desde su menú ⋯ → Editar."
+    );
   });
 }
 
@@ -214,6 +238,8 @@ function montarExportaciones() {
 
 function bloqueDondeSeGuardan() {
   const { modo, soportaArchivo, nombreArchivo, necesitaReconectar } = gestor.estado();
+  const boton = (accion, texto, titulo, clase = "btn") =>
+    `<button type="button" class="${clase}" data-alm="${accion}" title="${esc(titulo)}">${esc(texto)}</button>`;
 
   const explicacion = {
     archivo: `Ahora mismo el panel escribe en <strong>${esc(nombreArchivo)}</strong>, y deja además una copia en este navegador.`,
@@ -248,20 +274,23 @@ function bloqueDondeSeGuardan() {
   $("#btn-alm-desvincular").hidden = modo !== "archivo" && !necesitaReconectar;
 }
 
-/** Las tres últimas versiones archivadas, con su botón para restaurar. */
-function pintarCopias() {
-  const copias = leerCopias();
-  if (!copias.length) {
-    return `<h4 class="alm-titulo">Copias de seguridad</h4>
-      <p class="pista">Todavía no hay ninguna. El panel archiva por su cuenta una al abrir, una antes de cada
-      operación que sustituye todo y otra cada pocos minutos mientras trabajas; conserva las últimas seis y una
-      por día de la última semana.</p>`;
-  }
+function bloqueLlevar() {
+  return `<h4 class="alm-titulo">Llevarlos a otra parte</h4>
+    <p class="pista">Para pasarlos a otra computadora sin archivo en la nube, o compartirlos. <em>Descargar</em>
+      crea un .json con todas tus materias. <em>Cargar</em> lo abre aquí: si trae una sola materia te pregunta si
+      agregarla o sustituir todo; si trae varias, sustituye todo, y lo de ahora queda en las versiones anteriores.</p>
+    <div class="alm-botones">
+      <button type="button" class="btn" data-alm="descargar" title="Descargar todas tus materias en un archivo .json">Descargar mis datos</button>
+      <button type="button" class="btn" data-alm="cargar" title="Abrir un .json descargado de Pauta: agrega una materia o sustituye todo, según lo que traiga">Cargar datos de un archivo…</button>
+    </div>`;
+}
 
-  return `<h4 class="alm-titulo">Copias de seguridad</h4>
-    <p class="pista">${copias.length === 1 ? "La única versión archivada" : `Las últimas ${copias.length} versiones archivadas`}
-    por el panel. Restaurar sustituye lo que hay ahora, y antes archiva el estado actual.</p>
-    <ul class="alm-copias">
+/** Las versiones archivadas, plegadas: solo hacen falta cuando algo salió mal. */
+function bloqueVersiones(abierto) {
+  const copias = leerCopias();
+  const lista = copias.length
+    ? `<p class="pista">Restaurar vuelve a esa versión; lo que hay ahora se guarda antes como una versión más.</p>
+      <ul class="alm-copias">
       ${copias
         .map((copia, i) => {
           const materias = copia.datos?.materias?.length || 0;
@@ -279,10 +308,10 @@ function pintarCopias() {
 function restaurarCopia(indice) {
   const copia = leerCopias()[indice];
   if (!copia) return;
-  if (!confirmar(`Se volverá a la versión del ${fechaHoraCorta(copia.fecha)} (${copia.motivo}). Lo que hay ahora se archiva como copia antes de sustituirlo. ¿Continuar?`)) return;
+  if (!confirmar(`Se volverá a la versión del ${fechaHoraCorta(copia.fecha)} (${copia.motivo}). Lo que hay ahora se guarda antes como una versión más. ¿Continuar?`)) return;
 
   try {
-    archivarCopia(estado.datos, "antes de restaurar una copia");
+    archivarCopia(estado.datos, "antes de restaurar una versión");
     cargarEnElPanel(copia.datos, { guardar: true });
     $("#dlg-almacen").close("cerrar");
     mostrarAviso(`Se restauró la versión guardada el ${fechaHoraCorta(copia.fecha)}`);

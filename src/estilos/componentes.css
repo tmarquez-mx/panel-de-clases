@@ -468,6 +468,41 @@ body.lateral-plegado .plegar{background:var(--acento-tenue);color:var(--acento)}
 .mc-estado[data-clase="problema"]{color:#FF9F9F}
 .mc-estado[data-clase="aviso"]{color:#FFD79A}
 .modo-clase .tecla{font-family:var(--mono);font-size:12px;color:rgba(255,255,255,.5);margin-left:auto}
+.mc-en-pantalla{
+  flex-basis:100%;margin:0 0 4px;font-size:13px;color:rgba(255,255,255,.6);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+
+/* ---------- Modo clase dentro de la ventanita flotante ----------
+   Mismo panel, otra escala: la ventanita mide unos 460 × 420 y se queda
+   encima de todo, así que el título manda y la nota se desplaza sola. */
+.cuerpo-consola{margin:0;background:#0B0B0C}
+.modo-clase.en-consola{position:static;min-height:100vh;box-sizing:border-box;padding:14px 16px 12px}
+.modo-clase.en-consola .progreso{margin-bottom:12px}
+.modo-clase.en-consola .reloj{font-size:12px;padding:3px 10px}
+.modo-clase.en-consola h2{font-size:clamp(19px,5.6vw,26px);margin:10px 0 6px;max-width:none}
+.modo-clase.en-consola .nota{font-size:13.5px;max-height:6.6em;overflow:auto}
+.modo-clase.en-consola .ruta{font-size:11.5px;margin-top:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;word-break:normal}
+.modo-clase.en-consola .pie{gap:6px;padding-top:10px}
+.modo-clase.en-consola .btn{padding:6px 11px;font-size:13px}
+.modo-clase.en-consola .mc-estado{margin-top:6px;font-size:12px}
+.modo-clase.en-consola .tecla{flex-basis:100%;margin:2px 0 0;font-size:11px}
+
+/* ---------- Escenario ----------
+   La portada a toda la ventana, encima del panel: mientras dura la clase
+   esta pestaña es lo que ve el grupo. Los controles solo aparecen al cerrar
+   la ventanita, y discretos, porque el grupo también los ve. Van arriba: la
+   portada carga todo su peso abajo y ahí taparían la clave del curso. */
+.escenario{position:fixed;inset:0;z-index:60;background:#F2F1EF}
+.escenario iframe{display:block;width:100%;height:100%;border:0}
+.escenario-control{
+  position:absolute;right:16px;top:16px;max-width:min(520px,calc(100% - 32px));
+  display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end;
+  padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.92);
+  box-shadow:0 4px 18px rgba(0,0,0,.12);font-size:13px;opacity:.6;transition:opacity .15s;
+}
+.escenario-control:hover,.escenario-control:focus-within{opacity:1}
+.escenario-control p{margin:0;flex-basis:100%;color:var(--gris-tenue);line-height:1.4}
 
 /* ---------- Diálogos ---------- */
 dialog{
@@ -573,7 +608,7 @@ dialog::backdrop{background:rgba(0,0,0,.28);-webkit-backdrop-filter:blur(3px);ba
 }
 .aviso-flotante .cerrar:hover{opacity:1}
 
-/* ---------- Copias de seguridad ---------- */
+/* ---------- Versiones anteriores ---------- */
 .alm-titulo{margin:20px 0 4px;font-size:12.5px;letter-spacing:0;color:var(--gris-tenue);font-weight:600}
 .alm-copias{list-style:none;margin:10px 0 0;padding:0;font-size:13px}
 .alm-copias li{display:flex;align-items:center;gap:10px;border-top:1px solid var(--linea);padding:8px 0}

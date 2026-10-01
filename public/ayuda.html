@@ -854,12 +854,12 @@ details[open] summary{border-bottom:1px solid var(--linea)}
     <li class="tarjeta">
       <div class="etiquetas"><span class="tipo">Paso 1</span></div>
       <h3>Selecciona la sesión del día y haz clic en «Modo clase»</h3>
-      <p>Es el botón rojo, en la barra de controles de la sesión. Pide pantalla completa al navegador, así que en el proyector desaparecen la barra de direcciones y las pestañas. Con la <a href="#presentacion">ventana de presentación</a> encendida no la pide: ahí lo que se proyecta es la otra ventana, y la pantalla completa solo taparía lo compartido.</p>
+      <p>Es el botón rojo, en la barra de controles de la sesión. Pide pantalla completa al navegador, así que en el proyector desaparecen la barra de direcciones y las pestañas. Con la <a href="#presentacion">presentación</a> encendida no la pide: lo que ve el grupo es la portada y los recursos, y el modo clase se queda contigo —en Chrome y Edge, en una ventanita flotante—.</p>
     </li>
     <li class="tarjeta">
       <div class="etiquetas"><span class="tipo">Paso 2</span></div>
       <h3>Navega con las flechas del teclado</h3>
-      <p>← → para moverte entre recursos, «Abrir recurso» para abrir su liga sin salir de esta pantalla. Al pie se te confirma qué pasó: si fue a la <a href="#presentacion">ventana de presentación</a>, si se abrió en otra pestaña o si el navegador la bloqueó.</p>
+      <p>← → para moverte entre recursos y <kbd>A</kbd> —o «Abrir recurso»— para abrir su liga sin salir de esta pantalla. Al pie se te confirma qué pasó: si ya la ven tus alumnos en la <a href="#presentacion">presentación</a>, si se abrió en otra pestaña o si el navegador la bloqueó. Si sales y vuelves a entrar en la misma sesión, retomas el recurso donde ibas y el reloj no se reinicia.</p>
     </li>
     <li class="tarjeta">
       <div class="etiquetas"><span class="tipo">Paso 3</span></div>
@@ -901,25 +901,25 @@ details[open] summary{border-bottom:1px solid var(--linea)}
 <section class="seccion" id="presentacion">
   <div class="cabecera">
     <div class="meta">En clase</div>
-    <h2>Clases en Zoom: la ventana de presentación</h2>
-    <p>Una sola ventana aparte para todos los recursos. Compartes esa, y nada más: tus alumnos no ven Pauta cada vez que cambias de material.</p>
+    <h2>Clases en Zoom: la presentación</h2>
+    <p>Tus alumnos ven la portada y los recursos; tú ves además el reloj, tus notas y lo que sigue. Compartes una vez y no vuelves a Zoom en toda la clase.</p>
   </div>
 
-  <p><strong>El problema que resuelve.</strong> Normalmente cada recurso se abre en una pestaña nueva de la misma ventana. En Zoom eso deja dos malas opciones: compartir la ventana entera del navegador —y que el grupo vea tu Pauta, con tus tiempos y tu bitácora, cada vez que cambias— o compartir una sola pestaña, y entonces los recursos siguientes no se comparten. Lo que verían sería <em>recurso anterior → tu Pauta → recurso nuevo</em>.</p>
+  <p><strong>El problema que resuelve.</strong> Normalmente cada recurso se abre en una pestaña nueva. En Zoom eso deja dos malas opciones: compartir la ventana entera del navegador —y que el grupo vea tu Pauta, con tus tiempos y tu bitácora, cada vez que cambias— o compartir una sola pestaña, y entonces los recursos siguientes no se comparten. Lo que verían sería <em>recurso anterior → tu Pauta → recurso nuevo</em>.</p>
 
-  <p>Con la ventana de presentación encendida, todos los recursos van a una misma ventana. La compartes una vez al principio y se queda compartida toda la sesión: tú te quedas en Pauta y lo que el grupo ve cambia detrás, sin que la ventana te robe el foco.</p>
+  <p>Con «Presentación» encendida, en <strong>Chrome o Edge</strong> el modo clase se parte en dos. Los controles se mudan a una <strong>ventanita flotante</strong> que siempre queda encima y que Zoom no comparte. La pestaña de Pauta pasa a mostrar la <strong>portada</strong> de la sesión, a toda la ventana, y cada recurso se abre en una pestaña de esa misma ventana. Compartes esa ventana y ya.</p>
 
   <div class="maqueta" style="padding:16px;background:var(--papel)">
     <div class="m-zoom">
       <div class="m-zoom-caja">
-        <div class="m-zoom-rotulo">Tu pantalla</div>
+        <div class="m-zoom-rotulo">Solo tú la ves</div>
         <div class="m-zoom-pauta">
-          <div class="m-zoom-barra"><span class="m-marca">Pauta</span></div>
+          <div class="m-zoom-barra"><span class="m-marca">Controles</span></div>
           <div class="m-zoom-cuerpo">
             <span class="m-zoom-linea larga"></span>
             <span class="m-zoom-linea"></span>
             <span class="m-zoom-linea media"></span>
-            <span class="m-zoom-nota">tus tiempos, tu bitácora,<br>tus notas de clase</span>
+            <span class="m-zoom-nota">el reloj, tus notas,<br>el recurso que sigue</span>
           </div>
         </div>
       </div>
@@ -936,7 +936,7 @@ details[open] summary{border-bottom:1px solid var(--linea)}
     </div>
     <div class="leyenda">
       <ol>
-        <li><span class="num">1</span><div><strong>Se comparte una sola vez</strong> <span>— y se queda compartida toda la sesión.</span></div></li>
+        <li><span class="num">1</span><div><strong>Se comparte una sola vez</strong> <span>— y se queda compartida toda la sesión, aunque abras YouTube o Drive.</span></div></li>
         <li><span class="num">2</span><div><strong>La portada llena la espera</strong> <span>— puedes reservar la ventana antes de empezar sin proyectar ningún recurso.</span></div></li>
       </ol>
     </div>
@@ -946,31 +946,58 @@ details[open] summary{border-bottom:1px solid var(--linea)}
     <li class="tarjeta">
       <div class="etiquetas"><span class="tipo">Paso 1</span></div>
       <h3>Enciende «Presentación»</h3>
-      <p>Es el botón que está junto a «Modo clase», y dice en qué estado está: <em>Presentación: apagada</em> o <em>encendida</em>. Esto se hace <strong>una sola vez</strong>: queda encendido para las clases siguientes. La primera vez el navegador puede bloquear la ventana; permítele las ventanas emergentes a esta página y vuelve a intentarlo.</p>
+      <p>Es el botón que está junto a «Modo clase», y dice en qué estado está: <em>Presentación: apagada</em> o <em>encendida</em>. Se hace <strong>una sola vez</strong>: queda encendido para las clases siguientes.</p>
     </li>
     <li class="tarjeta">
       <div class="etiquetas"><span class="tipo">Paso 2</span></div>
       <h3>Entra a «Modo clase»</h3>
-      <p>La ventana de presentación se abre sola con la portada de la sesión. Con «Presentación» encendida, el modo clase <strong>no se pone en pantalla completa</strong>: lo que ve el grupo es la otra ventana, y esta se queda como tu consola, para que puedas ir a Zoom y volver sin dar vueltas.</p>
+      <p>Aparece la ventanita de controles y la pestaña de Pauta se convierte en la portada: nombre de la materia, sesión y fecha. Acomoda la ventanita donde te estorbe menos; se queda encima de todo.</p>
     </li>
     <li class="tarjeta">
       <div class="etiquetas"><span class="tipo">Paso 3</span></div>
-      <h3>Compártela en Zoom y ya no vuelvas</h3>
-      <p>En <em>Compartir pantalla</em>, elige la pestaña <strong>Ventana</strong> y ahí la ventana de la portada. <strong>No elijas «Pantalla» ni «Escritorio»:</strong> compartirías todo lo que tengas encima, incluido el propio Pauta. Como está mostrando la portada —nombre de la materia, sesión y fecha— puedes compartirla desde antes de empezar, sin adelantar ningún material.</p>
+      <h3>Comparte en Zoom la ventana de Pauta</h3>
+      <p><strong>En Mac, primero ten la ventana de Pauta en el mismo escritorio que Zoom</strong>, a la vista y sin pantalla completa: Zoom solo ofrece las ventanas del escritorio en el que estás. Si la de Pauta está en pantalla completa (que en Mac es un escritorio aparte), minimizada o en otro escritorio de Mission Control, no aparece en la lista; tráela, o sal de la pantalla completa con <kbd>⌃⌘F</kbd>, y vuelve a abrir <em>Compartir</em>.</p>
+      <p>En <em>Compartir pantalla</em>, en <strong>Ventanas de aplicación</strong>, elige la que lleva el <strong>nombre de la materia</strong> y muestra la portada. Si vas a poner videos, marca <em>Compartir sonido</em>. No elijas:</p>
+      <ul>
+        <li><strong>«Toda la pantalla» o «Desktop»</strong>: tus alumnos verían también la ventanita de controles.</li>
+        <li><strong>«Pestañas de Chrome»</strong>: comparte una sola pestaña, y Chrome te pediría confirmar cada recurso que abras.</li>
+        <li><strong>La que dice solo «Google Chrome», sin miniatura</strong>: suele ser la ventanita de controles.</li>
+      </ul>
     </li>
     <li class="tarjeta">
       <div class="etiquetas"><span class="tipo">Paso 4</span></div>
-      <h3>Da clase</h3>
-      <p>Cada «Abrir recurso» lleva el recurso a esa misma ventana, y el modo clase te confirma al pie qué pasó. Entre un recurso y el siguiente puedes volver a la portada con el botón <strong>Portada</strong>, sin salir de aquí.</p>
+      <h3>Da clase desde la ventanita</h3>
+      <p><strong>→</strong> y <strong>←</strong> recorren los recursos, <strong>A</strong> muestra el que tienes delante y <strong>P</strong> vuelve a la portada. Arriba de los botones, <em>En pantalla</em> te dice qué están viendo tus alumnos, sin tener que ir a Zoom a comprobarlo. Para pasar diapositivas o pausar un video, haz clic en el recurso; la ventanita sigue ahí.</p>
+    </li>
+    <li class="tarjeta">
+      <div class="etiquetas"><span class="tipo">Paso 5</span></div>
+      <h3>Al terminar, deja de compartir y vuelve al panel</h3>
+      <p>Al cerrar la ventanita —con «Salir», con <strong>Esc</strong> o con su ×— la portada se queda puesta: debajo está tu panel, y la ventana sigue compartida. Arriba a la derecha aparecen <em>Reanudar la clase</em> y <em>Volver al panel</em>. Deja de compartir en Zoom antes de volver al panel.</p>
     </li>
   </ol>
 
   <div class="nota-caja">
-    <strong>En el salón presencial</strong> funciona igual, pero con <em>escritorio extendido</em> en vez de duplicar pantalla: arrastra la ventana de presentación al proyector y quédate con Pauta en la tuya.
+    <strong>Si pierdes la ventanita de controles.</strong> Si la cerraste, en la portada aparece arriba a la derecha <em>Reanudar la clase</em>. Si sigue abierta pero no la encuentras —quedó en otro escritorio, por ejemplo—, haz clic en la portada y pulsa <kbd>Esc</kbd>: se cierra, y <em>Reanudar la clase</em> la vuelve a abrir junto a ti. Tus alumnos solo ven ese recuadro unos segundos, nunca tu panel.
+  </div>
+
+  <div class="nota-caja">
+    <strong>Si sales un momento, no pierdes el hilo.</strong> Al volver a entrar al modo clase en la misma sesión, retomas el recurso donde ibas y el reloj sigue contando desde que empezaste; lo que tus alumnos estaban viendo no se toca. Y si Pauta se recarga a media clase, la portada se queda puesta para que el grupo no vea el panel.
+  </div>
+
+  <div class="nota-caja">
+    <strong>Tus alumnos ven la ventana completa, con sus pestañas.</strong> Si en esa ventana tienes otras abiertas —el correo, por ejemplo— verán sus títulos. Abre Pauta en una ventana propia antes de la clase (en Chrome, <em>Archivo → Nueva ventana</em>, o arrastra la pestaña fuera).
   </div>
 
   <div class="oscuro-caja">
-    <strong>Por qué nace apagada.</strong> Reutilizar una ventana obliga a conservar su referencia, y eso permite que la página abierta alcance la ventana de Pauta. Es un cambio real respecto de abrir cada recurso en una pestaña aislada, así que se enciende a propósito y solo mientras haga falta. Con el interruptor apagado, todo se comporta como siempre. <em>«Abrir todas las ligas» se queda con pestañas</em> en los dos casos: son varias a la vez, y en una sola ventana se pisarían unas a otras.
+    <strong>En Safari y Firefox no hay ventanita flotante.</strong> Ahí los recursos van a una <em>ventana aparte</em>, que se abre sola con la portada al entrar al modo clase: compártela a ella. Funciona, con un límite que no depende de Pauta: YouTube, Google Drive, Classroom, Dropbox, iCloud, Canva, Padlet y Mentimeter <em>desconectan</em> esa ventana de Pauta por seguridad. El recurso se sigue viendo, pero el siguiente se abre en una ventana nueva que hay que volver a compartir. Pauta te lo avisa en el momento. Con Chrome o Edge eso no pasa: cada recurso es una pestaña más de la misma ventana compartida.
+  </div>
+
+  <div class="nota-caja">
+    <strong>En el salón presencial</strong> funciona igual, pero con <em>escritorio extendido</em> en vez de duplicar pantalla: arrastra al proyector la ventana que muestra la portada y quédate con la ventanita en tu pantalla.
+  </div>
+
+  <div class="oscuro-caja">
+    <strong>Por qué nace apagada.</strong> Para llevar cada recurso a la misma pestaña —o a la misma ventana—, Pauta tiene que conservar un vínculo con ella, y ese vínculo permite que la página abierta alcance la de Pauta. Es un cambio real respecto de abrir cada recurso en una pestaña aislada, así que se enciende a propósito. Con el interruptor apagado, todo se comporta como siempre. <em>«Abrir todas las ligas» se queda con pestañas aisladas</em> en los dos casos: son varias a la vez y se pisarían unas a otras.
   </div>
 </section>
 
