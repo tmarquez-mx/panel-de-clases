@@ -70,14 +70,20 @@ export const NUBES = [
   {
     id: "office",
     nombre: "Microsoft 365",
-    dominios: /(^|\.)(office\.com|office365\.com|live\.com)$/i,
+    /* Solo Office en línea. Antes también entraba «live.com» entero, que es
+       el inicio de sesión y el correo de Outlook: no son archivos. */
+    dominios: /(^|\.)(office\.com|office365\.com)$/i,
     comoCopiar: "Compartir → Copiar vínculo",
     sinConexion: "",
   },
   {
     id: "drive",
     nombre: "Google Drive",
-    dominios: /(^|\.)(drive\.google\.com|docs\.google\.com|google\.com)$/i,
+    /* Los dominios donde viven los ARCHIVOS: Drive y las hojas, documentos y
+       presentaciones. Antes la regla terminaba en «google.com» a secas, y con
+       eso Gmail, Meet, Calendar, Classroom, Sites, Académico y hasta el
+       buscador salían etiquetados como «Google Drive». */
+    dominios: /(^|\.)(drive\.google\.com|docs\.google\.com|sheets\.google\.com|slides\.google\.com|drive\.usercontent\.google\.com)$/i,
     comoCopiar: "clic derecho sobre el archivo → Compartir → Copiar vínculo",
     sinConexion:
       "En Drive para escritorio, clic derecho sobre la carpeta → Acceso sin conexión → Disponible sin conexión. En modo «transmisión» el archivo no está en el disco.",
@@ -131,10 +137,21 @@ export const nombreDeNube = (url) => nubeDe(url)?.nombre || "";
  * secciones y páginas— y quien lo usa lo llama por su nombre. Cuando el
  * cuaderno es otra cosa, el rótulo se queda en lo genérico.
  *
- * Se reconoce por tres señales: el esquema onenote: de la aplicación de
- * escritorio, el dominio onenote.com, y el marcador «:o:» que Microsoft
- * mete en las ligas compartidas para decir de qué tipo es el archivo
- * (:w: Word, :x: Excel, :p: PowerPoint, :o: OneNote).
+ * Se reconoce por estas señales:
+ *   · el esquema onenote: de la aplicación de escritorio;
+ *   · el dominio onenote.com;
+ *   · el marcador «:o:» que Microsoft mete en las ligas compartidas para
+ *     decir de qué tipo es el archivo (:w: Word, :x: Excel, :p: PowerPoint,
+ *     :o: OneNote);
+ *   · en SharePoint, la página onenote.aspx y los archivos .one, .onetoc2 y
+ *     .onepkg, tanto en la ruta como en el parámetro «file»;
+ *   · en SharePoint, un cuaderno guardado en un sitio, que se ve así:
+ *     /sites/…/SiteAssets/Nombre del cuaderno?web=1. Se pidió con las tres
+ *     condiciones a la vez —bajo SiteAssets, sin extensión de archivo en el
+ *     último tramo y con «web=1»— porque un archivo suelto de esa biblioteca
+ *     (una imagen, un Word) SÍ lleva extensión, y una carpeta a secas no lleva
+ *     «web=1». Esta última señal salió de un caso real: el cuaderno de una
+ *     materia con esa forma se rotulaba «Cuaderno del curso».
  */
 export function esCuadernoOneNote(url) {
   const texto = String(url || "").trim();
@@ -144,7 +161,23 @@ export function esCuadernoOneNote(url) {
     const u = new URL(texto);
     if (/(^|\.)onenote\.com$/i.test(u.hostname)) return true;
     const enMicrosoft = /(-my\.sharepoint\.com|(^|\.)sharepoint\.com|(^|\.)onedrive\.live\.com)$/i;
-    return enMicrosoft.test(u.hostname) && /\/:o:\//i.test(u.pathname);
+    if (!enMicrosoft.test(u.hostname)) return false;
+
+    if (/\/:o:\//i.test(u.pathname)) return true;
+
+    const ruta = decodeURIComponent(u.pathname);
+    const tramos = ruta.split("/").filter(Boolean);
+    const ultimo = tramos.at(-1) || "";
+    const esArchivoOneNote = (nombre) => /\.(one|onetoc2|onepkg)$/i.test(nombre);
+    if (/\/onenote\.aspx$/i.test(ruta) || esArchivoOneNote(ultimo)) return true;
+    if (esArchivoOneNote(u.searchParams.get("file") || "")) return true;
+
+    // Cuaderno de un sitio: BAJO SiteAssets —no la biblioteca misma, cuyo
+    // último tramo es «SiteAssets»—, sin extensión y abierto con web=1.
+    const sinExtension = ultimo !== "" && !/\.[A-Za-z0-9]{1,8}$/.test(ultimo);
+    const posicionDeSiteAssets = tramos.findIndex((t) => t.toLowerCase() === "siteassets");
+    const bajoSiteAssets = posicionDeSiteAssets !== -1 && posicionDeSiteAssets < tramos.length - 1;
+    return bajoSiteAssets && sinExtension && u.searchParams.get("web") === "1";
   } catch {
     return false;
   }

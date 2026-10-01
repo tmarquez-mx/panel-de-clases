@@ -55,12 +55,52 @@ const selloDe = (datos) => {
 };
 
 const MENSAJE_CONFLICTO =
-  "Otra computadora, u otra pestaña, cambió el archivo vinculado mientras tenías Pauta abierta. No se guardó nada en él para no pisar esos cambios. Los tuyos están a salvo en este navegador.";
+  "Otra computadora, u otra pestaña, cambió tu archivo mientras tenías Pauta abierta. No se guardó nada en él para no pisar esos cambios. Los tuyos están a salvo en este navegador.";
 
 const AVISO_NAVEGADOR_MAS_RECIENTE =
-  "La copia de este navegador era más reciente que la del archivo vinculado: se abrió esa. Al primer cambio, el archivo se pone al día.";
+  "La copia de este navegador era más reciente que la de tu archivo: se abrió esa. Al primer cambio, el archivo se pone al día.";
 
-export function crearGestor({ alCambiarEstado = () => {} } = {}) {
+/* Cuánto se espera entre un intento de escritura y el siguiente cuando el
+   archivo está ocupado. Suman unos dos segundos y medio: lo que tarda un
+   cliente de nube en soltarlo, no más, para no retener el guardado. */
+const ESPERAS_DE_REINTENTO_MS = [250, 750, 1500];
+const esperar = (ms) => new Promise((resolver) => window.setTimeout(resolver, ms));
+
+/* Cuánto se espera al abrir la página antes de dar por «tardando» lo que se
+   pidió. Sin límite, un archivo que la nube todavía está descargando —o un
+   IndexedDB que no contesta— dejaba a Pauta vacía y muda para siempre. */
+const ESPERA_MANIJA_MS = 5000;
+const ESPERA_ARCHIVO_MS = 10000;
+
+/** Rechaza con un error «TimeoutError» si la promesa no se resuelve a tiempo. */
+const conLimite = (promesa, ms) =>
+  new Promise((resolver, rechazar) => {
+    const reloj = window.setTimeout(
+      () => rechazar(Object.assign(new Error("tiempo agotado"), { name: "TimeoutError" })),
+      ms
+    );
+    promesa.then(
+      (valor) => { window.clearTimeout(reloj); resolver(valor); },
+      (error) => { window.clearTimeout(reloj); rechazar(error); }
+    );
+  });
+
+/** Mensajes de un fallo de escritura que NO obliga a reconectar. */
+const MENSAJE_DE_ESCRITURA = {
+  ocupado:
+    "No se pudo escribir en tu archivo porque está en uso —a veces pasa mientras la nube lo sincroniza—. Tus cambios están a salvo en este navegador y se reintentará en el siguiente cambio.",
+  disco:
+    "No se pudo escribir en tu archivo: el disco parece estar lleno. Tus cambios están a salvo en este navegador; libera espacio y se reintentará en el siguiente cambio.",
+  otro:
+    "No se pudo escribir en tu archivo. Tus cambios están a salvo en este navegador y se reintentará en el siguiente cambio. Si sigue igual, entra a «Mis datos».",
+};
+
+export function crearGestor({
+  alCambiarEstado = () => {},
+  esperasDeReintentoMs = ESPERAS_DE_REINTENTO_MS,
+  esperaManijaMs = ESPERA_MANIJA_MS,
+  esperaArchivoMs = ESPERA_ARCHIVO_MS,
+} = {}) {
   let manija = null;
   let modo = local.disponible() ? "navegador" : "memoria";
   let necesitaReconectar = false;
@@ -86,6 +126,11 @@ export function crearGestor({ alCambiarEstado = () => {} } = {}) {
   let enCurso = null;
   let repetir = false;
 
+  /* De dónde vinieron los datos con que se abrió la página. Si vinieron del
+     archivo y luego resultan inservibles, ese archivo no debe recibir
+     escrituras hasta que se resuelva. */
+  let deArchivoLaUltimaLectura = false;
+
   const estado = () => ({
     modo,
     hora: ultimaHora,
@@ -109,13 +154,31 @@ export function crearGestor({ alCambiarEstado = () => {} } = {}) {
     let contenido;
     try {
       contenido = await archivo.leer(manija);
-    } catch {
+    } catch (error) {
+      // Sin permiso o sin archivo no es «ilegible un instante»: es otra cosa
+      // y quien guarda debe tratarla como tal.
+      const tipo = archivo.clasificarError(error);
+      if (tipo === "permiso" || tipo === "no-existe") throw error;
       return { estado: "ilegible" };
     }
     const sello = selloDe(contenido);
     // Sin base no hay contra qué comparar: se adopta lo que hay.
     if (base === null || sello === base) return { estado: "igual" };
     return { estado: "cambio", sello, contenido };
+  }
+
+  /** Escribe en el archivo, reintentando solo si está ocupado. */
+  async function escribirEnElArchivo(sellados) {
+    for (let intento = 0; ; intento++) {
+      try {
+        await archivo.escribir(manija, sellados);
+        return;
+      } catch (error) {
+        const espera = esperasDeReintentoMs[intento];
+        if (archivo.clasificarError(error) !== "ocupado" || espera === undefined) throw error;
+        await esperar(espera);
+      }
+    }
   }
 
   /** Una pasada de guardado. Nunca lanza: los problemas se informan por el estado. */
@@ -142,7 +205,7 @@ export function crearGestor({ alCambiarEstado = () => {} } = {}) {
       } catch (error) {
         problemaLocal =
           error?.name === "QuotaExceededError"
-            ? "El almacenamiento del navegador está lleno, incluso sin copias de seguridad, y lo último que hiciste no se pudo guardar aquí. Usa «Guardar respaldo» o vincula un archivo para no perderlo."
+            ? "El almacenamiento del navegador está lleno, incluso sin versiones anteriores, y lo último que hiciste no se pudo guardar aquí. Entra a «Mis datos» y descárgalos, o guárdalos en un archivo, para no perderlo."
             : "El navegador no dejó guardar la copia local.";
       }
     }
@@ -161,7 +224,7 @@ export function crearGestor({ alCambiarEstado = () => {} } = {}) {
       } else {
         try {
           const permiso = await archivo.permiso(manija, false);
-          if (permiso !== "granted") throw new Error("sin permiso");
+          if (permiso !== "granted") throw Object.assign(new Error("sin permiso"), { name: "NotAllowedError" });
 
           if (confiarEnDisco) {
             confiarEnDisco = false;
@@ -173,7 +236,7 @@ export function crearGestor({ alCambiarEstado = () => {} } = {}) {
               // ciegas y tampoco se abandona el archivo: se reintenta luego.
               anunciar(
                 "error",
-                "No se pudo leer el archivo vinculado para comprobar que nadie más lo cambió, así que no se guardó nada en él. Tus cambios están a salvo en este navegador y se reintentará en el siguiente cambio."
+                "No se pudo leer tu archivo para comprobar que nadie más lo cambió, así que no se guardó nada en él. Tus cambios están a salvo en este navegador y se reintentará en el siguiente cambio."
               );
               return;
             }
@@ -184,12 +247,40 @@ export function crearGestor({ alCambiarEstado = () => {} } = {}) {
             }
           }
 
-          await archivo.escribir(manija, sellados);
+          await escribirEnElArchivo(sellados);
           fijarBase(selloDe(sellados));
-        } catch {
-          necesitaReconectar = true;
-          modo = hayCopiaLocal ? "navegador" : "memoria";
-          anunciar("error", "Se perdió el permiso sobre el archivo vinculado. Reconéctalo desde «Vincular archivo».");
+        } catch (error) {
+          /* Antes cualquier fallo se tomaba por «se perdió el permiso»: se
+             marcaba el archivo como desconectado y no se volvía a escribir en
+             él hasta reconectar a mano. Un solo bloqueo pasajero bastaba, y
+             aunque el archivo quedara libre al instante, los guardados
+             siguientes no le llegaban: la otra computadora veía un archivo
+             congelado. Ahora solo se desconecta cuando de verdad falta el
+             permiso o el archivo ya no existe; lo demás se reintenta. */
+          const tipo = archivo.clasificarError(error);
+
+          if (tipo === "permiso" || tipo === "no-existe") {
+            necesitaReconectar = true;
+            modo = hayCopiaLocal ? "navegador" : "memoria";
+          }
+
+          // Si tampoco se pudo guardar la copia local, «a salvo» no sería
+          // verdad: el mensaje tiene que decir que hay que respaldar a mano.
+          if (!hayCopiaLocal) {
+            anunciar(
+              "error",
+              "No se pudo escribir en tu archivo ni guardar la copia en este navegador. Entra a «Mis datos» y usa «Descargar mis datos» ahora para no perder lo que llevas."
+            );
+          } else if (tipo === "permiso") {
+            anunciar("error", "Se perdió el permiso sobre tu archivo. Reconéctalo desde «Mis datos».");
+          } else if (tipo === "no-existe") {
+            anunciar(
+              "error",
+              "Tu archivo ya no está donde estaba: quizá lo movieron o lo borraron. Tus cambios están a salvo en este navegador. Entra a «Mis datos» y elige otro archivo o crea uno nuevo."
+            );
+          } else {
+            anunciar("error", MENSAJE_DE_ESCRITURA[tipo] || MENSAJE_DE_ESCRITURA.otro);
+          }
           return;
         }
       }
@@ -278,7 +369,18 @@ export function crearGestor({ alCambiarEstado = () => {} } = {}) {
     let leyoElArchivo = false;
 
     if (archivo.soportado()) {
-      const guardada = await archivo.recordada();
+      anunciar("abriendo"); // la pantalla dice qué se está esperando, en vez de quedarse vacía
+
+      let noSePudoConsultar = false;
+      const guardada = await conLimite(archivo.recordada(), esperaManijaMs).catch(() => {
+        noSePudoConsultar = true;
+        return null;
+      });
+      if (noSePudoConsultar) {
+        aviso =
+          "No se pudo comprobar si guardabas en un archivo: el navegador tardó demasiado en responder. Se abrió la copia de este navegador. Si usabas un archivo, vuelve a cargar la página.";
+      }
+
       if (guardada) {
         manija = guardada;
         try {
@@ -286,23 +388,50 @@ export function crearGestor({ alCambiarEstado = () => {} } = {}) {
           // el permiso, no pedirlo. Si está en "prompt", se pide con un clic.
           const permiso = await archivo.permiso(manija, false);
           if (permiso === "granted") {
-            delArchivo = await archivo.leer(manija);
+            delArchivo = await conLimite(archivo.leer(manija), esperaArchivoMs);
             modo = "archivo";
             leyoElArchivo = true;
           } else {
             necesitaReconectar = true;
-            aviso = `El archivo vinculado (${manija.name}) necesita tu permiso otra vez. Entra a «Vincular archivo» y presiona Reconectar.`;
+            aviso = `Tu archivo (${manija.name}) necesita tu permiso otra vez. Entra a «Mis datos» y presiona Reconectar.`;
           }
-        } catch {
+        } catch (error) {
           necesitaReconectar = true;
-          aviso = `No se pudo leer el archivo vinculado (${manija.name}). Se usa la copia del navegador.`;
+          /* Tardar no es lo mismo que fallar. Un archivo «solo en línea» puede
+             estar descargándose, y entonces basta con esperar y reconectar; la
+             copia del navegador se abre mientras tanto y, como el archivo no
+             se leyó, no se escribe nada en él hasta reconectar. */
+          aviso =
+            error?.name === "TimeoutError"
+              ? `Tu archivo (${manija.name}) tardó demasiado en responder —quizá la nube lo está descargando—. Se abrió la copia de este navegador; cuando el archivo esté disponible, entra a «Mis datos» y presiona Reconectar.`
+              : `No se pudo leer tu archivo (${manija.name}). Se usa la copia del navegador.`;
         }
       }
     }
 
-    const delNavegador = local.leer();
+    const guardadoLocal = local.leerConEstado();
+    const delNavegador = guardadoLocal.datos;
     let datos = delArchivo || delNavegador;
     let hayConflicto = false;
+    deArchivoLaUltimaLectura = !!delArchivo;
+
+    /* Guardado dañado y ninguna otra fuente: se abrirán los datos de ejemplo.
+       Antes salía en silencio y el primer cambio sobrescribía lo dañado, sin
+       dejar rastro. Ahora se conserva aparte y se le dice a la usuaria qué
+       hacer, empezando por lo que ya tiene guardado. */
+    if (!datos && guardadoLocal.estado === "danado") {
+      const aSalvo = local.conservarDanado(guardadoLocal.crudo);
+      const copias = local.leerCopias().length;
+      const explicacion =
+        "Lo guardado en este navegador está dañado y no se pudo leer, así que se abrieron los datos de ejemplo. " +
+        (aSalvo
+          ? "Lo dañado se conservó aparte, sin tocarlo, y puedes descargarlo desde «Mis datos». "
+          : "No se pudo conservar aparte lo dañado. ") +
+        (copias
+          ? `Hay ${copias} ${copias === 1 ? "versión anterior" : "versiones anteriores"}: entra a «Mis datos» y restaura la más reciente antes de hacer cambios.`
+          : "Si tienes tus datos descargados, cárgalos desde «Mis datos» antes de hacer cambios.");
+      aviso = aviso ? `${aviso}\n\n${explicacion}` : explicacion;
+    }
 
     if (leyoElArchivo && !delArchivo) {
       // Archivo vacío: no hay nada que proteger en él.
@@ -451,6 +580,28 @@ export function crearGestor({ alCambiarEstado = () => {} } = {}) {
     return cargar ? contenido : null;
   }
 
+  /**
+   * Los datos leídos no sirven: migrar() los rechazó. Se conservan aparte y,
+   * si venían del archivo vinculado, ese archivo deja de recibir escrituras:
+   * antes se decía «nada se ha sobrescrito todavía» y el primer cambio
+   * sobrescribía el archivo con los datos de ejemplo. Devuelve si lo
+   * rechazado quedó a salvo.
+   */
+  function lecturaInvalida(crudos) {
+    let texto = null;
+    try {
+      texto = typeof crudos === "string" ? crudos : JSON.stringify(crudos);
+    } catch {
+      /* no se puede convertir a texto: no hay nada que conservar */
+    }
+    const aSalvo = !!texto && local.conservarDanado(texto);
+    if (deArchivoLaUltimaLectura && manija && modo === "archivo") {
+      necesitaReconectar = true;
+      modo = local.disponible() ? "navegador" : "memoria";
+    }
+    return aSalvo;
+  }
+
   /** Suelta el archivo. Los datos siguen en el navegador. */
   async function desvincular() {
     manija = null;
@@ -512,5 +663,6 @@ export function crearGestor({ alCambiarEstado = () => {} } = {}) {
     detalleDeConflicto,
     usarArchivo,
     guardarLaMia,
+    lecturaInvalida,
   };
 }

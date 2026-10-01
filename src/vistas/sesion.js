@@ -1,7 +1,7 @@
 /* Vista de sesión: cabecera, controles, bitácora y riel de recursos. */
 
 import { $, esc, confirmar, avisar } from "../util/dom.js";
-import { fechaCorta, fechaLarga } from "../util/fechas.js";
+import { fechaLarga } from "../util/fechas.js";
 import { esLocal, esWeb, urlSegura, procedencia } from "../util/urls.js";
 import { copiar } from "../util/portapapeles.js";
 import { ordenarRecursosPorMomento, siguienteEstado, tiposDisponibles } from "../datos/modelo.js";

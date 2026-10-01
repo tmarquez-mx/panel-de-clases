@@ -107,6 +107,13 @@ permiso: lo escrito sin permiso se conserva. Las versiones se reconocen por igua
 sello y nunca por cuál es «más reciente», así que no importa que los relojes de las
 computadoras no coincidan.
 
+**Cuando algo falla, Pauta no da el archivo por perdido a la primera.** Si el archivo está
+ocupado un instante —la nube lo sincroniza—, reintenta unos segundos antes de avisar, y
+solo lo desconecta si de verdad falta el permiso o el archivo ya no existe. Si lo guardado
+en el navegador está dañado, lo conserva aparte antes de abrir los datos de ejemplo, y se
+puede descargar desde *Mis datos*. Y si el archivo tarda en responder al abrir,
+Pauta no se queda vacía: abre la copia del navegador y avisa.
+
 Además, Pauta archiva versiones por su cuenta mientras trabajas: las **últimas seis**
 para deshacer lo reciente, más **una por día de los siete días anteriores** para volver
 más atrás. Se pueden restaurar desde *Archivo → Vincular archivo*.

@@ -12,7 +12,7 @@ import { fechaHoraCorta, horaCorta } from "./util/fechas.js";
 import { migrar, ErrorDeDatos } from "./datos/modelo.js";
 import { DATOS_DE_EJEMPLO } from "./datos/ejemplo.js";
 import { crearGestor } from "./almacenamiento/gestor.js";
-import { archivarCopia, leerCopias } from "./almacenamiento/local.js";
+import { archivarCopia, leerCopias, leerDanado, borrarDanado } from "./almacenamiento/local.js";
 import { estado, materia, irAMateria, registrarPersistencia, repintar, actualizar } from "./estado.js";
 import { montarLateral } from "./vistas/lateral.js";
 import { montarVistaSesion } from "./vistas/sesion.js";
@@ -25,6 +25,7 @@ import { montarEscalaDeTexto, montarLectura } from "./vistas/lectura.js";
 import { montarMudanza } from "./vistas/mudanza.js";
 import { exportarMarkdown } from "./exportacion/markdown.js";
 import { exportarPlantilla, exportarRespaldo } from "./exportacion/respaldo.js";
+import { descargar } from "./exportacion/descargar.js";
 
 /* Un respaldo del panel pesa unos pocos cientos de KB. Más que esto no es un
    respaldo: se rechaza antes de intentar leerlo, para no colgar el navegador. */
@@ -462,8 +463,9 @@ async function arrancar() {
   });
 
   let aviso = "";
+  let inicio = null;
   try {
-    const inicio = await gestor.iniciar();
+    inicio = await gestor.iniciar();
     aviso = inicio.aviso;
     cargarEnElPanel(inicio.datos || DATOS_DE_EJEMPLO);
     // Copia de seguridad del estado con el que se abrió, si había algo guardado.
@@ -471,6 +473,12 @@ async function arrancar() {
     if (inicio.hayConflicto) abrirConflicto();
   } catch (error) {
     cargarEnElPanel(DATOS_DE_EJEMPLO);
+    /* Antes este aviso decía «nada se ha sobrescrito todavía», y el primer
+       cambio sobrescribía justo lo que no se había podido leer. Ahora se
+       conserva aparte, y si venía del archivo vinculado ese archivo deja de
+       recibir escrituras: la frase es cierta. */
+    const aSalvo = gestor.lecturaInvalida(inicio?.datos ?? null);
+    const copias = leerCopias().length;
     avisar(
       `Lo guardado no se pudo leer, así que se abrieron los datos de ejemplo. Nada se ha sobrescrito todavía: importa tu último respaldo antes de hacer cambios.\n\n${
         error instanceof ErrorDeDatos ? error.message : "El archivo guardado está dañado."

@@ -39,13 +39,78 @@ export function disponible() {
   }
 }
 
-export function leer() {
+/**
+ * Lo que hay guardado en el navegador, distinguiendo cuatro cosas que antes
+ * se confundían en un solo «null»:
+ *
+ *   vacio       — no hay nada guardado: primera vez, o se borró.
+ *   ok          — hay datos y se leyeron.
+ *   danado      — HAY algo guardado y no se puede leer. Es lo que importa
+ *                 no confundir con «vacío»: si se trata como vacío, el primer
+ *                 cambio lo sobrescribe y se pierde sin dejar rastro.
+ *   inaccesible — el navegador no deja mirar.
+ *
+ * `crudo` es el texto tal cual estaba, para poder conservarlo.
+ */
+export function leerConEstado() {
+  let crudo;
   try {
-    const crudo = window.localStorage.getItem(CLAVE);
-    return crudo ? JSON.parse(crudo) : null;
+    crudo = window.localStorage.getItem(CLAVE);
   } catch {
-    // JSON corrupto o acceso bloqueado: se ignora y se sigue sin datos previos.
+    return { estado: "inaccesible", datos: null, crudo: null };
+  }
+  if (crudo === null || crudo === "") return { estado: "vacio", datos: null, crudo: null };
+  try {
+    const datos = JSON.parse(crudo);
+    if (datos && typeof datos === "object") return { estado: "ok", datos, crudo };
+  } catch {
+    /* cae al «dañado» de abajo */
+  }
+  return { estado: "danado", datos: null, crudo };
+}
+
+export const leer = () => leerConEstado().datos;
+
+/* ---------------------------------------------------------
+   Lo que no se pudo leer, guardado aparte.
+
+   Cuando el guardado del navegador está dañado se abren los datos de
+   ejemplo, y el primer cambio escribiría sobre lo dañado. Aunque no se pueda
+   leer hoy, puede que alguien lo recupere mañana: se copia a otra clave,
+   sin tocarlo, antes de que nada lo pise.
+
+   Se conserva una sola: la primera. Si ya hay una guardada sin resolver no se
+   la pisa con otra, porque se ignora cuál valdría más. La usuaria la
+   descarga o la descarta desde «Mis datos».
+   --------------------------------------------------------- */
+
+const CLAVE_DANADO = "panel-de-clases:datos-danados";
+
+/** Devuelve true si lo dañado quedó a salvo, y false si no cupo o no se pudo. */
+export function conservarDanado(crudo) {
+  if (typeof crudo !== "string" || !crudo) return false;
+  try {
+    if (window.localStorage.getItem(CLAVE_DANADO) !== null) return true;
+    window.localStorage.setItem(CLAVE_DANADO, crudo);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function leerDanado() {
+  try {
+    return window.localStorage.getItem(CLAVE_DANADO);
+  } catch {
     return null;
+  }
+}
+
+export function borrarDanado() {
+  try {
+    window.localStorage.removeItem(CLAVE_DANADO);
+  } catch {
+    /* nada que hacer */
   }
 }
 
