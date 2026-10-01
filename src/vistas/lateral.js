@@ -99,9 +99,10 @@ function pintarSesiones() {
     .map((i) => {
       const s = sesiones[i];
       const num = String(s.num || i + 1).padStart(2, "0");
-      /* El título se abrevia a una línea para que el número y la fecha se
-         recorran de un vistazo; completo sigue en los datos, en el atributo
-         title y en la cabecera de la vista principal. */
+      /* El título se abrevia a dos líneas —una cortaba casi cualquier título
+         con la letra a tamaño cómodo— para que el número y la fecha se sigan
+         recorriendo de un vistazo; completo sigue en el atributo title y en
+         la cabecera de la vista principal. */
       return `
     <div class="fila sesion" data-activo="${i === estado.sesionActiva}">
       <button class="principalbtn" data-ir="${i}" title="${esc(s.titulo)}">
