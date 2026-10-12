@@ -29,6 +29,13 @@ function menuDeMateria(boton, i) {
   ]);
 }
 
+/* Carpeta, cuaderno y Configurar ocupaban tres renglones a la vista todo el
+   tiempo y se usan poco: quedan plegados tras una flechita que sí se ve.
+   Abierto o cerrado es preferencia de esta pantalla, no de los datos. */
+const CLAVE_ENLACES = "panel-de-clases:enlaces-abiertos";
+let enlacesAbiertos = false;
+try { enlacesAbiertos = localStorage.getItem(CLAVE_ENLACES) === "1"; } catch { /* sin memoria */ }
+
 function pintarMaterias() {
   // El rótulo sigue a lo que hay: «Materias» si todo son cursos, «Talleres»
   // si todo son talleres, y «Actividades» cuando está mezclado.
@@ -39,11 +46,19 @@ function pintarMaterias() {
     .map(
       (m, i) => `
     <div class="fila materia" data-activo="${i === estado.materiaActiva}">
-      <button class="principalbtn" data-ir="${i}" title="Abrir ${esc(voz(m).etiqueta.toLowerCase())}">${esc(m.nombre)}${m.clase && m.clase !== "curso" ? `<span class="clase">${esc(voz(m).etiqueta)}</span>` : ""}<small>${esc(m.clave || "")}</small></button>
+      <button class="principalbtn" data-ir="${i}"${i === estado.materiaActiva ? ' aria-current="true"' : ""} title="Abrir ${esc(voz(m).etiqueta.toLowerCase())}">${esc(m.nombre)}${m.clase && m.clase !== "curso" ? `<span class="clase">${esc(voz(m).etiqueta)}</span>` : ""}<small>${esc(m.clave || "")}</small></button>
       <button class="lapiz" data-opciones="${i}" aria-haspopup="menu" title="Editar, duplicar o descargar como texto" aria-label="Opciones de ${esc(voz(m).etiqueta.toLowerCase())} ${esc(m.nombre)}">⋯</button>
     </div>`
     )
     .join("");
+
+  /* Las sesiones se despliegan bajo su materia, no al final de la lista:
+     con muchas materias había que bajar hasta abajo para verlas. Los nodos
+     se mudan (no se copian), así conservan sus oyentes. */
+  const detalle = $("#detalle-materia");
+  const activa = $("#lista-materias").children[estado.materiaActiva];
+  detalle.hidden = !activa;
+  if (activa) activa.after(detalle);
 
   const m = materia();
   /* Una liga con un esquema que no se puede abrir se muestra como texto, nunca
@@ -64,7 +79,9 @@ function pintarMaterias() {
     ? ""
     : sinEnlaces
       ? `<button class="config-materia" data-configurar title="Agregar la carpeta donde viven los materiales y el cuaderno del curso, estén en la nube que estén">Vincular carpeta y cuaderno…</button>`
-      : [
+      : `<button class="desplegar-enlaces" id="btn-enlaces" aria-expanded="${enlacesAbiertos}" aria-controls="enlaces-lista"
+          title="${enlacesAbiertos ? "Ocultar" : "Mostrar"} la carpeta, el cuaderno y su configuración"><span class="flecha" aria-hidden="true">›</span>Carpeta y cuaderno</button>
+        <div class="enlaces-lista" id="enlaces-lista"${enlacesAbiertos ? "" : " hidden"}>` + [
           /* La carpeta no lleva el nombre de la nube. Antes decía siempre
              «OneDrive», que era falso la mitad de las veces; nombrarla de
              verdad tampoco sirve —el OneDrive institucional se anuncia
@@ -76,7 +93,7 @@ function pintarMaterias() {
           m.carpeta ? enlace(m.carpeta, "Carpeta del curso", "") : "",
           m.cuaderno ? enlace(m.cuaderno, rotuloDeCuaderno(m.cuaderno), "") : "",
           `<button class="config-materia" data-configurar title="Cambiar la carpeta y el cuaderno vinculados">Configurar…</button>`,
-        ].join("");
+        ].join("") + "</div>";
 }
 
 function pintarSesiones() {
@@ -107,7 +124,7 @@ function pintarSesiones() {
          la cabecera de la vista principal. */
       return `
     <div class="fila sesion" data-activo="${i === estado.sesionActiva}">
-      <button class="principalbtn" data-ir="${i}" title="${esc(s.titulo)}">
+      <button class="principalbtn" data-ir="${i}"${i === estado.sesionActiva ? ' aria-current="page"' : ""} title="${esc(s.titulo)}">
         <span class="linea-meta">
           <span class="num-ses">${esc(v.encuentro.slice(0, 1).toUpperCase())}${num}</span>
           <span class="fecha-chip${s.fecha ? "" : " sin-fecha"}">${esc(fechaCorta(s.fecha))}</span>
@@ -141,6 +158,8 @@ export function montarLateral() {
     if (ir) {
       irAMateria(Number(ir.dataset.ir)); // ya sale de la vista de semestre
       repintar();
+      // La lista se reescribe: sin esto el foco del teclado caía al inicio.
+      $(`#lista-materias .fila.materia [data-ir="${ir.dataset.ir}"]`)?.focus({ preventScroll: true });
     }
   });
 
@@ -154,15 +173,24 @@ export function montarLateral() {
     if (ir) {
       irASesion(Number(ir.dataset.ir));
       repintar();
+      $(`#lista-sesiones [data-ir="${ir.dataset.ir}"]`)?.focus({ preventScroll: true });
     }
   });
 
   $("#btn-ver-todas").addEventListener("click", () => {
     estado.verTodasLasSesiones = !estado.verTodasLasSesiones;
     repintar();
+    $("#btn-ver-todas").setAttribute("aria-expanded", String(estado.verTodasLasSesiones));
   });
 
   $("#enlaces-materia").addEventListener("click", (e) => {
+    if (e.target.closest("#btn-enlaces")) {
+      enlacesAbiertos = !enlacesAbiertos;
+      try { localStorage.setItem(CLAVE_ENLACES, enlacesAbiertos ? "1" : "0"); } catch { /* sin memoria */ }
+      pintarMaterias();
+      $("#btn-enlaces")?.focus();
+      return;
+    }
     if (e.target.closest("[data-configurar]")) abrirDlgMateria(estado.materiaActiva);
   });
 
@@ -183,6 +211,8 @@ export function montarLateral() {
   const boton = $("#btn-plegar");
   const aplicarPlegado = (plegado) => {
     document.body.classList.toggle("lateral-plegado", plegado);
+    // Plegada no se ve: que tampoco la alcance el tabulador.
+    $("#lateral").inert = plegado;
     boton.setAttribute("aria-expanded", String(!plegado));
     boton.title = plegado ? "Mostrar la barra lateral" : "Ocultar la barra lateral";
   };
@@ -208,16 +238,14 @@ export function montarLateral() {
   suscribir(() => {
     pintarMaterias();
     pintarSesiones();
-    /* Las sesiones se despliegan bajo su materia, no al final de la lista:
-       con muchas materias había que bajar hasta abajo para verlas. Los nodos
-       se mudan (no se copian), así conservan sus oyentes. */
-    const detalle = $("#detalle-materia");
-    const activa = $("#lista-materias").children[estado.materiaActiva];
-    detalle.hidden = !activa;
-    if (activa) activa.after(detalle);
     const vm = voz(materia());
-    $("#btn-semestre").textContent = estado.vistaSemestre
+    // Se escribe en el nombre, no en el botón: borraría la descripción.
+    $("#semestre-nombre").textContent = estado.vistaSemestre
       ? `Volver a ${vm.encuentro.toLowerCase() === "sesión" ? "la sesión" : "lo anterior"}`
       : vm.vistaGeneral;
+    $("#btn-semestre").setAttribute("aria-pressed", String(!!estado.vistaSemestre));
+    $("#rotulo-herr").textContent = vm.herramientas;
+    $("#semestre-desc").textContent = estado.vistaSemestre ? "Regresar a lo que tenías abierto" : vm.descVista;
+    $("#revisar-desc").textContent = vm.descRevisar;
   });
 }

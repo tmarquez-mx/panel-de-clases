@@ -122,9 +122,17 @@
     </section>
 
     <section class="grupo-lat">
-      <p class="rotulo"><span>Herramientas</span></p>
-      <button class="ver-todas" id="btn-semestre" title="Ver todas las sesiones del curso en una tabla, con fecha y número de recursos">Vista de semestre</button>
-      <button class="ver-todas" id="btn-revisar" title="Buscar ligas vacías, rutas locales y ligas mal formadas en toda la materia">Revisar enlaces</button>
+      <!-- Cada herramienta dice qué hace sin tener que pasar el cursor: solo
+           con el nombre, nadie sabía para qué servían. -->
+      <p class="rotulo"><span id="rotulo-herr">Herramientas del curso</span></p>
+      <button class="herramienta" id="btn-semestre" aria-pressed="false" title="Ver todas las sesiones del curso en una tabla, con fecha y número de recursos">
+        <span class="h-nombre" id="semestre-nombre">Vista de semestre</span>
+        <span class="h-desc" id="semestre-desc"></span>
+      </button>
+      <button class="herramienta" id="btn-revisar" title="Buscar ligas vacías, rutas locales y ligas mal formadas en toda la materia">
+        <span class="h-nombre">Revisar enlaces</span>
+        <span class="h-desc" id="revisar-desc"></span>
+      </button>
     </section>
   </nav>
 

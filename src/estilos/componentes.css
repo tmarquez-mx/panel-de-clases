@@ -94,9 +94,23 @@ body.lateral-plegado .plegar{background:var(--acento-tenue);color:var(--acento)}
 /* Lo de la materia abierta se despliega bajo su renglón, sangrado y con
    una línea a la izquierda para que se lea como suyo. */
 .detalle-materia{
-  margin:4px 0 12px 12px;padding:4px 0 6px 6px;border-left:2px solid var(--seleccion-fuerte);
+  margin:4px 0 14px 14px;padding:4px 0 8px 8px;border-left:2px solid var(--seleccion-fuerte);
 }
-.detalle-materia .enlaces-materia{margin-top:2px;margin-bottom:10px}
+.detalle-materia .enlaces-materia{margin-top:0;margin-bottom:8px;padding:0}
+.detalle-materia #rotulo-sesiones{margin-top:2px}
+
+/* Carpeta y cuaderno plegados: una línea gris con flecha en vez de tres
+   ligas rojas; la flecha gira como la de la bitácora. */
+.desplegar-enlaces{
+  border:0;background:none;cursor:pointer;font:inherit;font-size:13.5px;color:var(--gris-tenue);
+  padding:5px 8px;min-height:28px;border-radius:var(--r-chip);text-align:left;align-self:flex-start;
+}
+.desplegar-enlaces:hover{background:var(--relleno);color:var(--negro)}
+.desplegar-enlaces .flecha{display:inline-block;width:12px;margin-right:4px;transition:transform .2s ease}
+.desplegar-enlaces[aria-expanded="true"] .flecha{transform:rotate(90deg)}
+.enlaces-lista{display:flex;flex-direction:column;gap:5px;padding:2px 0 4px 24px}
+.enlaces-lista[hidden]{display:none}
+.enlaces-lista .config-materia{padding-left:0}
 
 /* Configurar carpeta y cuaderno: una sola entrada discreta en lugar de dos
    renglones anunciando lo que falta. */
@@ -158,6 +172,27 @@ body.lateral-plegado .plegar{background:var(--acento-tenue);color:var(--acento)}
   content:"";position:absolute;left:0;top:6px;bottom:6px;width:3px;
   border-radius:0 3px 3px 0;background:var(--rojo);
 }
+/* Tres niveles que no se confunden: la actividad abierta es la pastilla
+   rosa con filete rojo; la sesión elegida, una tarjeta blanca con su número
+   en rojo; las demás actividades llevan nombre oscuro y una raya fina
+   entre ellas, mientras las sesiones van más chicas y en gris. */
+.fila.sesion[data-activo="true"]{background:var(--blanco);box-shadow:0 1px 2px rgba(0,0,0,.06),inset 0 0 0 1px var(--linea)}
+.fila.sesion[data-activo="true"]:hover{background:var(--blanco)}
+.fila.sesion[data-activo="true"]::before{content:none}
+.fila.sesion[data-activo="true"] .num-ses{color:var(--rojo)}
+.fila.sesion[data-activo="true"] .principalbtn{font-weight:500}
+.fila.sesion .principalbtn{padding:6px 10px}
+.fila.sesion .titulo-ses{font-size:14.5px}
+.fila.sesion:not([data-activo="true"]) .titulo-ses{color:var(--gris-tenue)}
+.fila.materia .principalbtn{font-weight:500;color:var(--negro)}
+.fila.materia[data-activo="true"] .principalbtn{font-weight:600}
+.detalle-materia + .fila.materia,.fila.materia + .fila.materia{margin-top:6px}
+.detalle-materia + .fila.materia::after,.fila.materia + .fila.materia::after{
+  content:"";position:absolute;left:10px;right:10px;top:-4px;border-top:1px solid var(--linea);
+}
+.fila.materia{overflow:visible}
+.fila :focus-visible{outline-offset:-2px}
+
 .fila .principalbtn{
   flex:1;text-align:left;background:none;border:0;padding:8px 10px 8px 12px;
   cursor:pointer;font-size:15.5px;min-width:0;color:inherit;line-height:1.35;
@@ -169,7 +204,7 @@ body.lateral-plegado .plegar{background:var(--acento-tenue);color:var(--acento)}
    que también exista al tocar y para no competir con el nombre. */
 .fila .lapiz{
   border:0;background:none;cursor:pointer;padding:0 11px;
-  color:var(--gris);font-size:13.5px;opacity:1;
+  color:var(--gris-tenue);font-size:13.5px;opacity:1;
 }
 .fila:hover .lapiz,.fila[data-activo="true"] .lapiz,.fila .lapiz:focus-visible{color:var(--gris-tenue)}
 .fila[data-activo="true"] .lapiz{color:var(--gris-tenue)}
@@ -203,6 +238,20 @@ body.lateral-plegado .plegar{background:var(--acento-tenue);color:var(--acento)}
   border-radius:var(--r-control);transition:background .18s ease;
 }
 .ver-todas:hover{background:var(--acento-tenue)}
+.detalle-materia .ver-todas{font-size:13.5px;color:var(--gris-tenue)}
+.detalle-materia .ver-todas:hover{color:var(--acento)}
+
+/* Herramientas en dos líneas: el nombre y, debajo, para qué sirve. */
+.herramienta{
+  display:flex;flex-direction:column;gap:2px;width:100%;border:0;background:none;cursor:pointer;
+  text-align:left;padding:8px 10px;border-radius:var(--r-control);font:inherit;
+  transition:background .18s ease;
+}
+.herramienta + .herramienta{margin-top:2px}
+.herramienta:hover{background:var(--acento-tenue)}
+.herramienta[aria-pressed="true"]{background:var(--seleccion)}
+.h-nombre{font-size:14.5px;font-weight:500;color:var(--acento)}
+.h-desc{font-size:13px;color:var(--gris-tenue);line-height:1.35}
 .enlaces-materia{margin-top:14px;font-size:13.5px;display:flex;flex-direction:column;gap:5px;padding:0 8px}
 .enlaces-materia a{word-break:break-all}
 .enlaces-materia span{color:var(--gris-tenue)}
@@ -669,6 +718,8 @@ dialog::backdrop{background:rgba(0,0,0,.28);-webkit-backdrop-filter:blur(3px);ba
   .fila .lapiz{opacity:1}
   .barra{position:static}
   .controles{top:0} /* sin cabecera pegada, se pega al borde */
+  .desplegar-enlaces,.herramienta{min-height:40px}
+  .detalle-materia{margin-left:8px}
   .barra .der{margin-left:0;width:100%}
   .guardado{max-width:none}
   .grupo-acciones{margin-left:0}
