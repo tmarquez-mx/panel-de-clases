@@ -66,10 +66,11 @@
 <path d="M0 0 C0.825 0.165 0.825 0.165 5 1 C4.34 2.32 3.68 3.64 3 5 C2.01 4.67 1.02 4.34 0 4 C0 2.68 0 1.36 0 0 Z " fill="#262626" transform="translate(842,266)"/>
 </svg>
   <div class="der">
+    <!-- «Mis datos»: el único lugar para todo lo que tiene que ver con tus
+         datos —dónde se guardan, llevarlos a otra computadora, volver a una
+         versión anterior—. Muestra además si están guardados. -->
     <button class="chip-guardado" id="estado-guardado" aria-haspopup="dialog"
-      title="Ver dónde y cuándo se guardó"></button>
-    <button class="btn" id="btn-archivo" aria-haspopup="menu"
-      title="Vincular archivo, importar y guardar respaldos, exportar">Archivo</button>
+      title="Mis datos: dónde se guardan, descargarlos, cargarlos y volver a una versión anterior"></button>
     <div class="escala-texto" role="group" aria-label="Tamaño del texto">
       <button class="btn-icono" id="btn-texto-menos" title="Reducir el tamaño del texto" aria-label="Reducir el tamaño del texto">A<span class="menos">−</span></button>
       <button class="btn-icono" id="btn-texto-reset" title="Volver al tamaño normal" aria-label="Volver al tamaño normal del texto">A</button>
@@ -77,13 +78,10 @@
     </div>
     <a class="btn" href="/ayuda" target="_blank" rel="noopener" title="Abrir la guía de uso, con ejemplos paso a paso">Ayuda</a>
 
-    <!-- Siguen en el documento, accionados desde el menú «Archivo»: así
-         conservan sus manejadores, sus nombres y sus confirmaciones. -->
-    <button class="btn" id="btn-vincular" hidden title="Elegir un archivo .json del disco donde el panel escriba cada cambio, y ver dónde se está guardando">Vincular archivo</button>
-    <button class="btn" id="btn-importar" hidden title="Cargar un respaldo .json. Sustituye todo lo que hay ahora en el panel, previa confirmación">Importar respaldo</button>
-    <button class="btn" id="btn-json" hidden title="Descargar todo el panel como archivo .json, con todas las materias">Guardar respaldo</button>
-    <button class="btn" id="btn-md" hidden title="Descargar la materia activa en texto: sesiones, recursos, ligas, notas y bitácoras">Exportar a Markdown</button>
-    <button class="btn" id="btn-plantilla" hidden title="Descargar la materia activa sin ligas ni bitácoras, para compartirla sin filtrar tus URLs">Plantilla del curso</button>
+    <!-- Siguen en el documento, accionados desde el menú «⋯» de cada
+         materia: así conservan sus manejadores, nombres y confirmaciones. -->
+    <button class="btn" id="btn-md" hidden title="Descargar esta materia como texto (.md): sesiones, recursos, ligas, notas y bitácoras. Se abre con cualquier editor">Descargar como texto (.md)</button>
+    <button class="btn" id="btn-plantilla" hidden title="Hacer una copia de esta materia: con sus recursos y ligas, para darla otro semestre, o solo su estructura, sin ligas, para otro curso o un taller">Duplicar materia…</button>
   </div>
 </header>
 
@@ -111,16 +109,16 @@
     <section class="grupo-lat">
       <p class="rotulo"><span id="rotulo-materias">Materias</span> <button class="mas" id="btn-materia-nueva" title="Crear un curso, un taller o una ponencia">+ Nueva</button></p>
       <div id="lista-materias"></div>
-      <div class="enlaces-materia" id="enlaces-materia"></div>
-    </section>
-
-    <section class="grupo-lat">
-      <p class="rotulo">
-        <span id="rotulo-sesiones">Sesión vigente</span>
-        <button class="mas" id="btn-sesion-nueva" title="Crear una sesión nueva en esta materia">+ Sesión</button>
-      </p>
-      <div id="lista-sesiones"></div>
-      <button class="ver-todas" id="btn-ver-todas" title="Mostrar todas las sesiones del curso o solo la vigente"></button>
+      <!-- Se muda, al pintar, justo debajo del renglón de la materia abierta -->
+      <div class="detalle-materia" id="detalle-materia">
+        <div class="enlaces-materia" id="enlaces-materia"></div>
+        <p class="rotulo">
+          <span id="rotulo-sesiones">Sesión vigente</span>
+          <button class="mas" id="btn-sesion-nueva" title="Crear una sesión nueva en esta materia">+ Sesión</button>
+        </p>
+        <div id="lista-sesiones"></div>
+        <button class="ver-todas" id="btn-ver-todas" title="Mostrar todas las sesiones del curso o solo la vigente"></button>
+      </div>
     </section>
 
     <section class="grupo-lat">
@@ -162,9 +160,13 @@
         </div>
         <span class="conteo" id="conteo"></span>
         <div class="grupo-acciones">
-          <button class="btn" id="btn-nuevo" title="Agregar un recurso a esta sesión">Agregar recurso</button>
+          <button class="btn" id="btn-nuevo" aria-keyshortcuts="N" title="Agregar un recurso a esta sesión (atajo: tecla N)">Agregar recurso <kbd class="atajo" aria-hidden="true">N</kbd></button>
+          <!-- Estaba enterrado en el menú «⋯». Preparar una clase en Zoom
+               obligaba a entrar al menú, salir a compartir y volver a
+               buscar «Modo clase»: tres viajes para empezar. -->
+          <button class="btn" id="btn-presentacion" aria-pressed="false"></button>
           <button class="btn btn-solido" id="btn-modo-clase" title="Pantalla completa, un recurso a la vez. Flechas para avanzar, Escape para salir">Modo clase</button>
-          <button class="btn-icono" id="btn-mas-acciones" aria-haspopup="menu" aria-label="Más acciones de la sesión" title="Abrir todo, ordenar por minutos, ventana de presentación y nueva nota en Word">⋯</button>
+          <button class="btn-icono" id="btn-mas-acciones" aria-haspopup="menu" aria-label="Más acciones de la sesión" title="Abrir todo, ordenar por minutos, mostrar la portada y nueva nota en Word">⋯</button>
         </div>
         <!-- Igual que arriba: viven aquí, se accionan desde el menú. -->
         <button class="btn" id="btn-abrir-todo" hidden title="Abrir en pestañas todas las ligas web de esta sesión">Abrir todo</button>
@@ -185,7 +187,7 @@
           <textarea id="txt-bitacora" placeholder="Qué funcionó, qué quedó pendiente, con qué empezar la próxima vez."
             title="Notas de después de la clase. Se guardan solas mientras escribes"></textarea>
           <p class="solo-impresion" id="bitacora-impresa"></p>
-          <p class="pie-bit">Se guarda dentro del respaldo del panel (no en tu nube) y sale en la exportación a Markdown.</p>
+          <p class="pie-bit">Se guarda con el resto de tus datos y sale al descargar la materia como texto.</p>
         </div>
       </details>
     </section>
@@ -241,14 +243,31 @@
   <p class="nota" id="mc-nota"></p>
   <span class="ruta" id="mc-ruta"></span>
   <div class="pie">
+    <!-- Lo que ven los alumnos, para no tener que ir a Zoom a comprobarlo. -->
+    <p class="mc-en-pantalla" id="mc-en-pantalla" hidden></p>
     <button class="btn" id="mc-anterior" title="Recurso anterior (flecha izquierda)">Anterior</button>
-    <button class="btn" id="mc-abrir" title="Abrir este recurso en otra pestaña, sin salir del modo clase">Abrir recurso</button>
-    <button class="btn" id="mc-portada" hidden title="Llevar la ventana de presentación de vuelta a la portada de la sesión">Portada</button>
+    <button class="btn" id="mc-abrir" title="Abrir este recurso en otra pestaña, sin salir del modo clase (A)">Abrir recurso</button>
+    <button class="btn" id="mc-portada" hidden title="Volver a mostrar la portada de la sesión a tus alumnos (P)">Portada</button>
     <button class="btn" id="mc-siguiente" title="Recurso siguiente (flecha derecha)">Siguiente</button>
-    <button class="btn" id="mc-salir" title="Salir del modo clase (Escape)">Salir</button>
-    <span class="tecla">← → para navegar · Esc para salir</span>
+    <button class="btn" id="mc-salir" title="Salir del modo clase (Esc)">Salir</button>
+      <!-- Qué pasó al abrir. En pantalla completa no se ve nada de lo que
+           ocurre fuera, así que hay que decirlo aquí dentro. -->
+      <p class="mc-estado" id="mc-estado" role="status" aria-live="polite"></p>
+    <span class="tecla" id="mc-teclas">← → recursos · A abrir · Esc salir</span>
   </div>
 </section>
+
+<!-- Escenario: lo que ve el grupo en esta pestaña mientras los controles
+     están en la ventanita flotante. Ver src/vistas/presentacion.js. -->
+<div class="escenario" id="escenario" hidden>
+  <!-- sandbox sin permisos: la portada solo se mira, no ejecuta nada. -->
+  <iframe id="escenario-portada" title="Portada de la sesión" tabindex="-1" sandbox></iframe>
+  <div class="escenario-control" id="escenario-control" hidden>
+    <p id="escenario-aviso"></p>
+    <button class="btn" id="btn-escenario-reanudar" title="Volver a abrir los controles flotantes, en el recurso donde ibas y con el reloj de la clase">Reanudar la clase</button>
+    <button class="btn btn-solido" id="btn-escenario-volver" title="Quitar la portada y volver al panel. Si sigues compartiendo esta ventana en Zoom, tus alumnos verán el panel">Volver al panel</button>
+  </div>
+</div>
 
 <!-- ---------- Diálogo: recurso ---------- -->
 <dialog id="dlg-recurso" aria-labelledby="rec-titulo-dlg">
@@ -321,7 +340,7 @@
       </div>
       <div class="campo">
         <label for="s-titulo">Título de la sesión</label>
-        <input id="s-titulo" required title="El tema de la sesión. Es lo que se ve grande arriba y lo que aparece en la portada de la ventana de presentación">
+        <input id="s-titulo" required title="El tema de la sesión. Es lo que se ve grande arriba y lo que aparece en la portada de la presentación">
       </div>
       <div class="campo">
         <label for="s-proposito">Propósito</label>
@@ -409,7 +428,7 @@
       </div>
       <div class="campo">
         <label for="m-nombre" id="lbl-m-nombre">Nombre de la materia</label>
-        <input id="m-nombre" required title="El nombre con que aparece en la lista de la izquierda y en la portada de la ventana de presentación">
+        <input id="m-nombre" required title="El nombre con que aparece en la lista de la izquierda y en la portada de la presentación">
       </div>
       <div class="campo">
         <label for="m-clave" id="lbl-m-clave">Nivel y periodo</label>
@@ -481,23 +500,109 @@
 <dialog id="dlg-almacen" aria-labelledby="alm-titulo-dlg">
   <form method="dialog">
     <div class="dlg-cuerpo">
-      <h3 id="alm-titulo-dlg">Dónde se guardan tus datos</h3>
+      <h3 id="alm-titulo-dlg">Mis datos</h3>
       <div id="alm-cuerpo"></div>
-
-      <details class="alm-ayuda" id="alm-ayuda">
-        <summary title="Desplegar la explicación de dónde quedan los datos y cómo volver a una copia anterior">Guardado y respaldos</summary>
-        <div class="alm-ayuda-cuerpo" id="alm-ayuda-cuerpo"></div>
-        <p class="alm-ayuda-liga"><a href="/ayuda#como-guarda" target="_blank" rel="noopener"
-          title="Abrir la guía de Pauta en otra pestaña, en la sección de guardado">Ver la guía completa sobre guardado ↗</a></p>
-      </details>
+      <p class="alm-ayuda-liga"><a href="/ayuda#como-guarda" target="_blank" rel="noopener"
+        title="Abrir la guía de Pauta en otra pestaña, en la sección de guardado">Cómo funciona el guardado ↗</a></p>
     </div>
     <div class="dlg-pie">
-      <button type="button" class="btn" id="btn-alm-reconectar" title="Volver a pedir permiso sobre el archivo vinculado y seguir escribiendo en él">Reconectar</button>
-      <button type="button" class="btn" id="btn-alm-nuevo" title="Crear un .json nuevo y escribir ahí cada cambio, de aquí en adelante">Vincular archivo nuevo</button>
-      <button type="button" class="btn" id="btn-alm-existente" title="Abrir un .json que ya tengas y seguir escribiendo en él">Abrir archivo existente</button>
       <div class="derecha">
-        <button type="button" class="btn peligro" id="btn-alm-desvincular" title="Dejar de escribir en el archivo. Los datos siguen en este navegador">Desvincular</button>
         <button class="btn btn-solido" value="cerrar" title="Cerrar esta ventana">Cerrar</button>
+      </div>
+    </div>
+  </form>
+</dialog>
+
+<!-- ---------- Diálogo: duplicar materia ---------- -->
+<dialog id="dlg-plantilla" aria-labelledby="pl-titulo-dlg">
+  <form method="dialog">
+    <div class="dlg-cuerpo">
+      <h3 id="pl-titulo-dlg">Duplicar materia</h3>
+      <p class="sub" id="pl-sub"></p>
+
+      <fieldset class="opciones-copia">
+        <legend class="oculto-visual">Para qué la quieres</legend>
+        <label class="opcion-copia" title="Conserva tus recursos con sus ligas, la carpeta y el cuaderno del curso. Sirve para volver a dar el mismo curso con los mismos materiales">
+          <input type="radio" name="pl-modo" value="semestre" checked>
+          <strong>Copia para otro semestre</strong>
+          <span class="pista">Conserva tus recursos <em>con sus ligas</em>, la carpeta y el cuaderno del curso. Para volver a dar el mismo curso con los mismos materiales.</span>
+        </label>
+        <label class="opcion-copia" title="Quita todas las ligas, también las escritas dentro de las notas, y deja solo el esqueleto. Sirve para empezar otro curso o un taller, o para compartirla sin filtrar tus direcciones">
+          <input type="radio" name="pl-modo" value="estructura">
+          <strong>Estructura para otro curso o taller</strong>
+          <span class="pista">Quita <em>todas</em> las ligas —también las escritas dentro de las notas, que quedan como «[liga quitada]»— y deja el esqueleto: sesiones, propósitos, títulos, tipos y notas de uso. Para empezar algo nuevo, o para compartirla sin filtrar tus direcciones.</span>
+        </label>
+      </fieldset>
+      <p class="pista pista-aparte">En las dos, las bitácoras se quedan fuera y todos los recursos vuelven a «pendiente».</p>
+
+      <div class="campo">
+        <label for="pl-nombre" id="lbl-pl-nombre">Nombre</label>
+        <input id="pl-nombre" required title="El nombre que llevará la copia. Cámbialo si es para otro curso o para un taller">
+      </div>
+      <div class="dos">
+        <div class="campo">
+          <label for="pl-clave" id="lbl-pl-clave">Nivel y periodo</label>
+          <input id="pl-clave" title="El dato que acompaña al nombre. Para otro semestre, cambia aquí el periodo">
+        </div>
+        <div class="campo">
+          <label for="pl-clase">Qué es</label>
+          <select id="pl-clase" title="Cambia las palabras del panel: sesiones para un curso, bloques para un taller, presentaciones para una ponencia">
+            <option value="curso">Un curso</option>
+            <option value="taller">Un taller</option>
+            <option value="ponencia">Una ponencia</option>
+          </select>
+        </div>
+      </div>
+      <div class="campo">
+        <label for="pl-fecha">Fecha de la primera sesión <span class="opcional">(opcional)</span></label>
+        <input id="pl-fecha" type="date" title="Mueve todas las fechas para que la primera sesión caiga este día, conservando los intervalos entre ellas. Si la dejas vacía, las fechas se conservan tal cual">
+        <p class="pista">Mueve todas las fechas conservando los intervalos. Vacía, se conservan las actuales.</p>
+      </div>
+    </div>
+    <div class="dlg-pie">
+      <button type="button" class="btn" data-cerrar title="Cerrar sin copiar nada">Cancelar</button>
+      <div class="derecha">
+        <button type="button" class="btn" id="btn-pl-descargar" title="Descargar la copia como archivo .json, para guardarla o pasársela a alguien. Al importarla en otro panel se puede agregar junto a lo que haya ahí">Descargar archivo</button>
+        <button type="button" class="btn btn-solido" id="btn-pl-agregar" title="Agregar la copia a tu panel, junto a tus otras materias. No toca nada de lo que ya tienes">Agregar a mi panel</button>
+      </div>
+    </div>
+  </form>
+</dialog>
+
+<!-- ---------- Diálogo: importar un archivo con una sola materia ---------- -->
+<dialog id="dlg-importar" aria-labelledby="imp-titulo-dlg">
+  <form method="dialog">
+    <div class="dlg-cuerpo">
+      <h3 id="imp-titulo-dlg">El archivo trae una sola materia</h3>
+      <div id="imp-cuerpo"></div>
+    </div>
+    <div class="dlg-pie">
+      <button type="button" class="btn" data-cerrar title="Cerrar sin importar nada. Tu panel queda como está">Cancelar</button>
+      <div class="derecha">
+        <button type="button" class="btn peligro" id="btn-imp-sustituir"
+          title="Quitar todo lo que hay ahora en el panel y dejar solo lo del archivo. Lo de ahora se guarda antes como versión anterior">Sustituir todo</button>
+        <button type="button" class="btn btn-solido" id="btn-imp-agregar"
+          title="Agregar la materia del archivo junto a tus otras materias. No toca nada de lo que ya tienes">Agregar como materia nueva</button>
+      </div>
+    </div>
+  </form>
+</dialog>
+
+<!-- ---------- Diálogo: el archivo cambió en otra computadora ---------- -->
+<dialog id="dlg-conflicto" aria-labelledby="con-titulo-dlg">
+  <form method="dialog">
+    <div class="dlg-cuerpo">
+      <h3 id="con-titulo-dlg">El archivo cambió en otra computadora</h3>
+      <div id="con-cuerpo"></div>
+    </div>
+    <div class="dlg-pie">
+      <button type="button" class="btn" id="btn-con-despues" data-cerrar
+        title="Cerrar sin decidir. El archivo no se toca y sigues guardando solo en este navegador, hasta que elijas. Se puede resolver después desde el indicador de guardado">Decidir después</button>
+      <div class="derecha">
+        <button type="button" class="btn" id="btn-con-archivo"
+          title="Cargar lo que guardó la otra computadora. Lo que hay en esta pestaña se guarda antes como versión anterior">Usar la versión del archivo</button>
+        <button type="button" class="btn btn-solido" id="btn-con-mia"
+          title="Escribir lo de esta pestaña en el archivo. La versión que hay ahora en el archivo se guarda antes como versión anterior">Guardar la mía encima</button>
       </div>
     </div>
   </form>

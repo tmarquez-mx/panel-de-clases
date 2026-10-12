@@ -27,13 +27,6 @@ export function fechaCorta(f) {
   return d ? d.toLocaleDateString("es-MX", { day: "numeric", month: "short" }).replace(".", "") : "sin fecha";
 }
 
-/** Hoy en formato YYYY-MM-DD, hora local. */
-export function hoyISO() {
-  const d = new Date();
-  const dos = (n) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${dos(d.getMonth() + 1)}-${dos(d.getDate())}`;
-}
-
 /** Suma días a una fecha ISO y devuelve otra fecha ISO. Cadena vacía si no hay fecha. */
 export function sumarDias(f, dias) {
   const d = aFecha(f);

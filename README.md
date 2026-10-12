@@ -39,13 +39,16 @@ No se instala nada y no hay cuentas. Es una página que abres en **Chrome o Edge
    vigente.
 3. **Cuelga los recursos** de cada sesión: una liga, una lectura, una actividad, una
    nota. Si le pones el minuto (`0:15–0:40`), se acomodan solos en ese orden.
-4. **Vincula un archivo** dentro de tu carpeta de la nube. Desde ese momento tu
-   planeación te sigue a cualquier computadora.
+4. **Guarda en un archivo** de tu carpeta de la nube: botón **Mis datos** → *Guardar en un
+   archivo…*. Desde ese momento tu planeación te sigue a cualquier computadora.
 5. **El día de la clase, entra a Modo clase.** Pantalla completa, un recurso a la vez,
    flechas para avanzar y `Esc` para salir.
-6. **Si das clase en Zoom, enciende la ventana de presentación.** Todos los recursos se
-   abren en una sola ventana aparte: compartes esa y nada más, y tus alumnos no ven
-   Pauta cada vez que cambias de recurso.
+6. **Si das clase en Zoom, enciende «Presentación»** —el botón de al lado— y entra a
+   Modo clase. En Chrome o Edge los controles pasan a una ventanita flotante que solo
+   ves tú, y la pestaña de Pauta muestra la portada de la sesión; cada recurso se abre
+   en una pestaña de esa misma ventana. La compartes una vez, con *Compartir →
+   Ventana*, y no vuelves a Zoom en toda la clase. `→` avanza, `A` muestra, `P` vuelve
+   a la portada.
 
 No hay botón de guardar: cada cambio se guarda solo.
 
@@ -89,18 +92,47 @@ pulsarlo se abre el detalle.
 
 | Modo | Qué significa |
 |---|---|
-| **Archivo vinculado** | Hay un `.json` tuyo en el disco y Pauta escribe ahí cada cambio, además de dejar copia en el navegador. Es el modo recomendado. |
+| **En tu archivo** | Hay un `.json` tuyo en el disco y Pauta escribe ahí cada cambio, además de dejar copia en el navegador. Es el modo recomendado. |
 | **Navegador** | Todo se guarda en este navegador y esta computadora. No viaja a ningún servidor, pero tampoco a tu otra máquina. |
-| **Memoria** | El navegador bloqueó el almacenamiento. Pauta avisa; hay que exportar un respaldo antes de cerrar. |
+| **Memoria** | El navegador bloqueó el almacenamiento. Pauta avisa; hay que usar *Descargar mis datos* antes de cerrar. |
 
-**El archivo vinculado no depende de ninguna nube en particular.** Pauta usa la API
+**Guardar en un archivo no depende de ninguna nube en particular.** Pauta usa la API
 estándar del navegador y escribe en un archivo normal del disco; quien lo sincroniza es
 la aplicación de escritorio de tu nube. Funciona igual con OneDrive, Google Drive,
 Dropbox o iCloud, siempre que la carpeta esté **disponible sin conexión**.
 
+**Pauta no pisa lo que escribió otra computadora.** Antes de escribir en el archivo
+comprueba que sigue siendo la versión que este navegador conoce. Si otra computadora lo
+cambió mientras tenías Pauta abierta, se detiene y pregunta cuál versión conservar; la
+otra queda entre las versiones anteriores. Lo mismo al reconectar el archivo tras perder el
+permiso: lo escrito sin permiso se conserva. Las versiones se reconocen por igualdad de
+sello y nunca por cuál es «más reciente», así que no importa que los relojes de las
+computadoras no coincidan.
+
+**Cuando algo falla, Pauta no da el archivo por perdido a la primera.** Si el archivo está
+ocupado un instante —la nube lo sincroniza—, reintenta unos segundos antes de avisar, y
+solo lo desconecta si de verdad falta el permiso o el archivo ya no existe. Si lo guardado
+en el navegador está dañado, lo conserva aparte antes de abrir los datos de ejemplo, y se
+puede descargar desde *Mis datos*. Y si el archivo tarda en responder al abrir,
+Pauta no se queda vacía: abre la copia del navegador y avisa.
+
 Además, Pauta archiva versiones por su cuenta mientras trabajas: las **últimas seis**
 para deshacer lo reciente, más **una por día de los siete días anteriores** para volver
-más atrás. Se pueden restaurar desde *Archivo → Vincular archivo*.
+más atrás. Se restauran desde *Mis datos → Versiones anteriores*.
+
+Todo lo que tiene que ver con los datos vive en un solo lugar, el botón **Mis datos**, que
+dice además si todo está guardado. Ahí hay tres bloques: *dónde se guardan* (con la única
+acción que tiene sentido en cada situación: guardar en un archivo, reconectar o cambiar),
+*llevarlos a otra parte* (*Descargar mis datos* y *Cargar datos de un archivo*) y
+*versiones anteriores*, plegadas salvo cuando algo salió mal. Lo que se hace con **una
+materia** —editarla, duplicarla, descargarla como texto— está en el menú **⋯** de cada
+materia.
+
+Las copias no pueden quedarse con todo el espacio del navegador (unos cinco millones de
+caracteres por sitio, y cada copia es el panel entero). Están limitadas a la mitad, y si
+aun así el guardado principal no cupiera, Pauta suelta copias antes que dejar de guardar
+lo que estás escribiendo, y lo avisa. Con una planeación muy grande, lo más seguro es
+guardar en un archivo.
 
 ---
 
@@ -141,24 +173,33 @@ líneas, escrito dentro de `vite.config.js`, en lugar de agregar otra dependenci
 ## Datos y privacidad
 
 Pauta no manda nada a ningún servidor, no tiene analítica y no pide cuentas. Lo que
-escribes vive en tu navegador y, si lo vinculas, en tu archivo.
+escribes vive en tu navegador y, si guardas en un archivo, en tu archivo.
 
-**Cuidado con los respaldos.** Las ligas de OneDrive, Drive, Dropbox o SharePoint llevan claves
-de uso compartido y apuntan a una cuenta institucional: un respaldo publicado es una
+**Cuidado con los `.json`.** Las ligas de OneDrive, Drive, Dropbox o SharePoint llevan claves
+de uso compartido y apuntan a una cuenta institucional: un `.json` publicado es una
 llave publicada.
 
 - El `.gitignore` excluye cualquier `.json` de datos, `datos-locales/` y `respaldos/`.
 - Los datos de ejemplo del repositorio son ficticios y no tienen ninguna liga real.
-- No subas tu respaldo a un repositorio abierto. Para compartir la estructura de un
-  curso está **Plantilla del curso**, que exporta la materia **sin ligas y sin
-  bitácoras**: quedan las sesiones, fechas, títulos, propósitos, tipos, momentos y las
-  notas de uso, para que quien la reciba cuelgue sus propios archivos.
+- No subas tu archivo ni lo que descargues a un repositorio abierto. Para copiar un curso
+  está **Duplicar materia** (menú ⋯ de la materia), con dos opciones según para qué la quieras:
+  - **Copia para otro semestre**: conserva los recursos **con sus ligas**, la carpeta y el
+    cuaderno del curso, para volver a dar el mismo curso con los mismos materiales.
+  - **Estructura para otro curso o taller**: quita **todas** las ligas, también las escritas
+    dentro de títulos, propósitos y notas (quedan como «[liga quitada]»), y deja solo el
+    esqueleto. Es la que sirve para compartir sin filtrar tus direcciones.
+
+  En las dos las bitácoras se quedan fuera y los recursos vuelven a «pendiente». Se puede
+  poner otro nombre, otro periodo y otro tipo (curso, taller o ponencia), y mover todas las
+  fechas a partir de una nueva primera sesión conservando los intervalos. El resultado se
+  puede **agregar al propio panel**, junto a las demás materias, o descargar como archivo,
+  que al importarlo en otro panel también se puede agregar.
 - Pauta no abre ligas con esquemas peligrosos (`javascript:`, `data:`): si un respaldo
   ajeno trae una, la muestra como texto y avisa.
 
-### Formato del respaldo
+### Formato de los datos
 
-*Guardar respaldo* descarga un `.json` con esta estructura:
+*Descargar mis datos* crea un `.json` con esta estructura (la misma que tu archivo):
 
 ```json
 {
@@ -198,8 +239,11 @@ interfaz. Los respaldos anteriores, que no la traen, entran como `curso`.
 aparecen en «¿No existe todavía? Crear». Si falta, Pauta la deduce de la carpeta
 vinculada.
 
-*Importar respaldo* valida la estructura antes de tocar nada, dice cuántas materias y
-sesiones trae y pide confirmación, porque sustituye todo. Acepta respaldos de versiones
+*Cargar datos de un archivo* valida la estructura antes de tocar nada. Si el archivo trae
+varias materias son tus datos completos: dice cuántas materias y sesiones trae y pide
+confirmación, porque sustituye todo. Si trae **una sola** materia (una copia, una
+estructura, la materia de una colega) pregunta: *Agregar como materia nueva*, junto a las
+demás, o *Sustituir todo*. Sustituir guarda antes lo que había como versión anterior. Acepta archivos de versiones
 anteriores: los campos que falten se completan con valores por omisión.
 
 ---
@@ -218,11 +262,20 @@ anteriores: los campos que falten se completan con valores por omisión.
 - **«Abrir todo» y el bloqueador de ventanas emergentes**: la primera vez el navegador
   bloqueará las pestañas; hay que permitirlas para esa página. Lo mismo la primera vez
   que se enciende la ventana de presentación.
-- **La ventana de presentación suelta `noopener`.** Reutilizar una ventana exige
-  conservar su referencia, y eso permite que la página abierta alcance `window.opener`.
+- **La presentación conserva el vínculo con lo que abre.** Reutilizar una pestaña o una
+  ventana exige conservar su referencia, y eso permite que la página abierta alcance
+  `window.opener` (cortarlo con `w.opener = null` impide navegarla después; se probó).
   Por eso nace apagada y se enciende a propósito: con el interruptor apagado, cada
-  recurso se abre como siempre, en una pestaña con `noopener,noreferrer`.
-- **Deshacer llega hasta la última eliminación**, no más atrás.
+  recurso se abre en una pestaña a la que se le corta `opener` en el acto.
+- **Sin ventanita flotante, algunos sitios desconectan la ventana de presentación.**
+  En Safari y Firefox los recursos van a una ventana aparte, y YouTube, Google Drive,
+  Classroom, Dropbox, iCloud, Canva, Padlet y Mentimeter mandan
+  `Cross-Origin-Opener-Policy`: el navegador la separa de Pauta y el recurso siguiente
+  tiene que abrir otra, que hay que volver a compartir. Pauta lo detecta y lo avisa en
+  el momento. En Chrome y Edge no pasa: con la ventanita flotante (*Document
+  Picture-in-Picture*) cada recurso es una pestaña de la misma ventana compartida.
+- **Deshacer llega hasta la última eliminación**, no más atrás. Devuelve solo lo que se
+  quitó, en su lugar, sin tocar lo escrito después.
 - **La búsqueda abarca la sesión abierta**, no el curso entero. El filtro de tipos sí
   ofrece los tipos de toda la materia.
 - **No hay pruebas automáticas.** Todo se verifica a mano.
@@ -243,7 +296,7 @@ public/
 src/
   main.js                   Arranque: monta las vistas y conecta el guardado
   estado.js                 Qué materia y qué sesión están activas; avisa a las vistas
-  historial.js              Deshacer la última eliminación
+  historial.js              Deshacer una eliminación: repone solo lo quitado
   datos/
     modelo.js               Estructura, migración de respaldos y operaciones
     vocabulario.js          Curso, taller o ponencia: solo las palabras
@@ -251,22 +304,22 @@ src/
     ejemplo.js              Materias ficticias, sin ligas reales
   almacenamiento/
     gestor.js               Decide dónde se guarda y en qué modo está
-    local.js                localStorage y copias de seguridad por tramos
+    local.js                localStorage y versiones anteriores por tramos
     archivo.js              File System Access API
-    manijas.js              Recuerda el archivo vinculado (IndexedDB)
+    manijas.js              Recuerda tu archivo (IndexedDB)
   vistas/
     lateral.js              Materias, enlaces del curso, sesiones y plegado
     sesion.js               Cabecera, controles, riel de recursos y bitácora
     semestre.js             Todas las sesiones de un vistazo
-    modoClase.js            Pantalla completa, un recurso a la vez, con reloj
-    presentacion.js         Ventana aparte para compartir en Zoom, con su portada
+    modoClase.js            Un recurso a la vez, con reloj; en Zoom, en ventanita flotante
+    presentacion.js         Lo que ven los alumnos: escenario y pestañas, o ventana aparte
     lectura.js              Tamaño del texto y vista de lectura
     menu.js                 Menús «⋯», accesibles y con teclado
     dialogos.js             Formularios de recurso, sesión, duplicar, mover y materia
     revision.js             Revisión de la forma de las ligas
     aviso.js                Aviso flotante con la acción para revertir
     mudanza.js              Aviso de cambio de dirección (temporal)
-  exportacion/              Markdown, respaldo completo, plantilla y descarga
+  exportacion/              Texto (.md), «Descargar mis datos», «Duplicar materia» y descarga
   util/                     Fechas, ligas, portapapeles y atajos del DOM
   estilos/                  base, componentes e impresión
 ```
@@ -280,11 +333,12 @@ qué otras vistas existen.
 ## Accesibilidad
 
 - Todo se puede usar con el teclado, y el foco siempre se ve. Los menús cierran con
-  `Esc` y se recorren con las flechas.
+  `Esc` y se recorren con las flechas. `N` agrega un recurso cuando no se escribe en
+  ningún campo; la tecla se ve junto al botón.
 - Ningún control aparece solo al pasar el cursor.
 - **Cada control lleva su cartelito**: al pasar el cursor, cualquier botón, campo o
   menú dice qué hace. Los que cambian de comportamiento lo dicen —«Abrir» anuncia si
-  va a una pestaña nueva o a la ventana de presentación—.
+  va a una pestaña nueva o a la presentación—.
 - El estado nunca se comunica solo con color: cambia también la palabra o la forma.
 - Los tamaños de lectura se ajustan con **A− A A+** sin descuadrar la interfaz.
 - En modo clase, el resto de la página queda fuera del recorrido del teclado y del

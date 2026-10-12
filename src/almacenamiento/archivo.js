@@ -59,6 +59,37 @@ export async function permiso(manija, pedir = false) {
   return estado;
 }
 
+/**
+ * Qué clase de fallo es un error de la API de archivos. Importa distinguirlos
+ * porque piden cosas opuestas: si falta el permiso hay que pedirlo otra vez,
+ * pero si el archivo está ocupado un instante —un cliente de nube lo
+ * sincroniza— lo correcto es esperar y reintentar, no dar el archivo por
+ * perdido.
+ *
+ *   permiso    — el navegador ya no deja escribir: hay que reconectar.
+ *   no-existe  — el archivo se movió o se borró: hay que vincular otro.
+ *   ocupado    — bloqueado o cambiado un instante: se reintenta.
+ *   disco      — el disco está lleno.
+ *   otro       — cualquier otra cosa.
+ */
+export function clasificarError(error) {
+  switch (error?.name) {
+    case "NotAllowedError":
+    case "SecurityError":
+      return "permiso";
+    case "NotFoundError":
+      return "no-existe";
+    case "NoModificationAllowedError":
+    case "InvalidStateError":
+    case "AbortError":
+      return "ocupado";
+    case "QuotaExceededError":
+      return "disco";
+    default:
+      return "otro";
+  }
+}
+
 export async function leer(manija) {
   const archivo = await manija.getFile();
   const texto = await archivo.text();
@@ -69,9 +100,19 @@ export async function escribir(manija, datos) {
   const flujo = await manija.createWritable();
   try {
     await flujo.write(JSON.stringify(datos, null, 2));
-  } finally {
-    await flujo.close();
+  } catch (error) {
+    /* Un flujo que falló se aborta, no se cierra. Cerrarlo intentaría
+       confirmar lo escrito a medias, y además el error de close() taparía el
+       verdadero: quien llama necesita el nombre del error original para
+       saber si fue el disco, el permiso o un bloqueo pasajero. */
+    try {
+      await flujo.abort();
+    } catch {
+      /* ya estaba roto */
+    }
+    throw error;
   }
+  await flujo.close();
 }
 
 /* El vínculo se recuerda solo cuando el gestor adopta el archivo, nunca al

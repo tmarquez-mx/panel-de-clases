@@ -364,8 +364,8 @@ details[open] summary{border-bottom:1px solid var(--linea)}
   <div class="grupo">
     <p class="rotulo">Guardar</p>
     <a href="#como-guarda">Cómo se guarda tu trabajo</a>
-    <a href="#nube">Vincular con tu nube</a>
-    <a href="#respaldos">Copias de seguridad</a>
+    <a href="#nube">Guardar en tu nube</a>
+    <a href="#respaldos">Versiones anteriores</a>
   </div>
   <div class="grupo">
     <p class="rotulo">En clase</p>
@@ -453,9 +453,11 @@ details[open] summary{border-bottom:1px solid var(--linea)}
         <div class="m-lateral">
           <p class="m-rotulo"><span class="badge">2</span>Materias <span class="m-mas">+ Nueva</span></p>
           <div class="m-fila activa">Comunicación oral<small>Posgrado · Otoño 2026</small></div>
+          <div style="margin:4px 0 8px 8px;padding-left:6px;border-left:2px solid var(--linea)">
+            <p class="m-rotulo"><span class="badge">3</span>Sesión vigente <span class="m-mas">+ Sesión</span></p>
+            <div class="m-fila activa">S01 · 1 sep<small>Cómo está armado este panel</small></div>
+          </div>
           <div class="m-fila">Redacción avanzada<small>Posgrado · Otoño 2026</small></div>
-          <p class="m-rotulo" style="margin-top:14px"><span class="badge">3</span>Sesión vigente <span class="m-mas">+ Sesión</span></p>
-          <div class="m-fila activa">S01 · 1 sep<small>Cómo está armado este panel</small></div>
           <p class="m-rotulo" style="margin-top:14px">Herramientas</p>
           <div class="m-fila" style="color:var(--rojo)">Vista de semestre</div>
         </div>
@@ -483,7 +485,7 @@ details[open] summary{border-bottom:1px solid var(--linea)}
     </div>
     <div class="leyenda">
       <ol>
-        <li><span class="num">1</span><div><strong>Archivo</strong> <span>— vincular tu archivo, importar y guardar respaldos, exportar. A su izquierda, el indicador de guardado: púlsalo y te dice dónde y a qué hora se guardó.</span></div></li>
+        <li><span class="num">1</span><div><strong>Mis datos</strong> <span>— dice si todo está guardado. Púlsalo para ver dónde se guardan, descargarlos, cargarlos en otra computadora o volver a una versión anterior.</span></div></li>
         <li><span class="num">2</span><div><strong>Materias</strong> <span>— tus cursos, talleres y ponencias, en la columna izquierda.</span></div></li>
         <li><span class="num">3</span><div><strong>Sesiones</strong> <span>— cada clase de esa materia. Abajo, las herramientas del curso.</span></div></li>
       </ol>
@@ -606,7 +608,7 @@ details[open] summary{border-bottom:1px solid var(--linea)}
     <li class="tarjeta">
       <div class="etiquetas"><span class="tipo">Paso 1</span></div>
       <h3>Haz clic en «Agregar recurso»</h3>
-      <p>Está en la barra de controles, encima del listado de recursos de la sesión.</p>
+      <p>Está en la barra de controles, encima del listado de recursos de la sesión. Esa barra se queda fija arriba aunque bajes por una lista larga, y también puedes pulsar la tecla <kbd>N</kbd> —cuando no estés escribiendo en un campo— para cargar varios recursos seguidos sin ir por el ratón.</p>
     </li>
     <li class="tarjeta">
       <div class="etiquetas"><span class="tipo">Paso 2</span></div>
@@ -672,24 +674,24 @@ details[open] summary{border-bottom:1px solid var(--linea)}
       <p>Al abrir Pauta sin hacer nada más, cada cambio se guarda en este navegador y esta computadora. No viaja a ningún servidor — y tampoco a tu otra computadora.</p>
     </div>
     <div class="item" style="border-color:var(--rojo)">
-      <h4 style="color:var(--rojo)">Archivo vinculado <span style="color:var(--gris-tenue);font-weight:400">(recomendado)</span></h4>
-      <p>Vinculas un archivo <code>.json</code> propio y Pauta escribe ahí cada cambio, además de dejar una copia en el navegador. Es la base de la sección de tu nube, más abajo.</p>
+      <h4 style="color:var(--rojo)">En tu archivo <span style="color:var(--gris-tenue);font-weight:400">(recomendado)</span></h4>
+      <p>En <em>Mis datos → Guardar en un archivo…</em> eliges un <code>.json</code> propio y Pauta escribe ahí cada cambio, además de dejar una copia en el navegador. Es la base de la sección de tu nube, más abajo.</p>
     </div>
     <div class="item">
       <h4>Sin guardado <span style="color:var(--gris-tenue);font-weight:400">(poco común)</span></h4>
-      <p>Solo ocurre si el navegador bloquea el almacenamiento local. Pauta te avisa; en ese caso, usa <em>Guardar respaldo</em> antes de cerrar la pestaña.</p>
+      <p>Solo ocurre si el navegador bloquea el almacenamiento local. Pauta te avisa; en ese caso, entra a <em>Mis datos</em> y usa <em>Descargar mis datos</em> antes de cerrar la pestaña.</p>
     </div>
   </div>
 
-  <p>El estado actual siempre se ve en la pastilla junto a los botones, arriba a la derecha:</p>
+  <p>El estado actual siempre se ve en <strong>Mis datos</strong>, arriba a la derecha:</p>
   <div class="maqueta" style="max-width:420px">
     <div style="background:var(--rojo);padding:10px 14px">
-      <span style="font-size:12px;display:inline-flex;align-items:center;gap:8px;background:rgba(118,118,128,.12);padding:6px 13px;border-radius:999px;color:var(--gris-tenue)"><span style="width:9px;height:9px;border-radius:50%;background:#248A3D;display:inline-block"></span>Guardado en pauta.json</span>
+      <span style="font-size:12px;display:inline-flex;align-items:center;gap:8px;background:rgba(118,118,128,.12);padding:6px 13px;border-radius:999px;color:var(--gris-tenue)"><span style="width:9px;height:9px;border-radius:50%;background:#248A3D;display:inline-block"></span><strong style="color:var(--negro)">Mis datos</strong>&nbsp;· Guardado en pauta.json</span>
     </div>
   </div>
 
   <div class="nota-caja">
-    Con «Guardar respaldo» descargas todo Pauta como <code>.json</code>, y con «Importar respaldo» lo cargas en otra computadora. Es la forma de pasar tus datos si no puedes vincular un archivo — pero hacerlo a mano cada vez es justo lo que <a href="#nube">vincular con tu nube</a> evita.
+    En <em>Mis datos</em>, «Descargar mis datos» crea un <code>.json</code> con todas tus materias, y «Cargar datos de un archivo» lo abre en otra computadora. Sirve si no puedes guardar en un archivo de tu nube — pero hacerlo a mano cada vez es justo lo que <a href="#nube">guardar en tu nube</a> evita.
   </div>
 </section>
 
@@ -697,7 +699,7 @@ details[open] summary{border-bottom:1px solid var(--linea)}
 <section class="seccion" id="nube">
   <div class="cabecera">
     <div class="meta">Guardar · recomendado</div>
-    <h2>Vincular tu archivo con tu nube</h2>
+    <h2>Guardar en un archivo de tu nube</h2>
     <p>Esto es lo único que necesitas configurar una vez. Después, Pauta guarda solo, y tu planeación te sigue a cualquier computadora donde tengas esa carpeta.</p>
     <p>Sirve <strong>cualquier nube que sincronice una carpeta con tu disco</strong>: OneDrive, Google Drive, Dropbox, iCloud Drive, Box. Pauta no habla con ninguna de ellas —escribe un archivo normal en tu computadora, con la API estándar del navegador— y es la aplicación de escritorio de tu nube la que lo sube. Por eso funciona igual en todas y no hay nada que conectar ni ninguna cuenta que dar.</p>
   </div>
@@ -710,13 +712,13 @@ details[open] summary{border-bottom:1px solid var(--linea)}
     </li>
     <li class="tarjeta">
       <div class="etiquetas"><span class="tipo">Paso 2</span></div>
-      <h3>Abre «Archivo» y elige «Vincular archivo…»</h3>
-      <p>«Archivo» es el botón de la barra de arriba. Dentro están también «Importar respaldo», «Guardar respaldo» y las exportaciones.</p>
+      <h3>Pulsa «Mis datos»</h3>
+      <p>Es el botón de arriba a la derecha que dice si todo está guardado. Abre un cuadro con tres partes: dónde se guardan, llevarlos a otra parte y versiones anteriores.</p>
     </li>
     <li class="tarjeta">
       <div class="etiquetas"><span class="tipo">Paso 3</span></div>
-      <h3>Elige «Vincular archivo nuevo»</h3>
-      <p>Se abre una ventana titulada «Dónde se guardan tus datos», con varias opciones — esta es la que empieza a escribir en un archivo tuyo.</p>
+      <h3>Elige «Guardar en un archivo…»</h3>
+      <p>Es el botón rojo de «Dónde se guardan». A partir de ahí, Pauta escribe cada cambio en un archivo tuyo.</p>
     </li>
     <li class="tarjeta">
       <div class="etiquetas"><span class="tipo">Paso 4</span></div>
@@ -736,11 +738,12 @@ details[open] summary{border-bottom:1px solid var(--linea)}
       <div class="m-dialogo-fondo">
         <div class="m-dialogo">
           <div class="m-dlg-cuerpo">
-            <h4>Dónde se guardan tus datos</h4>
-            <p class="m-sub" style="margin-bottom:10px">Ahora mismo Pauta guarda en este navegador.</p>
-            <div class="m-dlg-opcion marcada" style="display:flex;align-items:center;justify-content:flex-start"><span class="badge">1</span>Vincular archivo nuevo</div>
-            <div class="m-dlg-opcion">Abrir archivo existente</div>
-            <div class="m-dlg-opcion">Desvincular</div>
+            <h4>Mis datos</h4>
+            <p class="m-sub" style="margin-bottom:10px">Dónde se guardan: solo en este navegador, en esta computadora.</p>
+            <div class="m-dlg-opcion marcada" style="display:flex;align-items:center;justify-content:flex-start"><span class="badge">1</span>Guardar en un archivo…</div>
+            <div class="m-dlg-opcion">Ya tengo un archivo: abrirlo…</div>
+            <div class="m-dlg-opcion">Descargar mis datos · Cargar datos de un archivo…</div>
+            <div class="m-dlg-opcion">› Versiones anteriores</div>
           </div>
           <div class="m-dlg-pie">
             <span class="m-mini">Cerrar</span>
@@ -750,17 +753,17 @@ details[open] summary{border-bottom:1px solid var(--linea)}
     </div>
     <div class="leyenda">
       <ol>
-        <li><span class="num">1</span><div><strong>Vincular archivo nuevo</strong> <span>— crea el .json y empieza a escribir en él desde ahora.</span></div></li>
+        <li><span class="num">1</span><div><strong>Guardar en un archivo…</strong> <span>— crea el .json y empieza a escribir en él desde ahora.</span></div></li>
       </ol>
     </div>
   </div>
 
   <div class="oscuro-caja">
-    <strong>Por qué guardarlo en la MISMA carpeta de tus materiales.</strong> Si <code>pauta.json</code> vive dentro de la carpeta sincronizada que ya usas para este curso, tu planeación deja de estar atada a una sola computadora. En la del salón de clases, en la de tu oficina o en cualquiera de las salas de profesores: abres <a href="/" target="_blank" rel="noopener">pauta-docente.netlify.app</a>, entras a «Archivo → Vincular archivo» → «Abrir archivo existente», y eliges ese mismo archivo dentro de esa carpeta. Verás tu planeación completa, tal como la dejaste — sin copiar nada a mano.
+    <strong>Por qué guardarlo en la MISMA carpeta de tus materiales.</strong> Si <code>pauta.json</code> vive dentro de la carpeta sincronizada que ya usas para este curso, tu planeación deja de estar atada a una sola computadora. En la del salón de clases, en la de tu oficina o en cualquiera de las salas de profesores: abres <a href="/" target="_blank" rel="noopener">pauta-docente.netlify.app</a>, entras a «Mis datos» → «Ya tengo un archivo: abrirlo…», y eliges ese mismo archivo dentro de esa carpeta. Verás tu planeación completa, tal como la dejaste — sin copiar nada a mano.
   </div>
 
-  <h3>En una computadora nueva: «Abrir archivo existente»</h3>
-  <p>Es la opción de al lado. Elige el <code>.json</code> que ya vinculaste desde tu carpeta sincronizada y Pauta carga todo lo que tenías. Si dos computadoras editaron el archivo por separado, se queda con la versión más reciente.</p>
+  <h3>En una computadora nueva: «Ya tengo un archivo: abrirlo…»</h3>
+  <p>Es la opción de al lado. Elige el <code>.json</code> que ya usas, dentro de tu carpeta sincronizada, y Pauta carga todo lo que tenías. Si más adelante quieres usar otro archivo, o dejar de usar uno, en <em>Mis datos</em> está «Cambiar…».</p>
 
   <div class="oscuro-caja">
     <strong>La carpeta tiene que estar en el disco, no solo en línea.</strong> Todas las nubes tienen un modo que deja los archivos en el servidor y baja solo los que abres, para ahorrar espacio. Si <code>pauta.json</code> cae en esa situación, Pauta no puede escribir en él. Cómo marcar esa carpeta como disponible sin conexión:
@@ -774,19 +777,28 @@ details[open] summary{border-bottom:1px solid var(--linea)}
   </div>
 
   <div class="nota-caja">
-    De vez en cuando el navegador vuelve a pedir permiso sobre el archivo vinculado — es normal, una medida de seguridad del propio navegador, no un error de Pauta. Cuando pase, entra a <em>Archivo → Vincular archivo</em> y usa el botón <strong>Reconectar</strong>.
+    De vez en cuando el navegador vuelve a pedir permiso sobre tu archivo — es normal, una medida de seguridad del propio navegador, no un error de Pauta. Cuando pase, entra a <em>Mis datos</em> y usa el botón <strong>Reconectar</strong>. <strong>Lo que hayas escrito mientras tanto no se pierde:</strong> sigue guardándose en el navegador, y al reconectar Pauta lo escribe en el archivo.
   </div>
+
+  <h3>Si otra computadora cambia el archivo mientras tienes Pauta abierta</h3>
+  <p>Pasa, por ejemplo, cuando dejas Pauta abierta en casa, trabajas en la oficina y al día siguiente vuelves a la pestaña de casa. Pauta <strong>no escribe encima</strong> de lo que guardó la otra computadora: se detiene, avisa con un cuadro y el indicador de guardado se pone en rojo («Otra computadora cambió el archivo»). Tus cambios siguen a salvo en el navegador y el archivo no se toca hasta que decidas:</p>
+  <ul>
+    <li><strong>Usar la versión del archivo</strong> — cargas lo que guardó la otra computadora. Lo que tenías en esta pestaña se guarda antes como versión anterior.</li>
+    <li><strong>Guardar la mía encima</strong> — el archivo queda con lo de esta pestaña. La versión que había se guarda antes como versión anterior.</li>
+    <li><strong>Decidir después</strong> — no pasa nada con el archivo; puedes resolverlo más tarde desde el indicador de guardado.</li>
+  </ul>
+  <p>Sea cual sea tu elección, la otra versión queda en las <a href="#respaldos">versiones anteriores</a>, así que nada se pierde. Para que Pauta pueda comparar versiones no hace falta que los relojes de las computadoras coincidan.</p>
 </section>
 
 <!-- ============================================================ -->
 <section class="seccion" id="respaldos">
   <div class="cabecera">
     <div class="meta">Guardar</div>
-    <h2>Copias de seguridad</h2>
-    <p>Además de tu archivo, Pauta archiva versiones por su cuenta, para que puedas volver atrás si borraste algo sin darte cuenta o importaste el respaldo equivocado.</p>
+    <h2>Versiones anteriores</h2>
+    <p>Además de tu archivo, Pauta guarda versiones por su cuenta, para que puedas volver atrás si borraste algo sin darte cuenta o cargaste el archivo equivocado.</p>
   </div>
 
-  <p>El reparto importa más que el número. Guardar una copia con cada dato que capturas suena a más seguridad y es lo contrario: en diez minutos las ranuras quedarían ocupadas por tres versiones casi idénticas de hace un rato, y el estado de ayer —el único al que querrías volver— se habría perdido. Por eso se conservan en dos tramos:</p>
+  <p>El reparto importa más que el número. Guardar una versión con cada dato que capturas suena a más seguridad y es lo contrario: en diez minutos las ranuras quedarían ocupadas por tres versiones casi idénticas de hace un rato, y el estado de ayer —el único al que querrías volver— se habría perdido. Por eso se conservan en dos tramos:</p>
 
   <div class="grid">
     <div class="item">
@@ -799,11 +811,15 @@ details[open] summary{border-bottom:1px solid var(--linea)}
     </div>
   </div>
 
-  <p>Antes de cualquier operación que sustituya todo —abrir otro archivo, importar un respaldo, restaurar una copia— se archiva siempre, sin esperar. Las copias aparecen al final de la ventana «Dónde se guardan tus datos»:</p>
+  <div class="nota-caja">
+    <strong>Si tu planeación es muy grande</strong>, cada versión ocupa lo que ocupa todo el panel, y el navegador solo deja unos cinco millones de caracteres por sitio. Pauta no deja que las versiones se queden con ese espacio: guarda menos —primero suelta las recientes de más, después los días más viejos— para que <em>lo que escribes ahora</em> siempre quepa. Si aun así tuvo que soltar versiones, <em>Mis datos</em> te lo dice. Para una planeación así de grande lo más seguro es <a href="#nube">guardar en un archivo</a>, que no tiene ese límite.
+  </div>
+
+  <p>Antes de cualquier operación que sustituya todo —abrir otro archivo, cargar datos de un archivo, restaurar una versión— se guarda siempre una, sin esperar. Están al final de <em>Mis datos</em>, plegadas en «Versiones anteriores»; se despliegan solas cuando algo salió mal:</p>
 
   <div class="maqueta" style="max-width:480px">
     <div style="padding:14px 16px">
-      <h4 style="font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:var(--gris-tenue);margin-bottom:6px">Copias de seguridad</h4>
+      <h4 style="font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:var(--gris-tenue);margin-bottom:6px">Versiones anteriores</h4>
       <div class="m-copia nueva">
         <span class="m-cuando">Hoy, 10:32</span>
         <span class="m-que">mientras trabajabas · 2 materias, 5 sesiones</span>
@@ -811,7 +827,7 @@ details[open] summary{border-bottom:1px solid var(--linea)}
       </div>
       <div class="m-copia">
         <span class="m-cuando">Ayer, 18:10</span>
-        <span class="m-que">antes de importar un respaldo · 2 materias, 5 sesiones</span>
+        <span class="m-que">antes de cargar datos de un archivo · 2 materias, 5 sesiones</span>
         <span class="m-mini">Restaurar</span>
       </div>
       <div class="m-copia">
@@ -823,10 +839,10 @@ details[open] summary{border-bottom:1px solid var(--linea)}
   </div>
 
   <div class="nota-caja">
-    «Restaurar» sustituye lo que hay ahora — pero antes archiva el estado actual como una copia más, así que nunca pierdes la versión de la que partiste.
+    «Restaurar» sustituye lo que hay ahora — pero antes guarda el estado actual como una versión más, así que nunca pierdes la versión de la que partiste.
   </div>
 
-  <p>Estas copias viven en el navegador, no en tu nube: si abres Pauta en otra computadora no las vas a encontrar ahí. Por eso son un respaldo <em>local</em>, complementario a tener el archivo vinculado — no un sustituto.</p>
+  <p>Estas versiones viven en el navegador, no en tu nube: si abres Pauta en otra computadora no las vas a encontrar ahí. Son una red <em>local</em>, complementaria a guardar en un archivo — no un sustituto.</p>
 </section>
 
 <!-- ============================================================ -->
@@ -841,12 +857,12 @@ details[open] summary{border-bottom:1px solid var(--linea)}
     <li class="tarjeta">
       <div class="etiquetas"><span class="tipo">Paso 1</span></div>
       <h3>Selecciona la sesión del día y haz clic en «Modo clase»</h3>
-      <p>Es el botón rojo, en la barra de controles de la sesión. Pide pantalla completa al navegador, así que en el proyector desaparecen la barra de direcciones y las pestañas.</p>
+      <p>Es el botón rojo, en la barra de controles de la sesión. Pide pantalla completa al navegador, así que en el proyector desaparecen la barra de direcciones y las pestañas. Con la <a href="#presentacion">presentación</a> encendida no la pide: lo que ve el grupo es la portada y los recursos, y el modo clase se queda contigo —en Chrome y Edge, en una ventanita flotante—.</p>
     </li>
     <li class="tarjeta">
       <div class="etiquetas"><span class="tipo">Paso 2</span></div>
       <h3>Navega con las flechas del teclado</h3>
-      <p>← → para moverte entre recursos, «Abrir recurso» para abrir su liga sin salir de esta pantalla. Si encendiste la <a href="#presentacion">ventana de presentación</a>, el recurso aparece ahí y el botón te lo dice.</p>
+      <p>← → para moverte entre recursos y <kbd>A</kbd> —o «Abrir recurso»— para abrir su liga sin salir de esta pantalla. Al pie se te confirma qué pasó: si ya la ven tus alumnos en la <a href="#presentacion">presentación</a>, si se abrió en otra pestaña o si el navegador la bloqueó. Si sales y vuelves a entrar en la misma sesión, retomas el recurso donde ibas y el reloj no se reinicia.</p>
     </li>
     <li class="tarjeta">
       <div class="etiquetas"><span class="tipo">Paso 3</span></div>
@@ -888,25 +904,25 @@ details[open] summary{border-bottom:1px solid var(--linea)}
 <section class="seccion" id="presentacion">
   <div class="cabecera">
     <div class="meta">En clase</div>
-    <h2>Clases en Zoom: la ventana de presentación</h2>
-    <p>Una sola ventana aparte para todos los recursos. Compartes esa, y nada más: tus alumnos no ven Pauta cada vez que cambias de material.</p>
+    <h2>Clases en Zoom: la presentación</h2>
+    <p>Tus alumnos ven la portada y los recursos; tú ves además el reloj, tus notas y lo que sigue. Compartes una vez y no vuelves a Zoom en toda la clase.</p>
   </div>
 
-  <p><strong>El problema que resuelve.</strong> Normalmente cada recurso se abre en una pestaña nueva de la misma ventana. En Zoom eso deja dos malas opciones: compartir la ventana entera del navegador —y que el grupo vea tu Pauta, con tus tiempos y tu bitácora, cada vez que cambias— o compartir una sola pestaña, y entonces los recursos siguientes no se comparten. Lo que verían sería <em>recurso anterior → tu Pauta → recurso nuevo</em>.</p>
+  <p><strong>El problema que resuelve.</strong> Normalmente cada recurso se abre en una pestaña nueva. En Zoom eso deja dos malas opciones: compartir la ventana entera del navegador —y que el grupo vea tu Pauta, con tus tiempos y tu bitácora, cada vez que cambias— o compartir una sola pestaña, y entonces los recursos siguientes no se comparten. Lo que verían sería <em>recurso anterior → tu Pauta → recurso nuevo</em>.</p>
 
-  <p>Con la ventana de presentación encendida, todos los recursos van a una misma ventana. La compartes una vez al principio y se queda compartida toda la sesión: tú te quedas en Pauta y lo que el grupo ve cambia detrás, sin que la ventana te robe el foco.</p>
+  <p>Con «Presentación» encendida, en <strong>Chrome o Edge</strong> el modo clase se parte en dos. Los controles se mudan a una <strong>ventanita flotante</strong> que siempre queda encima y que Zoom no comparte. La pestaña de Pauta pasa a mostrar la <strong>portada</strong> de la sesión, a toda la ventana, y cada recurso se abre en una pestaña de esa misma ventana. Compartes esa ventana y ya.</p>
 
   <div class="maqueta" style="padding:16px;background:var(--papel)">
     <div class="m-zoom">
       <div class="m-zoom-caja">
-        <div class="m-zoom-rotulo">Tu pantalla</div>
+        <div class="m-zoom-rotulo">Solo tú la ves</div>
         <div class="m-zoom-pauta">
-          <div class="m-zoom-barra"><span class="m-marca">Pauta</span></div>
+          <div class="m-zoom-barra"><span class="m-marca">Controles</span></div>
           <div class="m-zoom-cuerpo">
             <span class="m-zoom-linea larga"></span>
             <span class="m-zoom-linea"></span>
             <span class="m-zoom-linea media"></span>
-            <span class="m-zoom-nota">tus tiempos, tu bitácora,<br>tus notas de clase</span>
+            <span class="m-zoom-nota">el reloj, tus notas,<br>el recurso que sigue</span>
           </div>
         </div>
       </div>
@@ -923,7 +939,7 @@ details[open] summary{border-bottom:1px solid var(--linea)}
     </div>
     <div class="leyenda">
       <ol>
-        <li><span class="num">1</span><div><strong>Se comparte una sola vez</strong> <span>— y se queda compartida toda la sesión.</span></div></li>
+        <li><span class="num">1</span><div><strong>Se comparte una sola vez</strong> <span>— y se queda compartida toda la sesión, aunque abras YouTube o Drive.</span></div></li>
         <li><span class="num">2</span><div><strong>La portada llena la espera</strong> <span>— puedes reservar la ventana antes de empezar sin proyectar ningún recurso.</span></div></li>
       </ol>
     </div>
@@ -932,27 +948,59 @@ details[open] summary{border-bottom:1px solid var(--linea)}
   <ol class="riel">
     <li class="tarjeta">
       <div class="etiquetas"><span class="tipo">Paso 1</span></div>
-      <h3>Enciéndela en el menú «⋯» de la sesión</h3>
-      <p>El de la derecha, junto a «Modo clase». Dice «Ventana de presentación: apagada»; al pulsarlo se enciende y abre la ventana con la portada de la sesión. La primera vez el navegador puede bloquearla: permítele las ventanas emergentes a esta página y vuelve a intentarlo.</p>
+      <h3>Enciende «Presentación»</h3>
+      <p>Es el botón que está junto a «Modo clase», y dice en qué estado está: <em>Presentación: apagada</em> o <em>encendida</em>. Se hace <strong>una sola vez</strong>: queda encendido para las clases siguientes.</p>
     </li>
     <li class="tarjeta">
       <div class="etiquetas"><span class="tipo">Paso 2</span></div>
-      <h3>Compártela en Zoom</h3>
-      <p>En <em>Compartir pantalla</em>, elige <strong>esa ventana</strong>, no la pantalla completa ni la de Pauta. Como está mostrando la portada —nombre de la materia, sesión y fecha— puedes compartirla desde antes de empezar, sin adelantar ningún material.</p>
+      <h3>Entra a «Modo clase»</h3>
+      <p>Aparece la ventanita de controles y la pestaña de Pauta se convierte en la portada: nombre de la materia, sesión y fecha. Acomoda la ventanita donde te estorbe menos; se queda encima de todo.</p>
     </li>
     <li class="tarjeta">
       <div class="etiquetas"><span class="tipo">Paso 3</span></div>
-      <h3>Da clase normal</h3>
-      <p>Cada «Abrir» lleva el recurso a esa ventana. Entre un recurso y el siguiente puedes volver a la portada: con «Mostrar la portada» del mismo menú «⋯», o con el botón <strong>Portada</strong> del modo clase.</p>
+      <h3>Comparte en Zoom la ventana de Pauta</h3>
+      <p><strong>En Mac, primero ten la ventana de Pauta en el mismo escritorio que Zoom</strong>, a la vista y sin pantalla completa: Zoom solo ofrece las ventanas del escritorio en el que estás. Si la de Pauta está en pantalla completa (que en Mac es un escritorio aparte), minimizada o en otro escritorio de Mission Control, no aparece en la lista; tráela, o sal de la pantalla completa con <kbd>⌃⌘F</kbd>, y vuelve a abrir <em>Compartir</em>.</p>
+      <p>En <em>Compartir pantalla</em>, en <strong>Ventanas de aplicación</strong>, elige la que lleva el <strong>nombre de la materia</strong> y muestra la portada. Si vas a poner videos, marca <em>Compartir sonido</em>. No elijas:</p>
+      <ul>
+        <li><strong>«Toda la pantalla» o «Desktop»</strong>: tus alumnos verían también la ventanita de controles.</li>
+        <li><strong>«Pestañas de Chrome»</strong>: comparte una sola pestaña, y Chrome te pediría confirmar cada recurso que abras.</li>
+        <li><strong>La que dice solo «Google Chrome», sin miniatura</strong>: suele ser la ventanita de controles.</li>
+      </ul>
+    </li>
+    <li class="tarjeta">
+      <div class="etiquetas"><span class="tipo">Paso 4</span></div>
+      <h3>Da clase desde la ventanita</h3>
+      <p><strong>→</strong> y <strong>←</strong> recorren los recursos, <strong>A</strong> muestra el que tienes delante y <strong>P</strong> vuelve a la portada. Arriba de los botones, <em>En pantalla</em> te dice qué están viendo tus alumnos, sin tener que ir a Zoom a comprobarlo. Para pasar diapositivas o pausar un video, haz clic en el recurso; la ventanita sigue ahí.</p>
+    </li>
+    <li class="tarjeta">
+      <div class="etiquetas"><span class="tipo">Paso 5</span></div>
+      <h3>Al terminar, deja de compartir y vuelve al panel</h3>
+      <p>Al cerrar la ventanita —con «Salir», con <strong>Esc</strong> o con su ×— la portada se queda puesta: debajo está tu panel, y la ventana sigue compartida. Arriba a la derecha aparecen <em>Reanudar la clase</em> y <em>Volver al panel</em>. Deja de compartir en Zoom antes de volver al panel.</p>
     </li>
   </ol>
 
   <div class="nota-caja">
-    <strong>En el salón presencial</strong> funciona igual, pero con <em>escritorio extendido</em> en vez de duplicar pantalla: arrastra la ventana de presentación al proyector y quédate con Pauta en la tuya.
+    <strong>Si pierdes la ventanita de controles.</strong> Si la cerraste, en la portada aparece arriba a la derecha <em>Reanudar la clase</em>. Si sigue abierta pero no la encuentras —quedó en otro escritorio, por ejemplo—, haz clic en la portada y pulsa <kbd>Esc</kbd>: se cierra, y <em>Reanudar la clase</em> la vuelve a abrir junto a ti. Tus alumnos solo ven ese recuadro unos segundos, nunca tu panel.
+  </div>
+
+  <div class="nota-caja">
+    <strong>Si sales un momento, no pierdes el hilo.</strong> Al volver a entrar al modo clase en la misma sesión, retomas el recurso donde ibas y el reloj sigue contando desde que empezaste; lo que tus alumnos estaban viendo no se toca. Y si Pauta se recarga a media clase, la portada se queda puesta para que el grupo no vea el panel.
+  </div>
+
+  <div class="nota-caja">
+    <strong>Tus alumnos ven la ventana completa, con sus pestañas.</strong> Si en esa ventana tienes otras abiertas —el correo, por ejemplo— verán sus títulos. Abre Pauta en una ventana propia antes de la clase (en Chrome, <em>Archivo → Nueva ventana</em>, o arrastra la pestaña fuera).
   </div>
 
   <div class="oscuro-caja">
-    <strong>Por qué nace apagada.</strong> Reutilizar una ventana obliga a conservar su referencia, y eso permite que la página abierta alcance la ventana de Pauta. Es un cambio real respecto de abrir cada recurso en una pestaña aislada, así que se enciende a propósito y solo mientras haga falta. Con el interruptor apagado, todo se comporta como siempre. <em>«Abrir todas las ligas» se queda con pestañas</em> en los dos casos: son varias a la vez, y en una sola ventana se pisarían unas a otras.
+    <strong>En Safari y Firefox no hay ventanita flotante.</strong> Ahí los recursos van a una <em>ventana aparte</em>, que se abre sola con la portada al entrar al modo clase: compártela a ella. Funciona, con un límite que no depende de Pauta: YouTube, Google Drive, Classroom, Dropbox, iCloud, Canva, Padlet y Mentimeter <em>desconectan</em> esa ventana de Pauta por seguridad. El recurso se sigue viendo, pero el siguiente se abre en una ventana nueva que hay que volver a compartir. Pauta te lo avisa en el momento. Con Chrome o Edge eso no pasa: cada recurso es una pestaña más de la misma ventana compartida.
+  </div>
+
+  <div class="nota-caja">
+    <strong>En el salón presencial</strong> funciona igual, pero con <em>escritorio extendido</em> en vez de duplicar pantalla: arrastra al proyector la ventana que muestra la portada y quédate con la ventanita en tu pantalla.
+  </div>
+
+  <div class="oscuro-caja">
+    <strong>Por qué nace apagada.</strong> Para llevar cada recurso a la misma pestaña —o a la misma ventana—, Pauta tiene que conservar un vínculo con ella, y ese vínculo permite que la página abierta alcance la de Pauta. Es un cambio real respecto de abrir cada recurso en una pestaña aislada, así que se enciende a propósito. Con el interruptor apagado, todo se comporta como siempre. <em>«Abrir todas las ligas» se queda con pestañas aisladas</em> en los dos casos: son varias a la vez y se pisarían unas a otras.
   </div>
 </section>
 
@@ -1006,12 +1054,12 @@ details[open] summary{border-bottom:1px solid var(--linea)}
       <p>Imprime la sesión activa como guion de papel, sin botones ni interfaz.</p>
     </div>
     <div class="item">
-      <h4>Exportar a Markdown</h4>
-      <p>Descarga la materia activa en texto plano: sesiones, recursos, ligas, notas y bitácoras.</p>
+      <h4>Descargar como texto (.md)</h4>
+      <p>En el menú <strong>⋯</strong> de cada materia, en la columna izquierda. Descarga la materia en texto: sesiones, recursos, ligas, notas y bitácoras. Se abre con cualquier editor.</p>
     </div>
     <div class="item">
-      <h4>Plantilla del curso</h4>
-      <p>Como la anterior, pero sin ligas ni bitácoras — para compartir tu planeación sin exponer tus URLs privadas.</p>
+      <h4>Duplicar materia</h4>
+      <p>En el menú <strong>⋯</strong> de cada materia. Hace una copia de ella, con dos opciones. <strong>Copia para otro semestre</strong> conserva tus recursos <em>con sus ligas</em>, la carpeta y el cuaderno: para volver a dar el mismo curso. <strong>Estructura para otro curso o taller</strong> quita <em>todas</em> las ligas, también las escritas dentro de las notas, y deja solo el esqueleto: para empezar algo nuevo o compartirla sin exponer tus direcciones. En las dos las bitácoras se quedan fuera y los recursos vuelven a «pendiente». Puedes cambiar el nombre, el periodo y el tipo, y mover las fechas a una nueva primera sesión. La copia se <strong>agrega a tu panel</strong> junto a tus otras materias, o se descarga como archivo. Al cargar un archivo que trae una sola materia (<em>Mis datos → Cargar datos de un archivo</em>), Pauta pregunta si <em>agregarla como materia nueva</em> o <em>sustituir todo</em>; uno con varias materias siempre sustituye todo, previa confirmación.</p>
     </div>
     <div class="item">
       <h4>Nueva nota</h4>
@@ -1019,7 +1067,7 @@ details[open] summary{border-bottom:1px solid var(--linea)}
     </div>
     <div class="item">
       <h4>Plegar la barra lateral</h4>
-      <p>El botón de la esquina superior izquierda la esconde y la trae de vuelta. Recuerda cómo la dejaste.</p>
+      <p>El botón de la esquina superior izquierda la esconde y la trae de vuelta. Recuerda cómo la dejaste. Las sesiones (o bloques) de la materia abierta se despliegan justo debajo de su nombre, con su carpeta y cuaderno; al abrir otra materia, se mudan con ella.</p>
     </div>
     <div class="item">
       <h4>Duplicar sesión</h4>
@@ -1034,7 +1082,9 @@ details[open] summary{border-bottom:1px solid var(--linea)}
       <span class="m-btn2">Deshacer</span>
     </div>
   </div>
-  <div class="nota-caja">Tienes unos segundos antes de que el aviso desaparezca solo.</div>
+  <div class="nota-caja">
+    Tienes unos segundos antes de que el aviso desaparezca solo. «Deshacer» devuelve <strong>solo lo que quitaste</strong>, en el lugar donde estaba: lo que hayas escrito mientras tanto —una bitácora, otro recurso— se queda como está. Solo se puede deshacer la última eliminación.
+  </div>
 </section>
 
 <!-- ============================================================ -->
@@ -1046,27 +1096,42 @@ details[open] summary{border-bottom:1px solid var(--linea)}
 
   <details>
     <summary>¿Pauta funciona sin internet?</summary>
-    <div class="resp"><p>Una vez cargada la página, sí. Pero si tu archivo vinculado está en una carpeta sincronizada, necesitas conexión para que tu nube lleve esos cambios a tus otras computadoras.</p></div>
+    <div class="resp"><p>Una vez cargada la página, sí. Pero si tu archivo está en una carpeta sincronizada, necesitas conexión para que tu nube lleve esos cambios a tus otras computadoras.</p></div>
+  </details>
+
+  <details>
+    <summary>¿Qué significa «No se pudo escribir en tu archivo porque está en uso»?</summary>
+    <div class="resp"><p>Otro programa tenía el archivo abierto justo cuando Pauta quiso escribir en él —suele ser la aplicación de tu nube, sincronizándolo—. Pauta espera unos segundos y lo vuelve a intentar sola; casi siempre basta y no ves nada. Si el aviso aparece, tus cambios <strong>están a salvo en el navegador</strong> y Pauta lo reintenta en el siguiente cambio. No hace falta reconectar: eso solo es cuando el aviso habla del <em>permiso</em> o de que el archivo <em>ya no está donde estaba</em>.</p></div>
+  </details>
+
+  <details>
+    <summary>Pauta abrió con datos de ejemplo y dijo que lo guardado estaba dañado. ¿Perdí mi planeación?</summary>
+    <div class="resp"><p>Probablemente no. Cuando Pauta no puede leer lo que había guardado en el navegador, <strong>lo conserva aparte, sin tocarlo</strong>, antes de dejarte trabajar con los datos de ejemplo. Entra a <em>Mis datos</em>: ahí aparece <em>«Se conservó aparte una versión que no se pudo leer»</em>, con un botón para descargarla, y las <a href="#respaldos">versiones anteriores</a> ya desplegadas: restaura la más reciente. Si tienes tus datos descargados, cárgalos con <em>Cargar datos de un archivo</em>.</p></div>
+  </details>
+
+  <details>
+    <summary>Pauta tarda en abrir mi archivo</summary>
+    <div class="resp"><p>Si el archivo está «solo en línea», la aplicación de tu nube tiene que descargarlo primero. Pauta espera unos segundos con el indicador en «Abriendo tu archivo…»; si no llega, abre la copia de este navegador y te lo dice. Cuando el archivo esté disponible entra a <em>Mis datos</em> y usa <strong>Reconectar</strong>: lo que hayas escrito mientras tanto se guarda en el archivo, no se pierde. Para que no vuelva a pasar, marca la carpeta como <a href="#nube">disponible sin conexión</a>.</p></div>
   </details>
 
   <details>
     <summary>¿Por qué me vuelve a pedir permiso sobre el archivo?</summary>
-    <div class="resp"><p>Es el propio navegador, no Pauta: por seguridad, Chrome y Edge piden confirmar el acceso cada cierto tiempo. Se resuelve con el botón <strong>Reconectar</strong> dentro de <em>Archivo → Vincular archivo</em>.</p></div>
+    <div class="resp"><p>Es el propio navegador, no Pauta: por seguridad, Chrome y Edge piden confirmar el acceso cada cierto tiempo. Se resuelve con el botón <strong>Reconectar</strong> dentro de <em>Mis datos</em>.</p></div>
   </details>
 
   <details>
-    <summary>Cerré la pestaña sin vincular archivo. ¿Perdí mi planeación?</summary>
-    <div class="resp"><p>No: si estabas en modo «navegador», tus datos siguen guardados en este navegador y esta computadora. Ábrelo de nuevo en el mismo Chrome o Edge y ahí van a estar. Si no aparecen, revisa las <a href="#respaldos">copias de seguridad</a>.</p></div>
+    <summary>Cerré la pestaña sin guardar en un archivo. ¿Perdí mi planeación?</summary>
+    <div class="resp"><p>No: si estabas en modo «navegador», tus datos siguen guardados en este navegador y esta computadora. Ábrelo de nuevo en el mismo Chrome o Edge y ahí van a estar. Si no aparecen, revisa las <a href="#respaldos">versiones anteriores</a>.</p></div>
   </details>
 
   <details>
     <summary>¿Puedo usar el mismo archivo desde varias computadoras?</summary>
-    <div class="resp"><p>Sí — es justo el punto de <a href="#nube">vincularlo dentro de tu carpeta sincronizada</a>. En cada computadora usas <em>Archivo → Vincular archivo → Abrir archivo existente</em> y eliges ese mismo .json.</p></div>
+    <div class="resp"><p>Sí — es justo el punto de <a href="#nube">guardarlo dentro de tu carpeta sincronizada</a>. En cada computadora usas <em>Mis datos → Ya tengo un archivo: abrirlo…</em> y eliges ese mismo .json.</p></div>
   </details>
 
   <details>
     <summary>¿Mis ligas de la nube son privadas?</summary>
-    <div class="resp"><p>Sí, Pauta no las envía a ningún servidor. Pero los respaldos <code>.json</code> sí las incluyen, con sus claves de uso compartido — no subas ese archivo a un repositorio abierto ni lo compartas fuera de tu nube institucional.</p></div>
+    <div class="resp"><p>Sí, Pauta no las envía a ningún servidor. Pero los <code>.json</code> —tu archivo y lo que descargues— sí las incluyen, con sus claves de uso compartido — no subas ese archivo a un repositorio abierto ni lo compartas fuera de tu nube institucional.</p></div>
   </details>
 
   <details>
@@ -1078,7 +1143,7 @@ details[open] summary{border-bottom:1px solid var(--linea)}
     <summary>Antes se llamaba «Pauta» y estaba en otra dirección. ¿Perdí algo?</summary>
     <div class="resp">
       <p>No. La dirección anterior reenvía sola a esta, así que las ligas viejas siguen funcionando.</p>
-      <p>Lo único que no viaja es lo guardado «en este navegador»: ese almacenamiento está atado a la dirección, y esta es nueva. Si usabas Pauta sin archivo vinculado, tu planeación sigue intacta en la dirección anterior: ábrela, usa <em>Archivo → Guardar respaldo</em> y luego <em>Archivo → Importar respaldo</em> aquí. Si tenías archivo vinculado, no tienes que hacer nada.</p>
+      <p>Lo único que no viaja es lo guardado «en este navegador»: ese almacenamiento está atado a la dirección, y esta es nueva. Si usabas Pauta sin guardar en un archivo, tu planeación sigue intacta en la dirección anterior: ábrela, usa <em>Descargar mis datos</em> y luego, aquí, <em>Mis datos → Cargar datos de un archivo</em>. Si guardabas en un archivo, no tienes que hacer nada.</p>
     </div>
   </details>
 

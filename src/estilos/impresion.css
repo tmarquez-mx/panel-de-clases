@@ -10,7 +10,7 @@
   .barra, .lateral, .controles, .acciones, .acciones-sesion,
   .ver-todas, .rotulo, .modo-clase, .pie-pagina, .enlaces-materia,
   dialog, .menu, .btn-icono, .tarjeta .punto,
-  .bitacora .pie-bit, .bitacora .aclara, .aviso-flotante{ display:none!important }
+  .bitacora .pie-bit, .bitacora .aclara, .aviso-flotante, .escenario{ display:none!important }
 
   .envoltura{display:block;min-height:0}
   .principal{padding:0;width:auto}

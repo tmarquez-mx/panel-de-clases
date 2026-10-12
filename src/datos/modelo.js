@@ -8,6 +8,7 @@
      "tipos": ["podcast"],            // tipos propios, además de los de base
      "materias": [{
        id, clase, nombre, clave, carpeta, cuaderno,   // clase: curso | taller | ponencia
+       ofimatica,                     // opcional: microsoft | google | ninguna
        sesiones: [{
          num, fecha, titulo, proposito, bitacora,
          recursos: [{ titulo, tipo, momento, url, nota, estado }]
@@ -20,8 +21,9 @@
    valores por omisión y nunca se pierde información existente.
    ========================================================= */
 
-import { aFecha } from "../util/fechas.js";
+import { aFecha, sumarDias } from "../util/fechas.js";
 import { CLASES } from "./vocabulario.js";
+import { SUITES } from "./nubes.js";
 
 export const VERSION_DATOS = 2;
 
@@ -50,7 +52,7 @@ export class ErrorDeDatos extends Error {
 /** Devuelve siempre una cadena, aunque el respaldo traiga números u objetos. */
 const texto = (v) => (typeof v === "string" ? v : typeof v === "number" ? String(v) : "");
 
-const identificador = () => `m${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+export const identificador = () => `m${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 
 const esObjeto = (v) => !!v && typeof v === "object" && !Array.isArray(v);
 
@@ -92,6 +94,16 @@ function normalizarMateria(entrada, posicion) {
   // Los respaldos anteriores no traen «clase»: todo lo que existía era un
   // curso, así que ese es el valor por omisión y nada se pierde al migrar.
   const clase = CLASES.includes(texto(m.clase).trim()) ? texto(m.clase).trim() : "curso";
+
+  /* La suite de ofimática es opcional, y ausente significa algo: que se
+     deduzca de la carpeta vinculada. Por eso solo se conserva si es una de
+     las tres válidas, y si no lo es simplemente no se escribe, en vez de
+     inventar un valor. Este campo se perdía al recargar porque migrar()
+     copia campo por campo y nadie se lo enseñó: todo lo que la interfaz
+     escribe en una materia tiene que aparecer aquí, o no sobrevive a la
+     siguiente carga. Object.hasOwn y no «in»: «constructor» está en cualquier
+     objeto y no es una suite. */
+  const ofimatica = texto(m.ofimatica).trim();
   const materia = {
     id: texto(m.id).trim() || identificador(),
     clase,
@@ -99,6 +111,7 @@ function normalizarMateria(entrada, posicion) {
     clave: texto(m.clave).trim(),
     carpeta: texto(m.carpeta).trim(),
     cuaderno: texto(m.cuaderno).trim(),
+    ...(Object.hasOwn(SUITES, ofimatica) ? { ofimatica } : {}),
     sesiones: soloObjetos(m.sesiones).map(normalizarSesion),
   };
   ordenarSesiones(materia);
@@ -112,18 +125,18 @@ function normalizarMateria(entrada, posicion) {
  */
 export function migrar(entrada) {
   if (!entrada || typeof entrada !== "object" || Array.isArray(entrada)) {
-    throw new ErrorDeDatos("El archivo no contiene un respaldo del panel: se esperaba un objeto JSON.");
+    throw new ErrorDeDatos("El archivo no tiene datos de Pauta: se esperaba un objeto JSON.");
   }
   if (!Array.isArray(entrada.materias)) {
-    throw new ErrorDeDatos('El archivo no tiene la lista "materias". No es un respaldo del panel.');
+    throw new ErrorDeDatos('El archivo no tiene la lista "materias". No son datos de Pauta.');
   }
   if (entrada.materias.length === 0) {
-    throw new ErrorDeDatos("El respaldo no tiene ninguna materia. No se cargó nada para no borrar lo que ya tienes.");
+    throw new ErrorDeDatos("El archivo no tiene ninguna materia. No se cargó nada para no borrar lo que ya tienes.");
   }
 
   const materias = soloObjetos(entrada.materias).map(normalizarMateria);
   if (!materias.length) {
-    throw new ErrorDeDatos("Ninguna materia del respaldo se pudo leer: el archivo está dañado.");
+    throw new ErrorDeDatos("Ninguna materia del archivo se pudo leer: está dañado.");
   }
 
   // Tipos propios: los declarados en el respaldo más los que aparezcan en los
@@ -259,4 +272,91 @@ export function copiaDeSesion(sesion, { num, fecha, titulo }) {
 
 export function materiaNueva(campos) {
   return { id: identificador(), sesiones: [], ...campos };
+}
+
+/* ---------- Copiar una materia ---------- */
+
+/* Las dos maneras de copiar una materia sirven a usos opuestos:
+ *
+ *   semestre    — volver a dar el mismo curso otro semestre. Conserva los
+ *                 recursos CON sus ligas, y también la carpeta, el cuaderno y
+ *                 la suite de ofimática: es tuyo y quieres los mismos
+ *                 materiales.
+ *   estructura  — empezar otro curso o un taller, o compartir el esqueleto.
+ *                 Quita TODAS las ligas y deja sesiones, propósitos, títulos,
+ *                 tipos, momentos y notas de uso.
+ *
+ * En las dos las bitácoras se quedan fuera y todos los recursos vuelven a
+ * «pendiente»: son de la vez anterior. */
+
+export const MARCA_DE_LIGA_QUITADA = "[liga quitada]";
+
+/* Ligas web y de aplicación de escritorio. Se reconocen por el esquema, no por
+   el dominio: lo que se quiere es no dejar ninguna dirección, sea de quien sea. */
+const LIGA_EN_TEXTO =
+  /(?:onenote:)?(?:https?|file):\/\/[^\s<>"]+|(?:obsidian|zotero|ms-word|ms-powerpoint|ms-excel|ms-onenote|onenote):\/\/[^\s<>"]+|mailto:[^\s<>"]+/gi;
+
+/**
+ * Quita las direcciones escritas DENTRO de un texto libre. Antes la plantilla
+ * vaciaba el campo «liga» de cada recurso pero dejaba las que la usuaria
+ * había pegado en una nota o en un propósito, y la promesa era «sin filtrar
+ * tus URLs». Queda una marca en su lugar para que la nota se siga leyendo
+ * («Lee esto: [liga quitada]») y se note que allí había algo.
+ * La puntuación que cierra la frase se conserva.
+ */
+export function quitarLigasDeTexto(crudo) {
+  return String(crudo ?? "").replace(LIGA_EN_TEXTO, (liga) => {
+    const cola = liga.match(/[.,;:)]+$/)?.[0] || "";
+    return MARCA_DE_LIGA_QUITADA + cola;
+  });
+}
+
+/** Cuántos días hay que mover las fechas para que la primera caiga en `primeraFecha`. */
+function desplazamientoDeFechas(sesiones, primeraFecha) {
+  const destino = aFecha(primeraFecha);
+  const fechas = sesiones.map((s) => aFecha(s.fecha)).filter(Boolean);
+  if (!destino || !fechas.length) return 0;
+  const primera = new Date(Math.min(...fechas));
+  return Math.round((destino - primera) / 86_400_000); // el redondeo absorbe el cambio de horario
+}
+
+/**
+ * Copia de una materia, lista para agregarse al panel o para descargarse.
+ * No modifica la original. Opciones:
+ *   modo          "semestre" (por omisión) o "estructura"
+ *   nombre, clave, clase   para poner otros; si faltan se conservan
+ *   primeraFecha  «AAAA-MM-DD»: mueve todas las fechas para que la primera
+ *                 sesión caiga ese día, conservando los intervalos. Sin ella,
+ *                 las fechas se conservan tal cual.
+ */
+export function copiaDeMateria(materia, opciones = {}) {
+  const conRecursos = opciones.modo !== "estructura";
+  const libre = (t) => (conRecursos ? texto(t) : quitarLigasDeTexto(t));
+  const dias = desplazamientoDeFechas(materia.sesiones || [], opciones.primeraFecha);
+  const mover = (fecha) => (dias && aFecha(fecha) ? sumarDias(fecha, dias) : texto(fecha));
+
+  return {
+    id: identificador(),
+    clase: CLASES.includes(opciones.clase) ? opciones.clase : materia.clase || "curso",
+    nombre: texto(opciones.nombre).trim() || materia.nombre,
+    clave: opciones.clave === undefined ? materia.clave : texto(opciones.clave).trim(),
+    carpeta: conRecursos ? texto(materia.carpeta) : "",
+    cuaderno: conRecursos ? texto(materia.cuaderno) : "",
+    ...(conRecursos && Object.hasOwn(SUITES, materia.ofimatica) ? { ofimatica: materia.ofimatica } : {}),
+    sesiones: (materia.sesiones || []).map((s) => ({
+      num: s.num,
+      fecha: mover(s.fecha),
+      titulo: libre(s.titulo),
+      proposito: libre(s.proposito),
+      bitacora: "",
+      recursos: (s.recursos || []).map((r) => ({
+        titulo: libre(r.titulo),
+        tipo: r.tipo,
+        momento: r.momento,
+        url: conRecursos ? texto(r.url) : "",
+        nota: libre(r.nota),
+        estado: "pendiente",
+      })),
+    })),
+  };
 }

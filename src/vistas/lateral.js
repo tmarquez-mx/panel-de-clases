@@ -9,17 +9,38 @@ import { voz, rotuloDeLaLista } from "../datos/vocabulario.js";
 import { rotuloDeCuaderno } from "../datos/nubes.js";
 import { abrirDlgMateria, abrirDlgSesion } from "./dialogos.js";
 import { abrirRevision } from "./revision.js";
+import { abrirMenu } from "./menu.js";
+
+/* Lo que se hace CON una materia vive en su propio menú: editarla,
+   duplicarla y descargarla como texto. Antes las dos últimas estaban en
+   «Archivo», revueltas con lo que se hace con los datos. Duplicar y
+   descargar actúan sobre la materia abierta, así que primero se abre. */
+function menuDeMateria(boton, i) {
+  const ir = () => {
+    if (estado.materiaActiva !== i) {
+      irAMateria(i);
+      repintar();
+    }
+  };
+  abrirMenu(boton, [
+    { etiqueta: "Editar…", titulo: "Cambiar nombre, periodo, tipo, carpeta y cuaderno, o eliminarla", accion: () => abrirDlgMateria(i) },
+    { etiqueta: "Duplicar…", titulo: $("#btn-plantilla").title, accion: () => { ir(); $("#btn-plantilla").click(); } },
+    { etiqueta: "Descargar como texto (.md)", titulo: $("#btn-md").title, accion: () => { ir(); $("#btn-md").click(); } },
+  ]);
+}
 
 function pintarMaterias() {
   // El rótulo sigue a lo que hay: «Materias» si todo son cursos, «Talleres»
   // si todo son talleres, y «Actividades» cuando está mezclado.
   $("#rotulo-materias").textContent = rotuloDeLaLista(estado.datos.materias);
+  // El detalle vive dentro de la lista; se saca antes de reescribirla.
+  $("#lista-materias").after($("#detalle-materia"));
   $("#lista-materias").innerHTML = estado.datos.materias
     .map(
       (m, i) => `
     <div class="fila materia" data-activo="${i === estado.materiaActiva}">
       <button class="principalbtn" data-ir="${i}" title="Abrir ${esc(voz(m).etiqueta.toLowerCase())}">${esc(m.nombre)}${m.clase && m.clase !== "curso" ? `<span class="clase">${esc(voz(m).etiqueta)}</span>` : ""}<small>${esc(m.clave || "")}</small></button>
-      <button class="lapiz" data-editar="${i}" title="Editar nombre, periodo, carpeta y cuaderno" aria-label="Editar ${esc(voz(m).etiqueta.toLowerCase())} ${esc(m.nombre)}">editar</button>
+      <button class="lapiz" data-opciones="${i}" aria-haspopup="menu" title="Editar, duplicar o descargar como texto" aria-label="Opciones de ${esc(voz(m).etiqueta.toLowerCase())} ${esc(m.nombre)}">⋯</button>
     </div>`
     )
     .join("");
@@ -80,9 +101,10 @@ function pintarSesiones() {
     .map((i) => {
       const s = sesiones[i];
       const num = String(s.num || i + 1).padStart(2, "0");
-      /* El título se abrevia a una línea para que el número y la fecha se
-         recorran de un vistazo; completo sigue en los datos, en el atributo
-         title y en la cabecera de la vista principal. */
+      /* El título se abrevia a dos líneas —una cortaba casi cualquier título
+         con la letra a tamaño cómodo— para que el número y la fecha se sigan
+         recorriendo de un vistazo; completo sigue en el atributo title y en
+         la cabecera de la vista principal. */
       return `
     <div class="fila sesion" data-activo="${i === estado.sesionActiva}">
       <button class="principalbtn" data-ir="${i}" title="${esc(s.titulo)}">
@@ -106,9 +128,13 @@ function pintarSesiones() {
 
 export function montarLateral() {
   $("#lista-materias").addEventListener("click", (e) => {
-    const editar = e.target.closest("[data-editar]");
-    if (editar) {
-      abrirDlgMateria(Number(editar.dataset.editar));
+    /* Las sesiones viven dentro de esta lista y también llevan data-ir; para
+       cuando el clic sube hasta aquí, su renglón ya se repintó y quedó suelto,
+       así que se pide que el botón sea de un renglón de materia. */
+    if (!e.target.closest(".fila.materia")) return;
+    const opciones = e.target.closest("[data-opciones]");
+    if (opciones) {
+      menuDeMateria(opciones, Number(opciones.dataset.opciones));
       return;
     }
     const ir = e.target.closest("[data-ir]");
@@ -182,6 +208,13 @@ export function montarLateral() {
   suscribir(() => {
     pintarMaterias();
     pintarSesiones();
+    /* Las sesiones se despliegan bajo su materia, no al final de la lista:
+       con muchas materias había que bajar hasta abajo para verlas. Los nodos
+       se mudan (no se copian), así conservan sus oyentes. */
+    const detalle = $("#detalle-materia");
+    const activa = $("#lista-materias").children[estado.materiaActiva];
+    detalle.hidden = !activa;
+    if (activa) activa.after(detalle);
     const vm = voz(materia());
     $("#btn-semestre").textContent = estado.vistaSemestre
       ? `Volver a ${vm.encuentro.toLowerCase() === "sesión" ? "la sesión" : "lo anterior"}`
