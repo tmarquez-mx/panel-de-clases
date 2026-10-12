@@ -333,7 +333,8 @@ qué otras vistas existen.
 ## Accesibilidad
 
 - Todo se puede usar con el teclado, y el foco siempre se ve. Los menús cierran con
-  `Esc` y se recorren con las flechas.
+  `Esc` y se recorren con las flechas. `N` agrega un recurso cuando no se escribe en
+  ningún campo; la tecla se ve junto al botón.
 - Ningún control aparece solo al pasar el cursor.
 - **Cada control lleva su cartelito**: al pasar el cursor, cualquier botón, campo o
   menú dice qué hace. Los que cambian de comportamiento lo dicen —«Abrir» anuncia si

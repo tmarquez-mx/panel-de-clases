@@ -109,16 +109,16 @@
     <section class="grupo-lat">
       <p class="rotulo"><span id="rotulo-materias">Materias</span> <button class="mas" id="btn-materia-nueva" title="Crear un curso, un taller o una ponencia">+ Nueva</button></p>
       <div id="lista-materias"></div>
-      <div class="enlaces-materia" id="enlaces-materia"></div>
-    </section>
-
-    <section class="grupo-lat">
-      <p class="rotulo">
-        <span id="rotulo-sesiones">Sesión vigente</span>
-        <button class="mas" id="btn-sesion-nueva" title="Crear una sesión nueva en esta materia">+ Sesión</button>
-      </p>
-      <div id="lista-sesiones"></div>
-      <button class="ver-todas" id="btn-ver-todas" title="Mostrar todas las sesiones del curso o solo la vigente"></button>
+      <!-- Se muda, al pintar, justo debajo del renglón de la materia abierta -->
+      <div class="detalle-materia" id="detalle-materia">
+        <div class="enlaces-materia" id="enlaces-materia"></div>
+        <p class="rotulo">
+          <span id="rotulo-sesiones">Sesión vigente</span>
+          <button class="mas" id="btn-sesion-nueva" title="Crear una sesión nueva en esta materia">+ Sesión</button>
+        </p>
+        <div id="lista-sesiones"></div>
+        <button class="ver-todas" id="btn-ver-todas" title="Mostrar todas las sesiones del curso o solo la vigente"></button>
+      </div>
     </section>
 
     <section class="grupo-lat">
@@ -160,7 +160,7 @@
         </div>
         <span class="conteo" id="conteo"></span>
         <div class="grupo-acciones">
-          <button class="btn" id="btn-nuevo" title="Agregar un recurso a esta sesión">Agregar recurso</button>
+          <button class="btn" id="btn-nuevo" aria-keyshortcuts="N" title="Agregar un recurso a esta sesión (atajo: tecla N)">Agregar recurso <kbd class="atajo" aria-hidden="true">N</kbd></button>
           <!-- Estaba enterrado en el menú «⋯». Preparar una clase en Zoom
                obligaba a entrar al menú, salir a compartir y volver a
                buscar «Modo clase»: tres viajes para empezar. -->

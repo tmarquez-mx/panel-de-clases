@@ -437,6 +437,21 @@ export function montarVistaSesion() {
 
   $("#btn-nuevo").addEventListener("click", () => abrirDlgRecurso(null));
 
+  /* Atajo N para agregar recurso, para cargar muchos seguidos sin ir por el
+     ratón. Solo cuando no se escribe en ningún campo, no hay cuadro ni modo
+     clase abiertos y el botón se ve: así nunca roba una letra a quien teclea. */
+  addEventListener("keydown", (e) => {
+    if (e.key !== "n" && e.key !== "N") return;
+    if (e.ctrlKey || e.metaKey || e.altKey || e.repeat || e.defaultPrevented) return;
+    const t = e.target;
+    if (t.closest?.("input, textarea, select, [contenteditable=''], [contenteditable='true']")) return;
+    if (document.querySelector("dialog[open], .modo-clase.activo")) return;
+    const b = $("#btn-nuevo");
+    if (b.disabled || !b.offsetParent) return;
+    e.preventDefault();
+    b.click();
+  });
+
   $("#btn-ordenar").addEventListener("click", () => {
     const s = sesion();
     if (!s?.recursos.length) return;

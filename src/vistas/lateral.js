@@ -33,6 +33,8 @@ function pintarMaterias() {
   // El rótulo sigue a lo que hay: «Materias» si todo son cursos, «Talleres»
   // si todo son talleres, y «Actividades» cuando está mezclado.
   $("#rotulo-materias").textContent = rotuloDeLaLista(estado.datos.materias);
+  // El detalle vive dentro de la lista; se saca antes de reescribirla.
+  $("#lista-materias").after($("#detalle-materia"));
   $("#lista-materias").innerHTML = estado.datos.materias
     .map(
       (m, i) => `
@@ -126,6 +128,10 @@ function pintarSesiones() {
 
 export function montarLateral() {
   $("#lista-materias").addEventListener("click", (e) => {
+    /* Las sesiones viven dentro de esta lista y también llevan data-ir; para
+       cuando el clic sube hasta aquí, su renglón ya se repintó y quedó suelto,
+       así que se pide que el botón sea de un renglón de materia. */
+    if (!e.target.closest(".fila.materia")) return;
     const opciones = e.target.closest("[data-opciones]");
     if (opciones) {
       menuDeMateria(opciones, Number(opciones.dataset.opciones));
@@ -202,6 +208,13 @@ export function montarLateral() {
   suscribir(() => {
     pintarMaterias();
     pintarSesiones();
+    /* Las sesiones se despliegan bajo su materia, no al final de la lista:
+       con muchas materias había que bajar hasta abajo para verlas. Los nodos
+       se mudan (no se copian), así conservan sus oyentes. */
+    const detalle = $("#detalle-materia");
+    const activa = $("#lista-materias").children[estado.materiaActiva];
+    detalle.hidden = !activa;
+    if (activa) activa.after(detalle);
     const vm = voz(materia());
     $("#btn-semestre").textContent = estado.vistaSemestre
       ? `Volver a ${vm.encuentro.toLowerCase() === "sesión" ? "la sesión" : "lo anterior"}`
